@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { HashRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Header } from '../widgets/header/index.js'
 import { Footer } from '../widgets/footer/index.js'
 import { HomePage } from '../pages/home/index.js'
@@ -14,9 +14,14 @@ import { applyTheme, getTheme } from '../shared/lib/theme.js'
 // Apply saved theme override before first paint to avoid flicker.
 applyTheme(getTheme())
 
+// `import.meta.env.BASE_URL` 은 vite.config.ts 의 `base` 값을 그대로 노출
+// (production = '/heries/', dev = '/'). BrowserRouter 의 basename 은
+// trailing slash 가 없어야 하므로 제거 — 결과: production='/heries', dev=''.
+const BASENAME = import.meta.env.BASE_URL.replace(/\/$/, '')
+
 function App() {
   return (
-    <HashRouter>
+    <BrowserRouter basename={BASENAME}>
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
@@ -35,7 +40,7 @@ function App() {
         />
       </Routes>
       <Footer />
-    </HashRouter>
+    </BrowserRouter>
   )
 }
 

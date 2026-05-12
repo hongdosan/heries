@@ -1,18 +1,40 @@
 <!DOCTYPE html>
-<!-- Fan Fiction · Non-Commercial · Original characters © respective creators -->
+<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>heries — hongdosan의 웹 시리즈</title>
-  <meta name="description" content="hongdosan의 비상업적 크로스팬픽 컬렉션." />
-  <link rel="icon" type="image/webp" href="./src/shared/img/favicon.webp" />
-  <link rel="stylesheet" href="./src/shared/styles/style.css" />
+  <meta name="description" content="hongdosan 의 오리지널 다세계관 웹 시리즈." />
+  <link rel="icon" type="image/webp" href="/src/shared/img/favicon.webp" />
+  <link rel="stylesheet" href="/src/shared/styles/style.css" />
+  <!--
+    SPA 라우팅 복원 — GitHub Pages 의 404.html 이 잘못된 경로를
+    `/?/<original-path>` 형태로 redirect 해 보낸다. 본 inline script 는
+    location.search 의 `/` 시작 패턴을 감지하여 history.replaceState 로
+    원본 path 를 복원한 뒤 React Router 가 정상 매칭하도록 한다.
+    출처 패턴: rafgraph/spa-github-pages (MIT). 본 프로젝트 의존성 추가 X,
+    vanilla JS inline 만으로 충분.
+  -->
+  <script type="text/javascript">
+    (function (l) {
+      if (l.search[1] === '/') {
+        var decoded = l.search.slice(1).split('&').map(function (s) {
+          return s.replace(/~and~/g, '&')
+        }).join('?')
+        window.history.replaceState(
+          null,
+          '',
+          l.pathname.slice(0, -1) + decoded + l.hash
+        )
+      }
+    })(window.location)
+  </script>
 </head>
 <body>
   <div id="app">
     <p class="loading">불러오는 중…</p>
   </div>
-  <script type="module" src="./src/app/main.tsx"></script>
+  <script type="module" src="/src/app/main.tsx"></script>
 </body>
 </html>

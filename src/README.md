@@ -2,13 +2,13 @@
 
 # src/ — Feature-Sliced Design (FSD)
 
-`heries` 의 프론트엔드. **React 19 + React Router 7 (HashRouter) + Vite 6 + TypeScript strict**. 외부 UI/상태 라이브러리 미사용 — *코드만 있으면 어디서든 실행 가능* 한 이식성을 우선한다.
+`heries` 의 프론트엔드. **React 19 + React Router 7 (BrowserRouter) + Vite 6 + TypeScript strict**. 외부 UI/상태 라이브러리 미사용 — *코드만 있으면 어디서든 실행 가능* 한 이식성을 우선한다. GitHub Pages 배포는 `public/404.html` SPA fallback 트릭으로 deep link 호환 (의존성 추가 0).
 
 ## 6 레이어 (의존 방향: 위 → 아래만)
 
 | 레이어 | 책임 | 의존 가능 (↓ 만) |
 |---|---|---|
-| `app/` | 글로벌 진입점 — `main.tsx` (`createRoot` + `StrictMode` + `HashRouter` + `Routes`) | pages, widgets, features, entities, shared |
+| `app/` | 글로벌 진입점 — `main.tsx` (`createRoot` + `StrictMode` + `BrowserRouter` + `Routes`) | pages, widgets, features, entities, shared |
 | `pages/` | URL 단위 페이지 — `useParams` + `useAsync` + 페이지별 hero | widgets, features, entities, shared |
 | `widgets/` | 페이지 구성 블록 (Header/Footer/SeriesList/ChapterToc/CharacterList) — props-only | features, entities, shared |
 | `features/` | 사용자 시나리오 (zero-state, 추후 검색·테마 토글·북마크 등) | entities, shared |
@@ -77,7 +77,7 @@ widgets/header/
 ```
 src/
 ├── README.md
-├── app/main.tsx                                    # createRoot + HashRouter + Routes
+├── app/main.tsx                                    # createRoot + BrowserRouter + Routes
 ├── pages/{home,series,chapter,character}/
 │   ├── *.tsx                                       # useParams + useAsync + 페이지 hero
 │   └── index.ts                                    # Public API
