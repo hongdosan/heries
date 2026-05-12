@@ -5,7 +5,7 @@
 **heries** = `hongdosan` + `(s)eries`. 단일 작가(`hongdosan`)가 운영하는 **오리지널 다세계관 정적 웹 시리즈**.
 
 **최소 의존 — React 19 + React Router + Vite + TypeScript.** 외부 UI/상태 라이브러리 미사용. *코드만 있으면 어디서든 실행 가능* 한
-이식성을 우선한다. GitHub Pages 로 발행 (HashRouter, `.nojekyll`).
+이식성을 우선한다. GitHub Pages 로 발행 (BrowserRouter, `.nojekyll`).
 
 ---
 
@@ -18,7 +18,7 @@
 ```
 
 - **모든 저작권은 hongdosan 에게 단독 귀속**. 복제·배포·전송·번역·각색·기계학습 모델 학습 데이터 사용 모두 사전 서면 허가 필수.
-- **외부 IP 차용 0** — 본 저장소는 타 작가의 캐릭터·세계관·고유 능력·고유 진영명·고유 표현을 일체 차용하지 않는다. 일반 명사 (닌자·헌터·정파·사파 등 장르 원형) 만 사용.
+- **외부 IP 차용 ZERO** — 본 저장소는 타 작가의 캐릭터·세계관·고유 능력·고유 진영명·고유 표현을 일체 차용하지 않는다. 일반 명사 (닌자·헌터·정파·사파 등 장르 원형) 만 사용.
 - **코드·구조도 동일하게 All Rights Reserved** — *코드·구조* (TypeScript·CSS·AI 에이전트 정의·빌드 스크립트·운영 문서 등) 와 *서사 콘텐츠* (`content/`) 모두 hongdosan 단독 귀속. 오픈소스 라이선스 아님. 사용·복제·수정·재배포·sublicense·기계학습 데이터 사용 모두 사전 서면 허가 필요. 상세: [`LICENSE`](./LICENSE).
 - 라이선스·권리 문의: `contact_hongdosan@naver.com` 또는 GitHub Issue.
 - 자세한 저작권 정책: [NOTICE](./NOTICE.md).
@@ -109,7 +109,7 @@ heries/
 │   └── optimize-images.mjs   # WebP 일괄 압축 (npm run optimize:images)
 ├── src/                      # FSD 6 레이어 — React 19 + TypeScript
 │   ├── README.md             # FSD 가이드
-│   ├── app/main.tsx          # createRoot + HashRouter + 테마 부트
+│   ├── app/main.tsx          # createRoot + BrowserRouter + 테마 부트
 │   ├── pages/                # URL 단위 페이지
 │   ├── widgets/              # 페이지 구성 블록 (Header/Footer/...)
 │   ├── features/             # 사용자 시나리오 (zero-state)
@@ -167,7 +167,7 @@ heries_arc: tba   # 본 작품 소환 시점·상태 (스포 — reader 마스�
 
 ## 프론트엔드 (FSD + React + Vite)
 
-`src/` 는 **Feature-Sliced Design (FSD)** 6 레이어. React 19 + React Router 7 (HashRouter) + Vite 6 기반.
+`src/` 는 **Feature-Sliced Design (FSD)** 6 레이어. React 19 + React Router 7 (BrowserRouter) + Vite 6 기반.
 외부 UI/상태 라이브러리 X.
 
 - FSD 가이드: [`src/README.md`](./src/README.md)
