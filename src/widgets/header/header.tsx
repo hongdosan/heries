@@ -13,6 +13,12 @@ const THEME_GLYPH: Record<Theme, string> = {
   dark: '●',
 }
 
+const THEME_LABEL: Record<Theme, string> = {
+  auto: '시스템',
+  light: '라이트',
+  dark: '다크',
+}
+
 export function Header() {
   const mailto = `mailto:${CONTACT_USER}@${CONTACT_DOMAIN}`
   const [theme, setThemeState] = useState<Theme>(() => getTheme())
@@ -51,6 +57,8 @@ export function Header() {
             type="button"
             className="theme-toggle"
             onClick={cycleTheme}
+            aria-label={`테마: ${THEME_LABEL[theme]} (눌러서 전환)`}
+            title={`테마 — 현재: ${THEME_LABEL[theme]}`}
           >
             <span className="theme-toggle-glyph" aria-hidden="true">{THEME_GLYPH[theme]}</span>
           </button>

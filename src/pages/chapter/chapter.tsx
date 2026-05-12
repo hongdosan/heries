@@ -1,5 +1,5 @@
 import {Link, useParams} from 'react-router-dom'
-import {loadChapter} from '../../entities/chapter'
+import {loadChapter} from '../../entities/chapter/index.js'
 import {fetchSeriesManifest} from '../../shared/lib/manifest.js'
 import {useAsync} from '../../shared/lib/use-async.js'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
