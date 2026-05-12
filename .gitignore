@@ -1,0 +1,42 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE — IntelliJ IDEA
+.idea/
+*.iml
+
+# Editor
+*.swp
+*~
+
+# Harness intermediate artifacts
+_workspace/
+
+# Claude Code agent worktrees (ephemeral isolation copies)
+.claude/worktrees/
+
+# Serena MCP workspace state (machine-local: indexes, cache, memories)
+.serena/
+
+# TypeScript build cache
+*.tsbuildinfo
+
+# Node / Vite
+node_modules/
+dist/
+dist-author/
+.vite/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Archived legacy content — replaced by hongdosan-original creator-only work
+# (2026-05-12 — removed from public git history via filter-repo; kept locally
+#  under content/_legacy_* for author reference only. New original work goes
+#  under content/series/clash-of-multiverses/ with the same slug but 100%
+#  original characters and worldbuilding.)
+content/_legacy_*/
+

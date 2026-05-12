@@ -1,0 +1,111 @@
+<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->
+
+# src/ — Feature-Sliced Design (FSD)
+
+`heries` 의 프론트엔드. **React 19 + React Router 7 (HashRouter) + Vite 6 + TypeScript strict**. 외부 UI/상태 라이브러리 미사용 — *코드만 있으면 어디서든 실행 가능* 한 이식성을 우선한다.
+
+## 6 레이어 (의존 방향: 위 → 아래만)
+
+| 레이어 | 책임 | 의존 가능 (↓ 만) |
+|---|---|---|
+| `app/` | 글로벌 진입점 — `main.tsx` (`createRoot` + `StrictMode` + `HashRouter` + `Routes`) | pages, widgets, features, entities, shared |
+| `pages/` | URL 단위 페이지 — `useParams` + `useAsync` + 페이지별 hero | widgets, features, entities, shared |
+| `widgets/` | 페이지 구성 블록 (Header/Footer/SeriesList/ChapterToc/CharacterList) — props-only | features, entities, shared |
+| `features/` | 사용자 시나리오 (zero-state, 추후 검색·테마 토글·북마크 등) | entities, shared |
+| `entities/` | 도메인 데이터 로더 (`loadSeries`/`loadChapter`/`loadCharacter`) — fetch + frontmatter + markdown + 스포 마스킹 합성 | shared |
+| `shared/` | 도메인 무지 유틸 — `lib/` (env·spoiler·use-async·markdown·frontmatter·manifest·types), `styles/` | (없음) |
+
+> **격리 규칙**: 동일 레이어 슬라이스 간 직접 import 금지. 다른 슬라이스를 사용하려면 그 슬라이스의 Public API (`index.ts`) 만 통과.
+
+## Public API 패턴
+
+각 슬라이스는 외부 노출용 `index.ts` 를 통해서만 접근. import 시 `.js` 확장자 명시 (Vite + TypeScript Bundler 모드 호환).
+
+```ts
+// ✓ 권장
+import { Header } from '../../widgets/header/index.js'
+
+// ✗ 금지 — 내부 모듈 직접 참조
+import { Header } from '../../widgets/header/header.js'
+```
+
+## 빌드
+
+```bash
+npm install              # 1회
+npm run dev              # 개발 (http://localhost:8000) — reader 모드
+npm run dev:author       # 개발 — 작가 모드 (스포 마스킹 해제, AUTHOR 배지)
+npm run build            # 프로덕션 (dist/) — 라이브 배포용
+npm run build:author     # 작가 빌드 (dist-author/) — 비공개
+npm run typecheck        # 타입 체크만
+```
+
+`.tsx`/`.ts` 소스만 git 커밋. 빌드 산출물 (`dist/`, `dist-author/`, `node_modules/`) 은 `.gitignore`.
+
+## 스포일러 분리
+
+`shared/lib/spoiler.ts` 가 정책 SSOT. `IS_AUTHOR_MODE` (`shared/lib/env.ts`, `VITE_AUTHOR_MODE` 환경변수) 가 false (default) 면:
+
+- `_series.md` 의 `## 시놉시스` 절 마스킹
+- 캐릭터 카드의 `## heries 분기 ~` 이하 모든 절 마스킹 (단 `## 검증 출처` 노출)
+- 캐릭터 frontmatter 의 `heries_arc` 필드 제거
+- 챕터 본문은 마스킹 안 함 (이미 발행됨)
+
+작가 빌드는 라이브 사이트에 *절대* 배포 X. 로컬 `npm run dev:author` 또는 `npm run build:author` 로만 운용.
+
+## 페이지 디자인 (디자인 시스템 v3)
+
+| 페이지 | 레이아웃 | 핵심 요소 |
+|---|---|---|
+| `HomePage` | 큰 hero + 시리즈 카드 그리드 | 작품 1개당 카드 1개. 호버 elevate. |
+| `SeriesPage` | hero (제목·상태 pill·시작일) + **3 탭** (개요·챕터·등장인물) | 정보 분리. `useState<Tab>` 로 탭 전환. |
+| `ChapterPage` | reader 폭(680px) + EP 모노 태그 + 본문 + **prev/next 카드** | 큰 행간 (1.95) + `word-break: keep-all` 한글 친화. |
+| `CharacterPage` | hero + **분할 레이아웃** (좌 sticky 메타카드 240px / 우 위키 본문) | 모바일은 단일 컬럼 적층. |
+
+**디자인 토큰**: `style.css` 상단의 `:root` 에 surface/text/accent/spacing/type/radius/shadow/motion 정의. 다크 모드는 `@media (prefers-color-scheme: dark)` 로 토큰 swap. 단일 폰트 (Pretendard) + 잉크블루 액센트 + 모노톤.
+
+## 슬라이스 구성 (예시: `widgets/header/`)
+
+```
+widgets/header/
+├── index.ts              # Public API — export { Header }
+└── header.tsx            # 컴포넌트 본체
+```
+
+## 디렉토리 구조
+
+```
+src/
+├── README.md
+├── app/main.tsx                                    # createRoot + HashRouter + Routes
+├── pages/{home,series,chapter,character}/
+│   ├── *.tsx                                       # useParams + useAsync + 페이지 hero
+│   └── index.ts                                    # Public API
+├── widgets/{header,footer,series-list,chapter-toc,character-list}/
+│   ├── *.tsx                                       # 컴포넌트
+│   └── index.ts                                    # Public API
+├── features/                                       # zero-state
+├── entities/{series,chapter,character}/
+│   ├── *.ts                                        # 데이터 로더 (스포 마스킹 합성)
+│   └── index.ts                                    # Public API
+└── shared/
+    ├── lib/                                        # types·frontmatter·markdown·manifest·env·spoiler·use-async
+    └── styles/style.css                            # 디자인 토큰 + 컴포넌트 + 다크 모드
+```
+
+## 작성 시 체크리스트
+
+1. 새 슬라이스 작성 시 → 적절한 레이어 (`widgets/` vs `features/` vs `entities/`)
+2. `index.ts` 만 Public API 로 export
+3. 다른 슬라이스의 내부 모듈 직접 import 금지
+4. 동일 레이어 간 import 발견 시 → `shared/` 또는 `entities/` 로 추출
+5. 외부 라이브러리 import 발견 시 → 사용자 확인 (CLAUDE.md §3 — 최소 의존)
+6. 신규 컨텐츠 절·필드가 스포 영역이면 → `shared/lib/spoiler.ts` 동시 갱신
+7. 새 페이지/위젯의 스타일은 `style.css` 의 디자인 토큰을 사용 (raw 색상값 X)
+
+## 관련 문서
+
+- [`/.claude/CLAUDE.md`](../.claude/CLAUDE.md) — 핵심 원칙 9개 (§3 최소 의존, §5 TS+JSX, §9 스포일러 분리)
+- [`/tsconfig.json`](../tsconfig.json) — `jsx: react-jsx`, `strict`, `moduleResolution: Bundler`
+- [`/vite.config.ts`](../vite.config.ts) — `publicDir: false` + `cp -R content dist/content` 후처리
+- [`/package.json`](../package.json) — 의존 7개 (react·react-dom·react-router-dom + vite·@vitejs/plugin-react·typescript + @types/react·@types/react-dom)

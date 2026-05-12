@@ -1,0 +1,48 @@
+Copyright (c) 2026 hongdosan. All Rights Reserved.
+
+ALL CONTENT in this repository (heries) — including both the *code and
+structure* (TypeScript, JavaScript, CSS, HTML, build scripts, AI agent
+definitions under `.claude/`, operational documentation, etc.) and the
+*narrative content* (under `content/` — characters, worldbuilding, plot,
+dialogue, original names, and creative expression) — is © 2026 hongdosan
+and is the exclusive property of the author.
+
+NO PART of this repository may be reproduced, distributed, transmitted,
+modified, adapted, translated, performed, displayed, sublicensed, sold,
+or used to train machine-learning models in any form or by any means —
+electronic, mechanical, photocopying, recording, or otherwise — without
+the prior written permission of the author, except in the case of:
+
+  - brief quotations embodied in critical reviews and certain other
+    non-commercial uses permitted by copyright law, and
+  - reading, browsing, and forking the public-facing GitHub repository
+    as permitted by GitHub Terms of Service (note that forking under
+    GitHub Terms does not grant any license to reproduce, modify, or
+    redistribute the content beyond what is expressly permitted herein).
+
+The third-party open-source dependencies declared in `package.json`
+(React, Vite, React Router, etc.) retain their respective original
+licenses and are NOT covered by this license.
+
+THIS IS NOT AN OPEN-SOURCE LICENSE. No grant of permission is made to
+use, copy, modify, merge, publish, distribute, sublicense, or sell
+copies of this repository for any purpose, commercial or non-commercial,
+without explicit prior written authorization.
+
+For permission requests — including but not limited to commercial use,
+translation, adaptation, media adaptation, machine-learning data use,
+and any other rights inquiry — write to the author at:
+
+    contact_hongdosan@naver.com
+
+Or open a GitHub Issue at:
+
+    https://github.com/hongdosan/heries/issues
+
+THE REPOSITORY IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE REPOSITORY OR THE USE OR OTHER
+DEALINGS IN THE REPOSITORY.
