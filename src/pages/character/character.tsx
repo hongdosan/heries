@@ -27,6 +27,7 @@ export function CharacterPage() {
   const fm = data.frontmatter
   const aliases = Array.isArray(fm.aliases) ? fm.aliases : []
   const hasMeta = fm.origin || fm.affiliation || fm.first_appearance || aliases.length > 0
+  const heriesArc = fm.heries_arc ? String(fm.heries_arc) : null
 
   return (
     <main className="page-character">
@@ -58,6 +59,7 @@ export function CharacterPage() {
               {fm.affiliation && (<><dt>소속</dt><dd dangerouslySetInnerHTML={{ __html: renderInline(String(fm.affiliation)) }} /></>)}
               {fm.first_appearance && (<><dt>첫 등장</dt><dd>{fm.first_appearance}</dd></>)}
               {aliases.length > 0 && (<><dt>이명</dt><dd dangerouslySetInnerHTML={{ __html: aliases.map((a) => renderInline(String(a))).join(' · ') }} /></>)}
+              {heriesArc && (<><dt className="author-only-label">소환 시점 <span className="author-only-badge">AUTHOR</span></dt><dd className="author-only-value" dangerouslySetInnerHTML={{ __html: renderInline(heriesArc) }} /></>)}
             </dl>
           </aside>
         ) : <span />}

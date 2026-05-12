@@ -300,6 +300,51 @@ button {
   text-transform: uppercase;
 }
 
+/* ─── AUTHOR 전용 콘텐츠 시각 마킹 ───────────────────────────
+ * reader 빌드에서는 이 클래스가 부착된 요소 자체가 마스킹되어
+ * 출력되지 않음 (scripts/copy-content.mjs spoiler 처리). 따라서
+ * 본 스타일은 *작가 빌드 / dev 환경* 에서만 시각적으로 보인다.
+ */
+.author-only-heading {
+  position: relative;
+  padding-left: var(--s-3);
+  border-left: 3px solid var(--warn-rule);
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+  border-radius: 2px;
+}
+.author-only-heading::before {
+  content: "🔒 AUTHOR 전용";
+  display: inline-block;
+  margin-right: var(--s-2);
+  padding: 1px 8px;
+  background: var(--warn-fg);
+  color: var(--warn-bg);
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  vertical-align: middle;
+}
+.author-only-label,
+.author-only-value {
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+}
+.author-only-badge {
+  display: inline-block;
+  margin-left: var(--s-2);
+  padding: 1px 6px;
+  background: var(--warn-fg);
+  color: var(--warn-bg);
+  border-radius: var(--r-pill);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
 /* ─── Page shells ───────────────────────────────────────── */
 main {
   flex: 1;

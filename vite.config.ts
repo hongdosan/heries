@@ -26,7 +26,11 @@ export default defineConfig(({ command }) => {
     base: isBuild && !isAuthor ? '/heries/' : '/',
     publicDir: 'public',
     build: {
-      outDir: 'dist',
+      // reader 와 author 빌드 산출물을 별도 디렉토리로 분기.
+      // 동일 `dist/` 사용 시 후행 빌드가 선행 빌드를 덮어써 마스킹 누수가
+      // 발생할 수 있다 — `dist` (reader, GH Pages 배포 대상) /
+      // `dist-author` (작가 로컬 검수 전용, 라이브 미배포).
+      outDir: isAuthor ? 'dist-author' : 'dist',
       emptyOutDir: true,
       target: 'es2022',
     },
