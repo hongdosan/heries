@@ -1,13 +1,13 @@
 import {Link, useParams, useSearchParams} from 'react-router-dom'
 import {loadSeries} from '../../entities/series'
-import {assetUrl} from '../../shared/lib/env.js'
+import {assetUrl, IS_AUTHOR_MODE} from '../../shared/lib/env.js'
 import {useAsync} from '../../shared/lib/use-async.js'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
 import {ChapterToc} from '../../widgets/chapter-toc'
 import {CharacterList} from '../../widgets/character-list'
 
-type Tab = 'overview' | 'chapters' | 'characters'
-const TABS: ReadonlyArray<Tab> = ['overview', 'chapters', 'characters']
+type Tab = 'overview' | 'chapters' | 'characters' | 'author'
+const TABS: ReadonlyArray<Tab> = ['overview', 'chapters', 'characters', 'author']
 
 export function SeriesPage() {
   const {slug = ''} = useParams<{ slug: string }>()
@@ -70,6 +70,12 @@ export function SeriesPage() {
                 onClick={() => setTab('characters')}>
           등장인물<span className="tab-count">{characterCount}</span>
         </button>
+        {IS_AUTHOR_MODE && (
+          <button role="tab" aria-selected={tab === 'author'} className="tab-btn"
+                  onClick={() => setTab('author')}>
+            작가 전용<span className="author-only-badge">AUTHOR</span>
+          </button>
+        )}
       </div>
 
       {tab === 'overview' && (
@@ -80,6 +86,24 @@ export function SeriesPage() {
       )}
       {tab === 'characters' && (
         <CharacterList slug={slug} characters={manifest.characters}/>
+      )}
+      {tab === 'author' && IS_AUTHOR_MODE && (
+        <section className="author-tab">
+          <p className="author-tab-desc">
+            본 탭은 <span className="author-only-badge">AUTHOR</span> 모드 빌드에서만 노출되는
+            작가 전용 자료 인덱스입니다. 시놉시스·세계관·연표·용어집·캐릭터 카드의 <em>H-eries 분기</em> 절은 reader 빌드에서 마스킹되므로, 본 탭에서 한곳에 모아 추적합니다.
+          </p>
+          <ul className="author-tab-list">
+            <li><strong>시놉시스</strong> — 개요 탭의 <em>## 시놉시스</em> 절 (3 페이즈 골격) 참조</li>
+            <li><strong>세계관</strong> — <code>content/series/{slug}/worldbuilding/</code> (향후 진영 SSOT 11 본문)</li>
+            <li><strong>연표</strong> — <code>content/series/{slug}/timeline/</code></li>
+            <li><strong>용어집</strong> — <code>content/series/{slug}/glossary/</code></li>
+            <li><strong>캐릭터 H-eries 분기</strong> — 각 캐릭터 페이지의 <em>## H-eries 분기 ~</em> 절 + frontmatter <code>heries_arc</code> (소환 시점)</li>
+          </ul>
+          <p className="author-tab-note">
+            ※ 신규 author 전용 페이지 (timeline·glossary 등) 는 향후 worldsmith 사이클에서 추가됩니다.
+          </p>
+        </section>
       )}
     </main>
   )

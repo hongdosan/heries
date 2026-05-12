@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { assetUrl } from '../../shared/lib/env.js'
 import type { ChapterIndex } from '../../shared/lib/types.js'
@@ -11,8 +11,27 @@ export interface ChapterTocProps {
 
 type Order = 'desc' | 'asc'
 
+const SORT_KEY = 'heries:chapter-sort-order'
+
+function readSavedOrder(): Order {
+  try {
+    const v = localStorage.getItem(SORT_KEY)
+    return v === 'asc' || v === 'desc' ? v : 'desc'
+  } catch {
+    return 'desc'
+  }
+}
+
 export function ChapterToc({ slug, chapters }: ChapterTocProps) {
-  const [order, setOrder] = useState<Order>('desc')
+  const [order, setOrder] = useState<Order>(() => readSavedOrder())
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SORT_KEY, order)
+    } catch {
+      // localStorage 비활성 환경 — silent
+    }
+  }, [order])
 
   if (chapters.length === 0) {
     return <p className="empty">아직 등록된 챕터가 없습니다. 작품 진행에 따라 추가됩니다.</p>

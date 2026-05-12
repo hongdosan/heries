@@ -15,5 +15,13 @@
     { "id": "hyeon-woo", "folder": "2-major-supporting", "name": "현우 (玄宇)" },
     { "id": "baek-mu-jin", "folder": "2-major-supporting", "name": "백무진 (白茂進)" }
   ],
-  "chapters": []
+  "chapters": [
+    {
+      "episode": 1,
+      "slug": "prologue",
+      "title": "프롤로그 — 열한 개의 세계",
+      "published": "2026-05-12",
+      "thumbnail": "thumbnails/ep-01-prologue.webp"
+    }
+  ]
 }
