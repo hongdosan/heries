@@ -6,7 +6,7 @@
 export type Theme = 'light' | 'dark' | 'auto'
 export const THEMES: ReadonlyArray<Theme> = ['auto', 'light', 'dark']
 
-const STORAGE_KEY = 'heries.theme'
+const STORAGE_KEY = 'H-eries.theme'
 
 export function getTheme(): Theme {
   try {

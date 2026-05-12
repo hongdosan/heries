@@ -1,7 +1,7 @@
 {
   "spoilerDirs": ["worldbuilding", "timeline", "glossary"],
   "seriesSpoilerHeaders": ["## 시놉시스"],
-  "heriesBranchHeader": "## heries 분기",
+  "heriesBranchHeader": "## H-eries 분기",
   "verificationHeader": "## 검증 출처",
   "spoilerFrontmatterKeys": ["heries_arc"]
 }

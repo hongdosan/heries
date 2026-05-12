@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { loadCharacter } from '../../entities/character/index.js'
+import { loadCharacter } from '../../entities/character'
 import { fetchSeriesManifest } from '../../shared/lib/manifest.js'
 import { renderInline } from '../../shared/lib/markdown.js'
 import { useAsync } from '../../shared/lib/use-async.js'
@@ -31,7 +31,7 @@ export function CharacterPage() {
   return (
     <main className="page-character">
       <nav className="breadcrumb">
-        <Link to="/">heries</Link><span className="sep">/</span>
+        <Link to="/">H-eries</Link><span className="sep">/</span>
         <Link to={`/series/${slug}`}>{manifest.title}</Link><span className="sep">/</span>
         <span>{fm.name || data.index.name}</span>
       </nav>

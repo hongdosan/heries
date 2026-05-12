@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { assetUrl } from '../../shared/lib/env.js'
 import { renderMarkdown } from '../../shared/lib/markdown.js'
 import { parseFrontmatter } from '../../shared/lib/frontmatter.js'
 import { useAsync } from '../../shared/lib/use-async.js'
@@ -7,7 +8,7 @@ type AboutFrontmatter = { title?: string; updated?: string }
 
 export function AboutPage() {
   const state = useAsync(async () => {
-    const res = await fetch('./content/about.md')
+    const res = await fetch(assetUrl('content/about.md'))
     if (!res.ok) throw new Error(`about.md 로드 실패 (${res.status})`)
     const raw = await res.text()
     const { frontmatter, body } = parseFrontmatter<AboutFrontmatter>(raw)
@@ -17,7 +18,7 @@ export function AboutPage() {
   return (
     <main className="page-about">
       <nav className="breadcrumb">
-        <Link to="/">heries</Link>
+        <Link to="/">H-eries</Link>
         <span className="sep">/</span>
         <span>소개</span>
       </nav>

@@ -1,8 +1,8 @@
-<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->
+<!-- © 2026 홍도산. All rights reserved. Original creator work. -->
 
-# heries 하네스 — 설치·적용 절차
+# H-eries 하네스 — 설치·적용 절차
 
-[`revfactory/harness`](https://github.com/revfactory/harness) 플러그인을 `heries` 에 설치하고 첫 에이전트를 생성하기까지의 실무 절차. 상위 도입 계획·분담 원칙은 [`harness-setup.md`](harness-setup.md) 우선 참조.
+[`revfactory/harness`](https://github.com/revfactory/harness) 플러그인을 `H-eries` 에 설치하고 첫 에이전트를 생성하기까지의 실무 절차. 상위 도입 계획·분담 원칙은 [`harness-setup.md`](harness-setup.md) 우선 참조.
 
 ## 목차
 
@@ -24,7 +24,7 @@
 |---|---|---|
 | Claude Code | 플러그인·실험 플래그 지원 버전 | `claude --version` |
 | Agent Teams 실험 플래그 | `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` | `echo "$CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"` → `1` |
-| 분담 원칙 합의 | [`harness-setup.md §2`](harness-setup.md#2-heries-도메인-분담-원칙) 매트릭스 확정 | 본 저장소 git 추적 |
+| 분담 원칙 합의 | [`harness-setup.md §2`](harness-setup.md#2-H-eries-도메인-분담-원칙) 매트릭스 확정 | 본 저장소 git 추적 |
 | GitHub 공개 저장소 | `gh` CLI 인증 + 저장소 연결 | `gh repo view` |
 | `.gitignore` 에 `_workspace/` | 하네스 중간 산출물 추적 차단 | `grep _workspace .gitignore` |
 
@@ -45,7 +45,7 @@ source ~/.zshrc
 
 ## 2. 설치
 
-두 옵션. **`heries` 는 옵션 A(Marketplace) 권장** — 업데이트·제거 표준화.
+두 옵션. **`H-eries` 는 옵션 A(Marketplace) 권장** — 업데이트·제거 표준화.
 
 ### 옵션 A — Marketplace (권장)
 
@@ -65,11 +65,11 @@ source ~/.zshrc
 cp -r skills/harness ~/.claude/skills/harness
 ```
 
-> 모든 프로젝트에서 공통 사용. `heries` 한정이라면 옵션 A 권장.
+> 모든 프로젝트에서 공통 사용. `H-eries` 한정이라면 옵션 A 권장.
 
 ### 2.1 산출물 디렉토리 정합
 
-`heries` 는 **`.claude/`** 가 그대로 git 추적된다 (서브모듈·symlink 없음 — 단일 공개 저장소). harness 산출물은 다음 위치에 직접 생성:
+`H-eries` 는 **`.claude/`** 가 그대로 git 추적된다 (서브모듈·symlink 없음 — 단일 공개 저장소). harness 산출물은 다음 위치에 직접 생성:
 
 | 디렉토리 | 처리 |
 |---|---|
@@ -117,7 +117,7 @@ find . ~/.claude -name "SKILL.md" -path "*harness*" 2>/dev/null
 
 ## 4. 첫 적용 — `agent-lorekeeper` 시범 생성
 
-`heries` 의 첫 하네스 도입 대상은 **`agent-lorekeeper`** (등장인물·세계관 SSOT 관리). 우선순위 근거: [`harness-setup.md §2.1`](harness-setup.md#21-하네스-대상-매트릭스).
+`H-eries` 의 첫 하네스 도입 대상은 **`agent-lorekeeper`** (등장인물·세계관 SSOT 관리). 우선순위 근거: [`harness-setup.md §2.1`](harness-setup.md#21-하네스-대상-매트릭스).
 
 ### 4.1 트리거 프롬프트 (예시)
 
@@ -126,15 +126,15 @@ Claude Code 세션에서 다음 자연어 프롬프트 입력:
 ```
 하네스 구성해줘.
 
-도메인: 비상업적 크로스팬픽 웹 시리즈 'heries' 의 등장인물·세계관·연표·용어집을 markdown SSOT 로 관리·검증하는 에이전트.
+도메인: 비상업적 크로스팬픽 웹 시리즈 'H-eries' 의 등장인물·세계관·연표·용어집을 markdown SSOT 로 관리·검증하는 에이전트.
 첫 작품: series/clash-of-multiverses/ (차원의 격돌).
 등장인물 .md 스키마: frontmatter (name, origin, affiliation, role, first_appearance, aliases) + 서술 본문.
 원작 차용 캐릭터는 origin 필드 필수 — 누락 시 reject.
 오리지널 캐릭터는 origin: original 명시.
 정적 사이트는 라이브러리 의존성 0 — markdown / HTML 만 사용. GitHub Pages raw static (`.nojekyll`).
 모든 .md 산출물 첫 줄에 비상업적 팬픽 고지 부착:
-  <!-- © 2026 hongdosan. All rights reserved. Original creator work. -->
-이름 규약: 파일 agent-lorekeeper.md, frontmatter name: heries-lorekeeper.
+  <!-- © 2026 홍도산. All rights reserved. Original creator work. -->
+이름 규약: 파일 agent-lorekeeper.md, frontmatter name: H-eries-lorekeeper.
 산출물 위치: .claude/agents/.
 단일 작가 가정 — 다인 협업 분기 미포함.
 GitHub 공개 저장소 — 비공개 토큰·시크릿 산출물 포함 금지.
@@ -167,13 +167,13 @@ cat .claude/CLAUDE.md   # 하네스 트리거 항목 추가 여부
 
 | # | 항목 | 통과 조건 |
 |---|------|----------|
-| 1 | 비상업적 팬픽 고지 | frontmatter 다음 줄에 `<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->` |
+| 1 | 비상업적 팬픽 고지 | frontmatter 다음 줄에 `<!-- © 2026 홍도산. All rights reserved. Original creator work. -->` |
 | 2 | SSOT 위치 인용 | `content/series/{slug}/characters/` 등 명시 |
 | 3 | 라이브러리 의존성 도입 시도 | 시도 시 사용자 확인 요청, 자동 도입 금지 |
 | 4 | `origin` 필드 강제 | 등장인물 카드에 `origin` 누락 시 reject |
 | 5 | 단일 작가 가정 | 다인 협업 분기 미포함 |
 | 6 | GitHub 공개 저장소 인지 | 비공개 토큰·시크릿 포함 금지 |
-| 7 | frontmatter `name` | `heries-lorekeeper` 패턴 |
+| 7 | frontmatter `name` | `H-eries-lorekeeper` 패턴 |
 
 검증 실패 항목 → 수동 보정 → [`harness-state.md`](harness-state.md) 변경 이력 기록.
 
@@ -266,7 +266,7 @@ rm -rf ~/.claude/skills/harness
 **원인**: harness 산출물의 frontmatter 직후 라인 누락.
 **해결**: `.claude/CLAUDE.md` 에 *모든 .md 산출물 첫 줄에 고지 부착* 을 명시. 검출 도우미 1줄 스크립트:
 ```bash
-grep -L "© 2026 hongdosan" $(find . -name "*.md" -not -path "./_workspace/*" -not -path "./node_modules/*")
+grep -L "© 2026 홍도산" $(find . -name "*.md" -not -path "./_workspace/*" -not -path "./node_modules/*")
 ```
 
 ### 8.7 `.claude/CLAUDE.md` 변경 충돌

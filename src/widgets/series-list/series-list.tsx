@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { assetUrl } from '../../shared/lib/env.js'
 import type { SeriesIndex } from '../../shared/lib/types.js'
 import { useImgFallback, PLACEHOLDER_THUMB } from '../../shared/lib/use-img-fallback.js'
 
@@ -22,7 +23,7 @@ function SeriesCard({ item }: { item: SeriesIndex }) {
     ? null
     : error
       ? PLACEHOLDER_THUMB
-      : `./content/${item.thumbnail}`
+      : assetUrl(`content/${item.thumbnail}`)
 
   return (
     <li>

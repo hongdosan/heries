@@ -7,6 +7,7 @@
 
 import { readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import process from 'node:process'
 
 const IMG_RE = /\.(webp|jpg|jpeg|png)$/i
 const MAX_BYTES = 500 * 1024 // 500 KB budget per image

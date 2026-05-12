@@ -1,5 +1,5 @@
 import {Link} from 'react-router-dom'
-import {loadCharacter} from '../../entities/character/index.js'
+import {loadCharacter} from '../../entities/character'
 import {useAsync} from '../../shared/lib/use-async.js'
 import type {CharacterIndex, SeriesManifest} from '../../shared/lib/types.js'
 
@@ -26,8 +26,8 @@ interface StripItem {
  * "이 챕터에 등장하는 인물" 미니 strip.
  *
  * Reader-safe: only `summary` (1~3줄 한입 요약) + 원작 작품명 + 이름 + 카드 링크.
- * heries 분기 절·heries_arc 는 loadCharacter() 가 reader 빌드에서 이미 마스킹 후
- * 반환하므로 본 컴포넌트는 frontmatter.heries_arc / heries 분기 본문에 절대
+ * H-eries 분기 절·heries_arc 는 loadCharacter() 가 reader 빌드에서 이미 마스킹 후
+ * 반환하므로 본 컴포넌트는 frontmatter.heries_arc / H-eries 분기 본문에 절대
  * 접근하지 않는다.
  */
 export function ChapterCharacterStrip({

@@ -1,8 +1,8 @@
-<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->
+<!-- © 2026 홍도산. All rights reserved. Original creator work. -->
 
 # src/ — Feature-Sliced Design (FSD)
 
-`heries` 의 프론트엔드. **React 19 + React Router 7 (BrowserRouter) + Vite 6 + TypeScript strict**. 외부 UI/상태 라이브러리 미사용 — *코드만 있으면 어디서든 실행 가능* 한 이식성을 우선한다. GitHub Pages 배포는 `public/404.html` SPA fallback 트릭으로 deep link 호환 (의존성 추가 0).
+`H-eries` 의 프론트엔드. **React 19 + React Router 7 (BrowserRouter) + Vite 6 + TypeScript strict**. 외부 UI/상태 라이브러리 미사용 — *코드만 있으면 어디서든 실행 가능* 한 이식성을 우선한다. GitHub Pages 배포는 `public/404.html` SPA fallback 트릭으로 deep link 호환 (의존성 추가 0).
 
 ## 6 레이어 (의존 방향: 위 → 아래만)
 
@@ -47,7 +47,7 @@ npm run typecheck        # 타입 체크만
 `shared/lib/spoiler.ts` 가 정책 SSOT. `IS_AUTHOR_MODE` (`shared/lib/env.ts`, `VITE_AUTHOR_MODE` 환경변수) 가 false (default) 면:
 
 - `_series.md` 의 `## 시놉시스` 절 마스킹
-- 캐릭터 카드의 `## heries 분기 ~` 이하 모든 절 마스킹 (단 `## 검증 출처` 노출)
+- 캐릭터 카드의 `## H-eries 분기 ~` 이하 모든 절 마스킹 (단 `## 검증 출처` 노출)
 - 캐릭터 frontmatter 의 `heries_arc` 필드 제거
 - 챕터 본문은 마스킹 안 함 (이미 발행됨)
 

@@ -1,16 +1,16 @@
 {
   "slug": "clash-of-multiverses",
   "title": "차원의 격돌",
-  "status": "재구축 중",
+  "status": "자작 매핑 완료 — 챕터 집필 대기",
   "characters": [
-    { "id": "hyeon-woo-jin", "folder": "1-protagonist", "name": "현우진 (玄祐眞)" },
+    { "id": "woo-jin-hyeok", "folder": "1-protagonist", "name": "우진혁 (禹鎭赫)" },
     { "id": "eira", "folder": "2-major-supporting", "name": "에이라 (Eira)" },
     { "id": "yamura-tou", "folder": "2-major-supporting", "name": "야무라 토우 (野邑 透)" },
-    { "id": "seo-un-hyeok", "folder": "2-major-supporting", "name": "서운혁 (徐雲赫)" },
-    { "id": "ryeong-geuk", "folder": "2-major-supporting", "name": "령극 (靈極)" },
+    { "id": "seo-un-ryong", "folder": "2-major-supporting", "name": "서운룡 (徐雲龍)" },
+    { "id": "cheon-ryeong-geuk", "folder": "2-major-supporting", "name": "천령극 (天靈極)" },
     { "id": "go-cheon-han", "folder": "2-major-supporting", "name": "고천한 (高天恨)" },
     { "id": "yu-baek-gyeong", "folder": "2-major-supporting", "name": "유백경 (柳白卿)" },
-    { "id": "bi-hyeon", "folder": "2-major-supporting", "name": "비현 (鼻玄)" },
+    { "id": "mak-mu-ryeon", "folder": "2-major-supporting", "name": "막무련 (莫武連)" },
     { "id": "rim-woo-gyeong", "folder": "2-major-supporting", "name": "림우경 (林禹卿)" },
     { "id": "hyeon-woo", "folder": "2-major-supporting", "name": "현우 (玄宇)" },
     { "id": "baek-mu-jin", "folder": "2-major-supporting", "name": "백무진 (白茂進)" }

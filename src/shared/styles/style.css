@@ -1,5 +1,5 @@
 /* ============================================================
-   heries — design system v3 (clean modern, Pretendard-only)
+   H-eries — design system v3 (clean modern, Pretendard-only)
    - Single typeface (Pretendard) for Korean readability
    - Quiet monochrome palette + minimal accent
    - Layout: tabbed series page, narrow chapter reader,
@@ -1053,15 +1053,15 @@ main .subtitle {
 }
 
 /* Inline gloss term ({용어|설명}) — hover tooltip via native <abbr title> */
-.article .heries-term,
-abbr.heries-term {
+.article .H-eries-term,
+abbr.H-eries-term {
   text-decoration: underline dotted var(--accent-ring);
   text-underline-offset: 3px;
   cursor: help;
   border: 0;
 }
-.article .heries-term:hover,
-abbr.heries-term:hover {
+.article .H-eries-term:hover,
+abbr.H-eries-term:hover {
   text-decoration-color: var(--accent);
   color: var(--accent);
 }

@@ -1,8 +1,8 @@
-<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->
+<!-- © 2026 홍도산. All rights reserved. Original creator work. -->
 
-# heries
+# H-eries
 
-**heries** = `hongdosan` + `(s)eries`. 단일 작가(`hongdosan`)가 운영하는 **오리지널 다세계관 정적 웹 시리즈**.
+**H-eries** = `홍도산` + `(s)eries`. 단일 작가(`홍도산`)가 운영하는 **오리지널 다중/평행 세계 정적 웹 시리즈**.
 
 **최소 의존 — React 19 + React Router + Vite + TypeScript.** 외부 UI/상태 라이브러리 미사용. *코드만 있으면 어디서든 실행 가능* 한
 이식성을 우선한다. GitHub Pages 로 발행 (BrowserRouter, `.nojekyll`).
@@ -11,22 +11,22 @@
 
 ## 저작권
 
-본 저장소의 모든 소설 본문·등장인물·세계관·고유명사·능력 체계·진영·줄거리·시각 자산은 작가 *hongdosan* 의 **100% 오리지널 창작** 이다.
+본 저장소의 모든 소설 본문·등장인물·세계관·고유명사·능력 체계·진영·줄거리·시각 자산은 작가*(홍도산)* 의 **100% 오리지널 창작** 이다.
 
 ```
-© 2026 hongdosan. All rights reserved.
+© 2026 홍도산. All rights reserved.
 ```
 
-- **모든 저작권은 hongdosan 에게 단독 귀속**. 복제·배포·전송·번역·각색·기계학습 모델 학습 데이터 사용 모두 사전 서면 허가 필수.
+- **모든 저작권은 홍도산 에게 단독 귀속**. 복제·배포·전송·번역·각색·기계학습 모델 학습 데이터 사용 모두 사전 서면 허가 필수.
 - **외부 IP 차용 ZERO** — 본 저장소는 타 작가의 캐릭터·세계관·고유 능력·고유 진영명·고유 표현을 일체 차용하지 않는다. 일반 명사 (닌자·헌터·정파·사파 등 장르 원형) 만 사용.
-- **코드·구조도 동일하게 All Rights Reserved** — *코드·구조* (TypeScript·CSS·AI 에이전트 정의·빌드 스크립트·운영 문서 등) 와 *서사 콘텐츠* (`content/`) 모두 hongdosan 단독 귀속. 오픈소스 라이선스 아님. 사용·복제·수정·재배포·sublicense·기계학습 데이터 사용 모두 사전 서면 허가 필요. 상세: [`LICENSE`](./LICENSE).
+- **코드·구조도 동일하게 All Rights Reserved** — *코드·구조* (TypeScript·CSS·AI 에이전트 정의·빌드 스크립트·운영 문서 등) 와 *서사 콘텐츠* (`content/`) 모두 홍도산 단독 귀속. 오픈소스 라이선스 아님. 사용·복제·수정·재배포·sublicense·기계학습 데이터 사용 모두 사전 서면 허가 필요. 상세: [`LICENSE`](./LICENSE).
 - 라이선스·권리 문의: `contact_hongdosan@naver.com` 또는 GitHub Issue.
 - 자세한 저작권 정책: [NOTICE](./NOTICE.md).
 
 모든 `.md` 산출물 첫 줄(또는 frontmatter 직후)에 다음 1줄 HTML 주석을 부착한다:
 
 ```html
-<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->
+<!-- © 2026 홍도산. All rights reserved. Original creator work. -->
 ```
 
 ---
@@ -45,7 +45,7 @@ npm run typecheck        # 타입 체크
 ## 배포
 
 `main` 브랜치 push 시 [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) 가 자동으로 GitHub
-Pages 에 reader 빌드를 배포한다 (`https://hongdosan.github.io/heries/`). 워크플로우는 `VITE_AUTHOR_MODE=""` 강제 — *
+Pages 에 reader 빌드를 배포한다 (`https://홍도산.github.io/H-eries/`). 워크플로우는 `VITE_AUTHOR_MODE=""` 강제 — *
 *작가 빌드는 자동 배포 경로에 들어갈 수 없다**. 첫 배포 전 GitHub Repository → Settings → Pages → Source =
 `GitHub Actions` 로 변경 필요.
 
@@ -58,7 +58,7 @@ Pages 에 reader 빌드를 배포한다 (`https://hongdosan.github.io/heries/`).
 **마스킹 대상** (reader 빌드에서 자동 제거):
 
 - `_series.md` 의 `## 시놉시스` 절
-- 캐릭터 카드의 `## heries 분기 ~` 이하 모든 절 (단 `## 검증 출처` 는 유지)
+- 캐릭터 카드의 `## H-eries 분기 ~` 이하 모든 절 (단 `## 검증 출처` 는 유지)
 - frontmatter `heries_arc` 필드
 - `worldbuilding/`, `timeline/`, `glossary/` 디렉토리
 
@@ -82,7 +82,7 @@ Pages 에 reader 빌드를 배포한다 (`https://hongdosan.github.io/heries/`).
 ## 디렉토리 구조
 
 ```
-heries/
+H-eries/
 ├── README.md                 # 본 파일
 ├── LICENSE                   # All Rights Reserved (코드·콘텐츠 전체)
 ├── .nojekyll                 # GitHub Pages raw static
@@ -143,7 +143,7 @@ aliases: [별칭1, 별칭2]
 heries_arc: tba   # 본 작품 소환 시점·상태 (스포 — reader 마스킹 대상)
 ---
 
-<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->
+<!-- © 2026 홍도산. All rights reserved. Original creator work. -->
 
 # (캐릭터명)
 
@@ -151,7 +151,7 @@ heries_arc: tba   # 본 작품 소환 시점·상태 (스포 — reader 마스�
 
 ## 원작 캐논 — 신체·무공·성격·인간관계 등 원작 사실
 
-## heries 분기 — 본 작품 내 변형 (스포 — reader 마스킹 대상)
+## H-eries 분기 — 본 작품 내 변형 (스포 — reader 마스킹 대상)
 
 ## 검증 출처 — 1차 자료 인용 (스포 영역 다음에 와도 노출 유지)
 ```
@@ -160,7 +160,7 @@ heries_arc: tba   # 본 작품 소환 시점·상태 (스포 — reader 마스�
 
 - 오리지널 캐릭터는 `origin: original` 명시. 차용 캐릭터는 원작 출처·원저작자 필수.
 - *원작 캐논 절* = 출발점 (원작 사실).
-- *heries 분기 절* = 작가 영역 (다중/평행 우주 변형). reader 빌드에서 자동 마스킹.
+- *H-eries 분기 절* = 작가 영역 (다중/평행 우주 변형). reader 빌드에서 자동 마스킹.
 - `heries_arc` 가 `tba` 면 분기 절은 placeholder 만 두고, 챕터 본문 작성 시 채운다.
 
 ---
@@ -194,4 +194,4 @@ heries_arc: tba   # 본 작품 소환 시점·상태 (스포 — reader 마스�
 
 ## 작가
 
-`hongdosan` (단독 작가). 외부 협업·다인 작가 분기는 가정하지 않는다.
+`홍도산` (단독 작가). 외부 협업·다인 작가 분기는 가정하지 않는다.

@@ -11,6 +11,7 @@ import { execSync } from 'node:child_process'
 import { readdirSync, statSync, mkdtempSync, renameSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { basename, extname, join } from 'node:path'
+import process from 'node:process'
 
 const IMG_RE = /\.(webp|jpg|jpeg|png)$/i
 const SHARP_CLI = 'sharp-cli@latest'
@@ -73,7 +74,7 @@ for (const dir of dirs) {
     // sharp-cli writes to an output directory using the original input filename
     // (just changes extension to .webp when -f webp is used). To avoid clobbering
     // the source mid-write, we stage to a tmp dir, then swap in.
-    const tmpDir = mkdtempSync(join(tmpdir(), 'heries-img-'))
+    const tmpDir = mkdtempSync(join(tmpdir(), 'H-eries-img-'))
     try {
       const cmd = [
         'npx', '-y', SHARP_CLI,

@@ -1,4 +1,4 @@
-// © 2026 hongdosan. All rights reserved. Original creator work.
+// © 2026 홍도산. All rights reserved. Original creator work.
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 
 /**
@@ -35,7 +35,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     // production 에서도 console 에 남겨 사용자의 브라우저 콘솔 / 디버그 시
     // 추적 가능. 외부 보고 채널은 없음 (의존성 0 정책).
     // eslint-disable-next-line no-console
-    console.error('[heries] ErrorBoundary caught:', error, info)
+    console.error('[H-eries] ErrorBoundary caught:', error, info)
     this.setState({ info })
   }
 
@@ -44,7 +44,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   handleHome = (): void => {
-    // import.meta.env.BASE_URL 은 vite base 값 (production='/heries/', dev/author='/').
+    // import.meta.env.BASE_URL 은 vite base 값 (production='/H-eries/', dev/author='/').
     // BrowserRouter basename 과 맞추어 홈으로 이동.
     window.location.assign(import.meta.env.BASE_URL)
   }

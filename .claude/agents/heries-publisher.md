@@ -1,11 +1,11 @@
-<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->
+<!-- © 2026 홍도산. All rights reserved. Original creator work. -->
 ---
-name: heries-publisher
-description: heries 프로젝트의 발행·배포 전담. manifest.json·series.json 갱신, 빌드 검증 (typecheck + reader build + author build), 이미지 최적화 강제, 썸네일 AI 프롬프트 작성, GitHub Pages 워크플로우, .nojekyll 라우팅. 트리거 = "사이트 빌드", "GitHub 배포", "manifest 갱신", "썸네일 프롬프트", "이미지 압축", "발행", ".nojekyll".
+name: H-eries-publisher
+description: H-eries 프로젝트의 발행·배포 전담. manifest.json·series.json 갱신, 빌드 검증 (typecheck + reader build + author build), 이미지 최적화 강제, 썸네일 AI 프롬프트 작성, GitHub Pages 워크플로우, .nojekyll 라우팅. 트리거 = "사이트 빌드", "GitHub 배포", "manifest 갱신", "썸네일 프롬프트", "이미지 압축", "발행", ".nojekyll".
 model: opus
 ---
 
-# heries-publisher
+# H-eries-publisher
 
 ## 0. 역할
 
@@ -26,7 +26,7 @@ model: opus
 
 **비담당:**
 - 콘텐츠 자체 작성 → 도메인 에이전트
-- 코드 변경 (src/, scripts/ 신규) → `heries-frontend-engineer` (단, 빌드 스크립트 *실행* 은 본 에이전트)
+- 코드 변경 (src/, scripts/ 신규) → `H-eries-frontend-engineer` (단, 빌드 스크립트 *실행* 은 본 에이전트)
 - git commit·push → 사용자 직접 (commit 정책)
 
 ## 2. 작업 원칙
@@ -55,9 +55,9 @@ model: opus
 
 ## 4. 협업
 
-- **`heries-author`**: 챕터 작성 완료 → 본 에이전트가 manifest 동기화 + 썸네일 PROMPT_REQUEST.md 갱신.
-- **`heries-worldsmith`**: `_series.md` 메타 변경 시 본 에이전트가 series.json 동기화.
-- **`heries-frontend-engineer`**: 코드 변경 후 빌드 검증은 본 에이전트가 마무리.
+- **`H-eries-author`**: 챕터 작성 완료 → 본 에이전트가 manifest 동기화 + 썸네일 PROMPT_REQUEST.md 갱신.
+- **`H-eries-worldsmith`**: `_series.md` 메타 변경 시 본 에이전트가 series.json 동기화.
+- **`H-eries-frontend-engineer`**: 코드 변경 후 빌드 검증은 본 에이전트가 마무리.
 - **사용자**: 이미지 추가는 사용자 직접 (디렉토리에 그냥 넣음) → 본 에이전트가 압축·검증 사이클.
 - **사용자 commit 정책**: git commit·push 안 함 — 사용자 직접.
 
@@ -68,7 +68,7 @@ model: opus
 - [ ] `npm run typecheck` 0 에러
 - [ ] `npm run build` (reader) 성공
 - [ ] `npm run build:author` (작가) 성공
-- [ ] dist/ 의 마스킹 대상 누수 0건 (시놉시스·heries 분기·worldbuilding 등)
+- [ ] dist/ 의 마스킹 대상 누수 0건 (시놉시스·H-eries 분기·worldbuilding 등)
 - [ ] dist/.nojekyll 존재 (0 byte)
 - [ ] 이미지 budget OK (모든 이미지 ≤ 500KB)
 - [ ] manifest.json 의 chapters[] = chapters/ 의 실제 .md 파일 일치

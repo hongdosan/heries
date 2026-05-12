@@ -1,13 +1,13 @@
-<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->
+<!-- © 2026 홍도산. All rights reserved. Original creator work. -->
 
-# heries 하네스 — 도입 가이드
+# H-eries 하네스 — 도입 가이드
 
-`heries` 가 [revfactory/harness](https://github.com/revfactory/harness) 를 도입하는 절차와 분담 원칙을 정의한다. 본 문서는 *계획·절차*. 도입 후 진화는 [harness-state.md](harness-state.md) 변경 이력에 누적 기록.
+`H-eries` 가 [revfactory/harness](https://github.com/revfactory/harness) 를 도입하는 절차와 분담 원칙을 정의한다. 본 문서는 *계획·절차*. 도입 후 진화는 [harness-state.md](harness-state.md) 변경 이력에 누적 기록.
 
 ## 목차
 
 - [1. 하네스란](#1-하네스란)
-- [2. heries 도메인 분담 원칙](#2-heries-도메인-분담-원칙)
+- [2. H-eries 도메인 분담 원칙](#2-H-eries-도메인-분담-원칙)
 - [3. 도입 절차 (Phase 0–5)](#3-도입-절차-phase-05)
 - [4. 산출물 위치·명명 규칙](#4-산출물-위치명명-규칙)
 - [5. 검증·진화](#5-검증진화)
@@ -46,9 +46,9 @@
 
 ---
 
-## 2. heries 도메인 분담 원칙
+## 2. H-eries 도메인 분담 원칙
 
-`heries` 는 **단일 작가** 도메인. FE/BE 같은 기술 영역 분담 없음. 모든 에이전트가 *작가의 글쓰기·검증·발행 사이클* 에 종속한다.
+`H-eries` 는 **단일 작가** 도메인. FE/BE 같은 기술 영역 분담 없음. 모든 에이전트가 *작가의 글쓰기·검증·발행 사이클* 에 종속한다.
 
 | 영역 | 담당 | 근거 |
 |------|------|------|
@@ -76,7 +76,7 @@
 
 ### Phase 0 — 사전 준비
 
-1. **라이선스 검토** — Apache 2.0 (harness) ↔ 비상업적 팬픽 고지 (heries) 충돌 없음. harness 산출물에는 heries 표기 표준 적용.
+1. **라이선스 검토** — Apache 2.0 (harness) ↔ 비상업적 팬픽 고지 (H-eries) 충돌 없음. harness 산출물에는 H-eries 표기 표준 적용.
 2. **환경 변수 활성화** — `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` 셸 환경 또는 `.zshrc`.
 3. **분담 원칙 합의** — §2 매트릭스를 본 문서 SSOT 처리.
 4. **GitHub 저장소 준비** — 공개 저장소. README 첫머리에 비상업적 팬픽 고지 + 차용 원작 출처 안내 표기.
@@ -97,17 +97,17 @@
 
 ### Phase 3 — 산출물 정합성 검증
 
-하네스 산출물이 **heries 고유 원칙** 과 정합하는지 검증.
+하네스 산출물이 **H-eries 고유 원칙** 과 정합하는지 검증.
 
 | # | 검증 항목 | 통과 조건 |
 |---|---|---|
-| 1 | 비상업적 팬픽 고지 부착 | frontmatter 다음 줄에 `<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->` |
+| 1 | 비상업적 팬픽 고지 부착 | frontmatter 다음 줄에 `<!-- © 2026 홍도산. All rights reserved. Original creator work. -->` |
 | 2 | SSOT 위치 인용 | `content/series/{slug}/characters/` 등 명시적 참조 |
 | 3 | 라이브러리 의존성 도입 시도 | 시도 시 사용자 확인 요청 (자동 도입 금지). `package.json` / `requirements.txt` / 빌드 스크립트 추가 거부 |
 | 4 | 원작 출처(`origin`) 필드 강제 | 등장인물 카드 frontmatter 에 `origin` 필드 필수 — 누락 시 reject |
 | 5 | 단일 작가 가정 | 다인 협업 분기 (브랜치 전략·리뷰 워크플로우 등) 미포함 |
 | 6 | GitHub 공개 저장소 인지 | 비공개 토큰·시크릿·개인 식별 정보 산출물에 포함 금지 |
-| 7 | frontmatter `name` | `heries-{role}` 패턴 (예: `heries-lorekeeper`) |
+| 7 | frontmatter `name` | `H-eries-{role}` 패턴 (예: `H-eries-lorekeeper`) |
 
 검증 실패 항목 → 수동 보정 → [`harness-state.md`](harness-state.md) 변경 이력에 사유 기록.
 
@@ -155,7 +155,7 @@
 | 대상 | 패턴 | 예시 |
 |---|---|---|
 | 에이전트 파일 | `agent-{role}.md` | `agent-lorekeeper.md` |
-| frontmatter `name` | `heries-{role}` | `heries-lorekeeper` |
+| frontmatter `name` | `H-eries-{role}` | `H-eries-lorekeeper` |
 | 스킬 디렉토리 | kebab-case 도메인 | `character-bible/` |
 | 시리즈 슬러그 | kebab-case (영문 권장) | `clash-of-multiverses` |
 | 등장인물 ID | kebab-case (오리지널) / 원작-식별자 (차용) | `protagonist-name`, `naruto-uzumaki` |
@@ -196,7 +196,7 @@
 
 ## 6. 작업 사이클
 
-`heries` 일상 사이클. 단일 작가 가정의 단순 6단계.
+`H-eries` 일상 사이클. 단일 작가 가정의 단순 6단계.
 
 | Step | 행위 | 주체 | 산출물 |
 |---|---|---|---|

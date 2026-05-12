@@ -4,7 +4,7 @@ import patterns from './spoiler-patterns.json'
 /**
  * Strip spoiler sections from a markdown body.
  * - For `_series.md`: drops the `## 시놉시스` section.
- * - For character cards: drops everything from `## heries 분기 ~` onward,
+ * - For character cards: drops everything from `## H-eries 분기 ~` onward,
  *   except the trailing `## 검증 출처` section (kept as it's source attribution, not spoiler).
  *
  * Author mode (`VITE_AUTHOR_MODE=true`) bypasses masking entirely.

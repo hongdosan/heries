@@ -13,10 +13,9 @@ export interface CharacterListProps {
   characters: CharacterIndex[]
 }
 
-export function CharacterList({ slug, characters }: CharacterListProps) {
+export function CharacterList({ slug, characters }: Readonly<CharacterListProps>) {
   return (
     <section>
-      <h2>등장인물</h2>
       {GROUP_ORDER.map(({ folder, label }) => {
         const members = characters.filter((c) => c.folder === folder)
         if (members.length === 0) return null

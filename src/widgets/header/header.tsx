@@ -3,7 +3,6 @@ import {Link} from 'react-router-dom'
 import {IS_AUTHOR_MODE} from '../../shared/lib/env.js'
 import {getTheme, nextTheme, setTheme, type Theme} from '../../shared/lib/theme.js'
 
-// 연락처 = 작가(hong) 의 사이드 프로젝트 통합 문의 메일.
 const CONTACT_USER = 'contact_hongdosan'
 const CONTACT_DOMAIN = 'naver.com'
 
@@ -33,16 +32,16 @@ export function Header() {
       <div className="site-header-row">
         <div className="brand">
           <div className="brand-row">
-            <Link to="/" className="brand-link">heries</Link>
+            <Link to="/" className="brand-link">H-eries</Link>
             {IS_AUTHOR_MODE && <span className="author-badge" title="작가 모드">AUTHOR</span>}
           </div>
-          <p className="meta">비상업적 크로스팬픽 웹 시리즈</p>
+          <p className="meta">오리지널 다중/평행 세계 시리즈</p>
         </div>
         <div className="site-header-actions">
           <a
             className="header-contact"
             href={mailto}
-            aria-label={`원작 권리자 저작권 문의 또는 아이디어 제보 — ${CONTACT_USER}@${CONTACT_DOMAIN}`}
+            aria-label={`저작권 문의 또는 아이디어 제보 — ${CONTACT_USER}@${CONTACT_DOMAIN}`}
           >
             <span className="header-contact-label">
               <span className="header-contact-label-full">저작권 · 아이디어 문의</span>

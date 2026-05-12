@@ -9,6 +9,7 @@
 
 import { readdir, readFile, writeFile, mkdir, copyFile } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
+import process from 'node:process'
 import patterns from '../src/shared/lib/spoiler-patterns.json' with { type: 'json' }
 
 const SRC = 'content'

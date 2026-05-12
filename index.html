@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->
+<!-- © 2026 홍도산. All rights reserved. Original creator work. -->
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>heries — hongdosan의 웹 시리즈</title>
-  <meta name="description" content="hongdosan 의 오리지널 다세계관 웹 시리즈." />
+  <title>H-eries — hongdosan의 웹 시리즈</title>
+  <meta name="description" content="홍도산 의 오리지널 다중/평행 세계 웹 시리즈." />
   <link rel="icon" type="image/webp" href="/src/shared/img/favicon.webp" />
   <link rel="stylesheet" href="/src/shared/styles/style.css" />
   <!--
@@ -19,7 +19,7 @@
   <script type="text/javascript">
     (function (l) {
       if (l.search[1] === '/') {
-        var decoded = l.search.slice(1).split('&').map(function (s) {
+        const decoded = l.search.slice(1).split('&').map(function (s) {
           return s.replace(/~and~/g, '&')
         }).join('?')
         window.history.replaceState(

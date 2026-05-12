@@ -1,9 +1,10 @@
 import {Link, useParams, useSearchParams} from 'react-router-dom'
-import {loadSeries} from '../../entities/series/index.js'
+import {loadSeries} from '../../entities/series'
+import {assetUrl} from '../../shared/lib/env.js'
 import {useAsync} from '../../shared/lib/use-async.js'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
-import {ChapterToc} from '../../widgets/chapter-toc/index.js'
-import {CharacterList} from '../../widgets/character-list/index.js'
+import {ChapterToc} from '../../widgets/chapter-toc'
+import {CharacterList} from '../../widgets/character-list'
 
 type Tab = 'overview' | 'chapters' | 'characters'
 const TABS: ReadonlyArray<Tab> = ['overview', 'chapters', 'characters']
@@ -33,12 +34,12 @@ export function SeriesPage() {
     ? null
     : cover.error
       ? PLACEHOLDER_THUMB
-      : `./content/series/${slug}/${manifest.thumbnail}`
+      : assetUrl(`content/series/${slug}/${manifest.thumbnail}`)
 
   return (
     <main className="page-series">
       <nav className="breadcrumb">
-        <Link to="/">heries</Link><span className="sep">/</span>
+        <Link to="/">H-eries</Link><span className="sep">/</span>
         <span>{manifest.title}</span>
       </nav>
 

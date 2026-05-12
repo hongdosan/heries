@@ -1,8 +1,8 @@
-<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->
+<!-- © 2026 홍도산. All rights reserved. Original creator work. -->
 
-# Claude 세션 Context Handoff — heries 4-Tier 적용 가이드
+# Claude 세션 Context Handoff — H-eries 4-Tier 적용 가이드
 
-`heries` 프로젝트가 [Claude 세션 간 Context Handoff: 4계층 전략](https://codex.epril.com/claude-session-context-handoff-4-layer-strategy) (codex.epril.com, 2026-04-23) 을 *단일 작가 정적 웹 시리즈* 도메인에 맞춰 적용한 운영 매뉴얼.
+`H-eries` 프로젝트가 [Claude 세션 간 Context Handoff: 4계층 전략](https://codex.epril.com/claude-session-context-handoff-4-layer-strategy) (codex.epril.com, 2026-04-23) 을 *단일 작가 정적 웹 시리즈* 도메인에 맞춰 적용한 운영 매뉴얼.
 
 > Tier 가 올라갈수록 영속성과 구조화 강도가 높아진다. 현 사이클: **Tier 1 + Tier 2 즉시 적용**, **Tier 3 부분 운영** (auto-memory + harness-state 변경 이력), **Tier 4 점진 도입** (ADR 은 사이트 디자인/콘텐츠 결정 누적 시).
 
@@ -13,7 +13,7 @@
 - [Tier 2 — Short-Term Handoff (Document & Clear)](#tier-2--short-term-handoff-document--clear)
 - [Tier 3 — Persistent Context (영구 메모리)](#tier-3--persistent-context-영구-메모리)
 - [Tier 4 — Cross-Session Orchestration](#tier-4--cross-session-orchestration)
-- [heries 디렉토리 매핑](#heries-디렉토리-매핑)
+- [H-eries 디렉토리 매핑](#H-eries-디렉토리-매핑)
 - [작성 규칙](#작성-규칙)
 - [안티 패턴](#안티-패턴)
 - [End-of-Session 한 줄 프롬프트](#end-of-session-한-줄-프롬프트)
@@ -23,7 +23,7 @@
 
 ## 목적
 
-| 문제 | heries 에서의 발현 | 본 전략의 해법 |
+| 문제 | H-eries 에서의 발현 | 본 전략의 해법 |
 |---|---|---|
 | Context rot | 1M 컨텍스트라도 60% 근방부터 품질 저하 | Tier 1 능동 개입 |
 | Auto-compact 비대칭 | 가장 둔해진 순간 발동 → 다음 턴 필수 정보 누락 | Tier 1 `/compact [focus]` + Tier 2 우회 |
@@ -37,7 +37,7 @@
 
 ### 사용 도구
 
-| 도구 | 용도 | heries 운영 원칙 |
+| 도구 | 용도 | H-eries 운영 원칙 |
 |---|---|---|
 | `/rewind` (Esc Esc) | 실패한 시도 직후 되돌리기 | 등장인물 카드 작성 중 *원작 사실 오류·라이브러리 자동 도입 시도* 발견 시 즉시 |
 | `/compact [focus]` | 부분 요약 — focus 인자 **필수** | 무인자 호출 금지. 예: `/compact focus on 청명 카드 결정 사항, drop namu.wiki 원문 텍스트` |
@@ -61,7 +61,7 @@
 2. `/clear` 또는 세션 재기동
 3. 새 세션에서 "X.md 를 읽고 이어서 작업해" + **검증 지시**
 
-### heries 핸드오프 문서 구조
+### H-eries 핸드오프 문서 구조
 
 **단일 파일 `.claude/handoff/CURRENT.md` 덮어쓰기** (2026-05-11 정책 변경). 날짜별 파일 (`<YYYY-MM-DD>-<topic>.md`) 생성·archive 디렉토리 모두 폐기. 이전 사이클 본문 회수 = `git log -p .claude/handoff/CURRENT.md` 로 commit 단위 추적.
 
@@ -108,7 +108,7 @@ git show <commit>:.claude/handoff/CURRENT.md      # 특정 시점 본문 회수
 | 위치 | 용도 | 변경 정책 |
 |---|---|---|
 | `~/.claude/CLAUDE.md` | 글로벌 사용자 규약 | 사용자 개인 영역 |
-| `.claude/CLAUDE.md` | heries 핵심 원칙 7개 + 도구 우선순위 | 변하지 않는 규약만 |
+| `.claude/CLAUDE.md` | H-eries 핵심 원칙 7개 + 도구 우선순위 | 변하지 않는 규약만 |
 | `README.md` | 프로젝트 진입점 | 작품 추가·라이선스 변경 시 |
 | `src/README.md` | FSD 가이드 (Public API · 의존 방향 · 빌드) | 아키텍처 결정 시 |
 | `content/series/{slug}/_series.md` | 시리즈 메타·시놉시스·차용 원작 목록 | 원작 차용 추가 시 |
@@ -119,7 +119,7 @@ git show <commit>:.claude/handoff/CURRENT.md      # 특정 시점 본문 회수
 
 ### 3.2 Report Registry 패턴 (점진 도입)
 
-| 원문 카테고리 | heries 매핑 | 비고 |
+| 원문 카테고리 | H-eries 매핑 | 비고 |
 |---|---|---|
 | `_registry.md` | (미도입 — 핸드오프 누적 시 신설) | 50줄 이내 인덱스 |
 | `arch/` | `README.md`, `src/README.md`, `harness-state.md` 변경 이력 | 메인 아키텍처 |
@@ -133,7 +133,7 @@ git show <commit>:.claude/handoff/CURRENT.md      # 특정 시점 본문 회수
 
 ### 3.3 auto-memory (이미 운영)
 
-`/Users/hongyeongjune/.claude/projects/-Users-hongyeongjune-IdeaProjects-{...}/memory/` — 사용자 선호·피드백 영속화. 디렉토리 리네임 (`clash-of-multiverses` → `heries`) 후 새 경로 자동 마이그레이션 여부는 다음 세션에서 확인.
+`/Users/hongyeongjune/.claude/projects/-Users-hongyeongjune-IdeaProjects-{...}/memory/` — 사용자 선호·피드백 영속화. 디렉토리 리네임 (`clash-of-multiverses` → `H-eries`) 후 새 경로 자동 마이그레이션 여부는 다음 세션에서 확인.
 
 ---
 
@@ -141,7 +141,7 @@ git show <commit>:.claude/handoff/CURRENT.md      # 특정 시점 본문 회수
 
 ### 4.1 Spec-Driven Development (이미 부분 운영)
 
-| heries 매체 | 역할 |
+| H-eries 매체 | 역할 |
 |---|---|
 | 등장인물 카드 (`characters/{id}.md`) | SSOT — 인물 정의 |
 | 시리즈 메타 (`_series.md`) | 시놉시스·차용 원작 목록 |
@@ -159,7 +159,7 @@ git show <commit>:.claude/handoff/CURRENT.md      # 특정 시점 본문 회수
 
 ### 4.3 Git commit + 핸드오프 이중 기록
 
-원문 지적 — commit message 는 *왜 그 결정·어떤 대안 배제* 미포함. heries 의 해법:
+원문 지적 — commit message 는 *왜 그 결정·어떤 대안 배제* 미포함. H-eries 의 해법:
 
 - Git commit message: `<type>(<scope>): <변경 요약>` (예: `feat(characters): add cheong-myeong card`)
 - 결정 근거: 핸드오프 또는 ADR 로 분리
@@ -167,9 +167,9 @@ git show <commit>:.claude/handoff/CURRENT.md      # 특정 시점 본문 회수
 
 ### 4.4 Master-Clone 정책
 
-heries 도 **Master-Clone** 채택:
+H-eries 도 **Master-Clone** 채택:
 
-| 모델 | 특징 | heries 채택 |
+| 모델 | 특징 | H-eries 채택 |
 |---|---|---|
 | **Master-Clone** | main agent 에 모든 컨텍스트, Task/Explore 로 자기 복제본에 위임 | ✓ 채택 |
 | Lead-Specialist | custom subagent 다수 | ✗ — 단일 작가라 조율 오버헤드 > 작업 |
@@ -180,9 +180,9 @@ heries 도 **Master-Clone** 채택:
 
 ---
 
-## heries 디렉토리 매핑
+## H-eries 디렉토리 매핑
 
-| 원문 권장 | heries 실제 |
+| 원문 권장 | H-eries 실제 |
 |---|---|
 | `.claude/reports/handoff/` | `.claude/handoff/` |
 | `.claude/reports/_registry.md` | (미도입) |
@@ -198,7 +198,7 @@ heries 도 **Master-Clone** 채택:
 3. **CLAUDE.md 중복 금지** — Prompt for New Chat 끝에 "Read CLAUDE.md first. Do NOT restate anything already covered there"
 4. **실패 명시적 기록** — Traps to Avoid 가 핸드오프 가치를 가장 많이 올림
 5. **토큰 예산 의식** — 2,000 토큰 이내. 상세는 별도 리포트로 분리
-6. **모든 .md 첫 줄에 비상업적 팬픽 고지** — heries 표준
+6. **모든 .md 첫 줄에 비상업적 팬픽 고지** — H-eries 표준
 
 ---
 
@@ -209,7 +209,7 @@ heries 도 **Master-Clone** 채택:
 - Long-running session 집착 — 새 task 는 이전 맥락 10% 만 필요
 - Subagent 과다 — Master-Clone 정책 위반
 - 핸드오프 없는 무중단 세션 — `/clear` 사고 시 복구 불가
-- **heries 고유**: 라이브러리 자동 도입 시도 (Astro/Eleventy/번들러). 라이브러리 의존성 0 원칙 위배
+- **H-eries 고유**: 라이브러리 자동 도입 시도 (Astro/Eleventy/번들러). 라이브러리 의존성 0 원칙 위배
 
 ---
 
@@ -231,7 +231,7 @@ heries 도 **Master-Clone** 채택:
 
 규칙:
 - 2,000 토큰 이내
-- 첫 줄에 `<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->`
+- 첫 줄에 `<!-- © 2026 홍도산. All rights reserved. Original creator work. -->`
 - Open Work 는 "X is not yet implemented" 식
 - Prompt for New Chat 끝에 "나열된 파일을 Read 도구로 읽고 본 문서의 주장을 코드와 대조해 검증해" 명시
 - CLAUDE.md / handoff/handoff.md / harness/ / src/README.md 에 이미 적힌 내용은 재기술 금지
@@ -243,7 +243,7 @@ heries 도 **Master-Clone** 채택:
 
 ## 참고
 
-- **원문 (외부)**: <https://codex.epril.com/claude-session-context-handoff-4-layer-strategy> — *Claude 세션 간 Context Handoff: 4계층 전략* (codex.epril.com, 2026-04-23). 본 가이드의 4-Tier 명칭·구조·실전 규칙·안티 패턴은 모두 원문 차용. heries 도메인에 맞춰 매핑·해석한 결과물.
-- heries 하네스 현 상태: [`../harness/harness-state.md`](../harness/harness-state.md)
-- heries 작업 사이클: [`../harness/harness-setup.md`](../harness/harness-setup.md) §6
+- **원문 (외부)**: <https://codex.epril.com/claude-session-context-handoff-4-layer-strategy> — *Claude 세션 간 Context Handoff: 4계층 전략* (codex.epril.com, 2026-04-23). 본 가이드의 4-Tier 명칭·구조·실전 규칙·안티 패턴은 모두 원문 차용. H-eries 도메인에 맞춰 매핑·해석한 결과물.
+- H-eries 하네스 현 상태: [`../harness/harness-state.md`](../harness/harness-state.md)
+- H-eries 작업 사이클: [`../harness/harness-setup.md`](../harness/harness-setup.md) §6
 - 핵심 원칙: [`../CLAUDE.md`](../CLAUDE.md)

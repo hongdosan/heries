@@ -1,11 +1,12 @@
 import {Link} from 'react-router-dom'
+import {assetUrl} from '../../shared/lib/env.js'
 import {fetchSeriesIndex} from '../../shared/lib/manifest.js'
 import {useAsync} from '../../shared/lib/use-async.js'
-import {SeriesList} from '../../widgets/series-list/index.js'
+import {SeriesList} from '../../widgets/series-list'
 
-const HERO_IMAGE = './content/_shared/thumbnail-placeholder.webp'
+const HERO_IMAGE = assetUrl('content/_shared/thumbnail-placeholder.webp')
 const HERO_ALT =
-  'heries — 여러 우주의 주인공이 한 무대에서 만나는 비상업적 크로스오버 팬픽 컬렉션'
+  'H-eries — 작가(홍도산) 의 오리지널 다중/평행 세계 웹 시리즈'
 
 export function HomePage() {
   const state = useAsync(() => fetchSeriesIndex(), [])
@@ -20,15 +21,15 @@ export function HomePage() {
         </div>
 
         <div className="home-hero-text">
-          <p className="home-hero-eyebrow">CROSSOVER · FANFICTION · WEB SERIES</p>
+          <p className="home-hero-eyebrow">MULTIVERSE · ORIGINAL · WEB SERIES</p>
 
           <h1 className="home-hero-title">
-            여러 우주의 주인공이 한 무대에서 만나는<br/>
-            비상업적 크로스오버 팬픽 컬렉션.
+            여러 우주의 주인공이 한 무대에서 부딪히는<br/>
+            작가(홍도산) 의 오리지널 다중/평행 세계 시리즈.
           </h1>
 
           <p className="home-hero-cta">
-            <Link to="/about">heries 가 무엇인가요? →</Link>
+            <Link to="/about">H-eries 가 무엇인가요? →</Link>
           </p>
         </div>
       </header>

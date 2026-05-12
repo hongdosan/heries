@@ -1,10 +1,11 @@
 import {Link, useParams} from 'react-router-dom'
-import {loadChapter} from '../../entities/chapter/index.js'
+import {loadChapter} from '../../entities/chapter'
+import {assetUrl} from '../../shared/lib/env.js'
 import {fetchSeriesManifest} from '../../shared/lib/manifest.js'
 import {useAsync} from '../../shared/lib/use-async.js'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
 import {extractOutline} from '../../shared/lib/markdown.js'
-import {ChapterCharacterStrip} from '../../widgets/chapter-character-strip/index.js'
+import {ChapterCharacterStrip} from '../../widgets/chapter-character-strip'
 import type {ChapterIndex} from '../../shared/lib/types.js'
 
 export function ChapterPage() {
@@ -31,12 +32,12 @@ export function ChapterPage() {
     ? null
     : cover.error
       ? PLACEHOLDER_THUMB
-      : `./content/series/${slug}/${data.index.thumbnail}`
+      : assetUrl(`content/series/${slug}/${data.index.thumbnail}`)
 
   return (
     <main className="page-chapter">
       <nav className="breadcrumb">
-        <Link to="/">heries</Link><span className="sep">/</span>
+        <Link to="/">H-eries</Link><span className="sep">/</span>
         <Link to={`/series/${slug}`}>{manifest.title}</Link><span className="sep">/</span>
         <span>ep {episode}</span>
       </nav>

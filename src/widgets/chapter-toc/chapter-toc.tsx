@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { assetUrl } from '../../shared/lib/env.js'
 import type { ChapterIndex } from '../../shared/lib/types.js'
 import { useImgFallback, PLACEHOLDER_THUMB } from '../../shared/lib/use-img-fallback.js'
 
@@ -58,7 +59,7 @@ function ChapterRow({ slug, ch }: { slug: string; ch: ChapterIndex }) {
     ? null
     : error
       ? PLACEHOLDER_THUMB
-      : `./content/series/${slug}/${ch.thumbnail}`
+      : assetUrl(`content/series/${slug}/${ch.thumbnail}`)
 
   return (
     <li>

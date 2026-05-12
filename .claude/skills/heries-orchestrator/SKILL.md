@@ -1,17 +1,17 @@
 ---
-name: heries-orchestrator
-description: heries 프로젝트의 모든 작업 라우터. 사용자 요청을 6 전문 에이전트 중 하나로 라우팅하고, 챕터 작성 사이클 (author → continuity-reviewer 파이프라인) 을 자동 트리거한다. heries 프로젝트에서 캐릭터 카드·세계관·챕터·코드·발행 관련 모든 요청에서 반드시 트리거할 것 — "등장인물 추가", "세계관 갱신", "챕터 작성", "ep-NN 작성", "정합성 감사", "컴포넌트 추가", "사이트 빌드", "manifest 갱신", "썸네일 프롬프트", "이미지 압축" 등. 단순 질문·읽기·검색은 직접 응답 가능.
+name: H-eries-orchestrator
+description: H-eries 프로젝트의 모든 작업 라우터. 사용자 요청을 6 전문 에이전트 중 하나로 라우팅하고, 챕터 작성 사이클 (author → continuity-reviewer 파이프라인) 을 자동 트리거한다. H-eries 프로젝트에서 캐릭터 카드·세계관·챕터·코드·발행 관련 모든 요청에서 반드시 트리거할 것 — "등장인물 추가", "세계관 갱신", "챕터 작성", "ep-NN 작성", "정합성 감사", "컴포넌트 추가", "사이트 빌드", "manifest 갱신", "썸네일 프롬프트", "이미지 압축" 등. 단순 질문·읽기·검색은 직접 응답 가능.
 ---
 
-<!-- © 2026 hongdosan. All rights reserved. Original creator work. -->
+<!-- © 2026 홍도산. All rights reserved. Original creator work. -->
 
-# heries-orchestrator
+# H-eries-orchestrator
 
-heries 프로젝트의 모든 작업 라우터. 사용자 요청을 6 전문 에이전트 중 하나로 라우팅하고, 다중 에이전트 협업 사이클을 조율한다.
+H-eries 프로젝트의 모든 작업 라우터. 사용자 요청을 6 전문 에이전트 중 하나로 라우팅하고, 다중 에이전트 협업 사이클을 조율한다.
 
 ## 0. 트리거 시점
 
-heries 프로젝트 (`/Users/hongdosan/onion-workspace/heries/`) 에서 다음 작업 요청 시 본 스킬을 트리거한다:
+H-eries 프로젝트 (`/Users/홍도산/onion-workspace/H-eries/`) 에서 다음 작업 요청 시 본 스킬을 트리거한다:
 
 - 캐릭터 카드·세계관·연표·용어집 작성/정정
 - 챕터 작성·검수
@@ -24,12 +24,12 @@ heries 프로젝트 (`/Users/hongdosan/onion-workspace/heries/`) 에서 다음 �
 
 | 사용자 요청 패턴 | 호출 에이전트 | 사용 도구 |
 |---|---|---|
-| "등장인물 추가/갱신", "캐릭터 카드", "origin 누락", "무공 정정" | `heries-lorekeeper` | Agent (subagent_type=general-purpose, model=opus) |
-| "세계관 추가", "연표 갱신", "용어집", "`_series.md`", "차용 원작 목록", "페이즈 구조" | `heries-worldsmith` | Agent |
-| "챕터 작성", "ep-NN 작성", "본문 집필", "시놉시스 받아", "떡밥 매설" | `heries-author` → 자동으로 `heries-continuity-reviewer` | Agent (파이프라인) |
-| "정합성 감사", "연속성 검증", "챕터 검수", "SSOT 정합", "떡밥 추적" | `heries-continuity-reviewer` | Agent |
-| "컴포넌트 추가", "렌더러 수정", "UX 개선", "FSD 레이어", "빌드 스크립트", "타입 에러", "마스킹 로직" | `heries-frontend-engineer` | Agent |
-| "사이트 빌드", "GitHub 배포", "manifest 갱신", "썸네일 프롬프트", "이미지 압축", "발행", "`.nojekyll`" | `heries-publisher` | Agent |
+| "등장인물 추가/갱신", "캐릭터 카드", "origin 누락", "무공 정정" | `H-eries-lorekeeper` | Agent (subagent_type=general-purpose, model=opus) |
+| "세계관 추가", "연표 갱신", "용어집", "`_series.md`", "차용 원작 목록", "페이즈 구조" | `H-eries-worldsmith` | Agent |
+| "챕터 작성", "ep-NN 작성", "본문 집필", "시놉시스 받아", "떡밥 매설" | `H-eries-author` → 자동으로 `H-eries-continuity-reviewer` | Agent (파이프라인) |
+| "정합성 감사", "연속성 검증", "챕터 검수", "SSOT 정합", "떡밥 추적" | `H-eries-continuity-reviewer` | Agent |
+| "컴포넌트 추가", "렌더러 수정", "UX 개선", "FSD 레이어", "빌드 스크립트", "타입 에러", "마스킹 로직" | `H-eries-frontend-engineer` | Agent |
+| "사이트 빌드", "GitHub 배포", "manifest 갱신", "썸네일 프롬프트", "이미지 압축", "발행", "`.nojekyll`" | `H-eries-publisher` | Agent |
 
 라우팅이 모호하면 사용자에게 1회만 확인 (사용자 메모리 *사전 4 질문 폭탄 X* 정책 준수).
 
@@ -38,8 +38,8 @@ heries 프로젝트 (`/Users/hongdosan/onion-workspace/heries/`) 에서 다음 �
 **기본 = 서브 에이전트 패턴.** 사용자 단일 요청 → 적합 에이전트 1회 호출. 결과를 사용자에게 보고.
 
 **예외 = 챕터 작성 사이클 (하이브리드 파이프라인):**
-1. `heries-author` 호출 → 챕터 본문 작성
-2. 자동으로 `heries-continuity-reviewer` 호출 → 정합성 감사
+1. `H-eries-author` 호출 → 챕터 본문 작성
+2. 자동으로 `H-eries-continuity-reviewer` 호출 → 정합성 감사
 3. critical 발견 시 사용자 보고 후 author 재호출 또는 lorekeeper/worldsmith 위임
 
 **팀 모드는 사용하지 않음** — 단일 작가 도메인이라 팀 통신 오버헤드가 이득보다 큼. 사용자가 명시 요청 시에만 전환.
@@ -73,12 +73,12 @@ Agent(subagent_type=general-purpose, model="opus", prompt=에이전트 정의 + 
 ```
 사용자 = 시놉시스 (사건·결과·등장 인물·핵심 대사 후보)
     ↓
-[Phase 1] heries-author 호출
+[Phase 1] H-eries-author 호출
     - 등장 캐릭터 카드 사전 Read
     - 시놉시스 → 본문 변환 (살붙이기·톤 활용)
     - 자체 검토 (메타 표현 제거·플롯 보존)
     ↓
-[Phase 2] heries-continuity-reviewer 자동 호출
+[Phase 2] H-eries-continuity-reviewer 자동 호출
     - 신규 챕터 vs SSOT cross-check
     - critical / major / minor 보고서
     ↓
@@ -86,7 +86,7 @@ critical 발견 시:
     - lorekeeper / worldsmith / author 위임
     - 위임 후 reviewer 재실행
     ↓
-[Phase 3] heries-publisher 호출 (사용자 확인 후)
+[Phase 3] H-eries-publisher 호출 (사용자 확인 후)
     - manifest.json 갱신
     - 썸네일 PROMPT_REQUEST.md 갱신
     - 빌드 검증
@@ -134,7 +134,7 @@ critical 발견 시:
 
 ## 10. 참고
 
-- 에이전트 정의: `.claude/agents/heries-{lorekeeper,worldsmith,author,continuity-reviewer,frontend-engineer,publisher}.md`
+- 에이전트 정의: `.claude/agents/H-eries-{lorekeeper,worldsmith,author,continuity-reviewer,frontend-engineer,publisher}.md`
 - 핵심 원칙: `.claude/CLAUDE.md` §핵심 원칙 (9 항)
 - 변경 이력 SSOT: `.claude/harness/harness-state.md`
 - 핸드오프: `.claude/handoff/CURRENT.md`

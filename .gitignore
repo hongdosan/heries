@@ -33,7 +33,7 @@ dist-author/
 .env.local
 .env.*.local
 
-# Archived legacy content — replaced by hongdosan-original creator-only work
+# Archived legacy content — replaced by 홍도산-original creator-only work
 # (2026-05-12 — removed from public git history via filter-repo; kept locally
 #  under content/_legacy_* for author reference only. New original work goes
 #  under content/series/clash-of-multiverses/ with the same slug but 100%

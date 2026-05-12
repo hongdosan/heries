@@ -1,10 +1,10 @@
-Copyright (c) 2026 hongdosan. All Rights Reserved.
+Copyright (c) 2026 홍도산. All Rights Reserved.
 
-ALL CONTENT in this repository (heries) — including both the *code and
+ALL CONTENT in this repository (H-eries) — including both the *code and
 structure* (TypeScript, JavaScript, CSS, HTML, build scripts, AI agent
 definitions under `.claude/`, operational documentation, etc.) and the
 *narrative content* (under `content/` — characters, worldbuilding, plot,
-dialogue, original names, and creative expression) — is © 2026 hongdosan
+dialogue, original names, and creative expression) — is © 2026 홍도산
 and is the exclusive property of the author.
 
 NO PART of this repository may be reproduced, distributed, transmitted,
@@ -37,7 +37,7 @@ and any other rights inquiry — write to the author at:
 
 Or open a GitHub Issue at:
 
-    https://github.com/hongdosan/heries/issues
+    https://github.com/홍도산/H-eries/issues
 
 THE REPOSITORY IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF

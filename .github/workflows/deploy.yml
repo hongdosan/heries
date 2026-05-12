@@ -1,4 +1,4 @@
-name: Deploy heries to GitHub Pages
+name: Deploy H-eries to GitHub Pages
 
 on:
   push:
