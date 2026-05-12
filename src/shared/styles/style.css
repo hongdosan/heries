@@ -1255,14 +1255,6 @@ abbr.heries-term:hover {
   color: var(--accent);
   border-color: var(--accent);
 }
-.site-footer .meta {
-  margin: 0;
-  font-size: var(--fs-xs);
-  color: var(--fg-4);
-  font-family: var(--font-mono);
-  text-align: right;
-}
-
 .sr-only {
   position: absolute;
   width: 1px;
