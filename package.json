@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "vite",
     "dev:author": "VITE_AUTHOR_MODE=true vite",
-    "build": "node scripts/check-images.mjs && tsc -b && vite build && node scripts/copy-content.mjs dist && cp .nojekyll dist/.nojekyll",
+    "build": "node scripts/check-images.mjs && tsc -b && vite build && node scripts/copy-content.mjs dist && cp .nojekyll dist/.nojekyll && node scripts/check-masking.mjs dist",
     "build:author": "node scripts/check-images.mjs && VITE_AUTHOR_MODE=true tsc -b && VITE_AUTHOR_MODE=true vite build --outDir dist-author && VITE_AUTHOR_MODE=true node scripts/copy-content.mjs dist-author && cp .nojekyll dist-author/.nojekyll",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
