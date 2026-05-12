@@ -19,9 +19,10 @@ export function SeriesList({ items }: SeriesListProps) {
 
 function SeriesCard({ item }: { item: SeriesIndex }) {
   const { error, fatal, onError } = useImgFallback()
-  const src = !item.thumbnail || fatal
+  // 작품 커버 이미지 없으면 placeholder 를 기본값으로.
+  const src = fatal
     ? null
-    : error
+    : !item.thumbnail || error
       ? PLACEHOLDER_THUMB
       : assetUrl(`content/${item.thumbnail}`)
 

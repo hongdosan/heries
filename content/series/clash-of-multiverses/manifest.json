@@ -2,6 +2,7 @@
   "slug": "clash-of-multiverses",
   "title": "차원의 격돌",
   "status": "자작 매핑 완료 — 챕터 집필 대기",
+  "thumbnail": "thumbnails/cover.webp",
   "characters": [
     { "id": "woo-jin-hyeok", "folder": "1-protagonist", "name": "우진혁 (禹鎭赫)" },
     { "id": "eira", "folder": "2-major-supporting", "name": "에이라 (Eira)" },
