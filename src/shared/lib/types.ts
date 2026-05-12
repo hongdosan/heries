@@ -10,7 +10,11 @@ export interface SeriesIndexFile {
   series: SeriesIndex[]
 }
 
-export type CharacterFolder = '1-main-character' | '2-major-supporting' | '3-supporting'
+export type CharacterFolder =
+  | '1-protagonist'
+  | '1-main-character'
+  | '2-major-supporting'
+  | '3-supporting'
 
 export interface CharacterIndex {
   id: string

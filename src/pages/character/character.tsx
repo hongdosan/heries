@@ -5,6 +5,7 @@ import { renderInline } from '../../shared/lib/markdown.js'
 import { useAsync } from '../../shared/lib/use-async.js'
 
 const FOLDER_LABEL: Record<string, string> = {
+  '1-protagonist': '주인공',
   '1-main-character': '주인공',
   '2-major-supporting': '주연',
   '3-supporting': '조연',

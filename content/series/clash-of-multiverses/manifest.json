@@ -3,17 +3,17 @@
   "title": "차원의 격돌",
   "status": "재구축 중",
   "characters": [
-    "1-protagonist/hyeon-woo-jin",
-    "2-major-supporting/eira",
-    "2-major-supporting/yamura-tou",
-    "2-major-supporting/seo-un-hyeok",
-    "2-major-supporting/ryeong-geuk",
-    "2-major-supporting/go-cheon-han",
-    "2-major-supporting/yu-baek-gyeong",
-    "2-major-supporting/bi-hyeon",
-    "2-major-supporting/rim-woo-gyeong",
-    "2-major-supporting/hyeon-woo",
-    "2-major-supporting/baek-mu-jin"
+    { "id": "hyeon-woo-jin", "folder": "1-protagonist", "name": "현우진 (玄祐眞)" },
+    { "id": "eira", "folder": "2-major-supporting", "name": "에이라 (Eira)" },
+    { "id": "yamura-tou", "folder": "2-major-supporting", "name": "야무라 토우 (野邑 透)" },
+    { "id": "seo-un-hyeok", "folder": "2-major-supporting", "name": "서운혁 (徐雲赫)" },
+    { "id": "ryeong-geuk", "folder": "2-major-supporting", "name": "령극 (靈極)" },
+    { "id": "go-cheon-han", "folder": "2-major-supporting", "name": "고천한 (高天恨)" },
+    { "id": "yu-baek-gyeong", "folder": "2-major-supporting", "name": "유백경 (柳白卿)" },
+    { "id": "bi-hyeon", "folder": "2-major-supporting", "name": "비현 (鼻玄)" },
+    { "id": "rim-woo-gyeong", "folder": "2-major-supporting", "name": "림우경 (林禹卿)" },
+    { "id": "hyeon-woo", "folder": "2-major-supporting", "name": "현우 (玄宇)" },
+    { "id": "baek-mu-jin", "folder": "2-major-supporting", "name": "백무진 (白茂進)" }
   ],
   "chapters": []
 }
