@@ -7,7 +7,7 @@
 // Spoiler patterns SSOT: src/shared/lib/spoiler-patterns.json
 // (shared with runtime spoiler.ts to keep build / runtime in lockstep)
 
-import { readdir, readFile, writeFile, mkdir, copyFile, stat } from 'node:fs/promises'
+import { readdir, readFile, writeFile, mkdir, copyFile } from 'node:fs/promises'
 import { dirname, join, relative } from 'node:path'
 import patterns from '../src/shared/lib/spoiler-patterns.json' with { type: 'json' }
 
