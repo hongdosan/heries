@@ -1,11 +1,11 @@
 import {Link, useParams} from 'react-router-dom'
 import {loadChapter} from '../../entities/chapter'
+import {CharacterMentionHost} from '../../features/character-mention'
 import {assetUrl} from '../../shared/lib/env.js'
 import {fetchSeriesManifest} from '../../shared/lib/manifest.js'
 import {useAsync} from '../../shared/lib/use-async.js'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
 import {extractOutline} from '../../shared/lib/markdown.js'
-import {ChapterCharacterStrip} from '../../widgets/chapter-character-strip'
 import type {ChapterIndex} from '../../shared/lib/types.js'
 
 export function ChapterPage() {
@@ -58,14 +58,6 @@ export function ChapterPage() {
         )}
       </header>
 
-      {Array.isArray(data.frontmatter.characters) && data.frontmatter.characters.length > 0 && (
-        <ChapterCharacterStrip
-          slug={slug}
-          manifest={manifest}
-          characterIds={data.frontmatter.characters}
-        />
-      )}
-
       {(() => {
         const outline = extractOutline(data.bodyHtml, 2)
         if (outline.length === 0) return null
@@ -94,10 +86,12 @@ export function ChapterPage() {
         )
       })()}
 
-      <article
-        className="article article-prose"
-        dangerouslySetInnerHTML={{__html: data.bodyHtml}}
-      />
+      <CharacterMentionHost slug={slug} manifest={manifest}>
+        <article
+          className="article article-prose"
+          dangerouslySetInnerHTML={{__html: data.bodyHtml}}
+        />
+      </CharacterMentionHost>
 
       <nav className="chapter-nav" aria-label="에피소드 이동">
         {prev ? (
