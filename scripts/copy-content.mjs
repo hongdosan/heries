@@ -74,8 +74,15 @@ async function* walk(dir, base = dir) {
       }
       yield* walk(full, base)
     } else {
+      const relSlash = '/' + rel.replace(/\\/g, '/')
       // Skip author-only notes inside thumbnails (e.g. PROMPTS.md).
-      if (!IS_AUTHOR && /\/thumbnails\/.+\.md$/.test('/' + rel.replace(/\\/g, '/'))) continue
+      if (!IS_AUTHOR && /\/thumbnails\/.+\.md$/.test(relSlash)) continue
+      // Skip author-only meta files inside characters/ — pool files (`_*.md`)
+      // and the README guide. Card files (slug.md) are reader-exposed.
+      if (!IS_AUTHOR && /\/characters\/.*\/_[^/]+\.md$/.test(relSlash)) continue
+      if (!IS_AUTHOR && /\/characters\/README\.md$/.test(relSlash)) continue
+      // Skip antagonist cards in reader build — they reveal Phase 2/3 spoilers.
+      if (!IS_AUTHOR && /\/characters\/3-antagonist\//.test(relSlash)) continue
       yield { full, rel }
     }
   }

@@ -1,6 +1,6 @@
 ---
 title: H-eries 는 무엇인가요
-updated: 2026-05-12
+updated: 2026-05-13
 ---
 
 <!-- © 2026 홍도산. All rights reserved. Original creator work. -->

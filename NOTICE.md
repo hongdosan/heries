@@ -23,6 +23,6 @@
 ## 라이선스 / 권리 문의
 
 - **이메일**: `contact_hongdosan@naver.com`
-- **GitHub Issue**: <https://github.com/hongdosan/heries/issues/new>
+- **GitHub Issue**: [hongdosan/heries/issues](https://github.com/hongdosan/heries/issues/new)
 
 상업적 사용·번역·각색·미디어 믹스·기타 권리 협의 모두 위 채널로 받습니다.

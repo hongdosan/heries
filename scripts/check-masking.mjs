@@ -38,10 +38,22 @@ async function walk(dir, hits, root) {
       if (/^_legacy_/.test(entry.name)) {
         hits.push({ kind: 'legacy-dir', path: rel })
       }
+      // Reject antagonist directory (Phase 2/3 spoilers)
+      if (entry.name === '3-antagonist' && rel.includes('characters')) {
+        hits.push({ kind: 'antagonist-dir', path: rel })
+      }
       await walk(full, hits, root)
       continue
     }
     if (!entry.name.endsWith('.md')) continue
+    // Reject author-only meta files (mob pool + README guide)
+    const relSlashName = rel.replace(/\\/g, '/')
+    if (/\/characters\/.*\/_[^/]+\.md$/.test('/' + relSlashName)) {
+      hits.push({ kind: 'pool-leak', path: rel })
+    }
+    if (/\/characters\/README\.md$/.test('/' + relSlashName)) {
+      hits.push({ kind: 'characters-readme-leak', path: rel })
+    }
     const raw = await readFile(full, 'utf8')
     const lines = raw.replace(/\r\n/g, '\n').split('\n')
     // Spoiler headers anywhere in body

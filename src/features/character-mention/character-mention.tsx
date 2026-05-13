@@ -93,8 +93,16 @@ export function CharacterMentionHost({ slug, manifest, children }: CharacterMent
     const fetchSummary = async (id: string): Promise<string> => {
       const cached = readCache(slug, id)
       if (cached !== null) return cached
+      // Early guard — manifest 에 등재되지 않은 id (오타·페이즈 2/3 미공개 빌런 등)
+      // 는 fetch 시도 자체를 생략. reader 빌드에서는 빌런 카드가 dist 에 없어
+      // 404 가 발생하므로 본 가드가 필수.
+      const m = manifestRef.current
+      if (!m.characters.some((c) => c.id === id)) {
+        writeCache(slug, id, '')
+        return ''
+      }
       try {
-        const data = await loadCharacter(slug, id, manifestRef.current)
+        const data = await loadCharacter(slug, id, m)
         const summary = String(data.frontmatter.summary ?? '').trim() || data.index.name
         writeCache(slug, id, summary)
         return summary

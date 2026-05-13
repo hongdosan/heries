@@ -16,8 +16,9 @@ import { ErrorBoundary } from '../shared/ui/error-boundary'
 applyTheme(getTheme())
 
 // `import.meta.env.BASE_URL` 은 vite.config.ts 의 `base` 값을 그대로 노출
-// (production = '/H-eries/', dev = '/'). BrowserRouter 의 basename 은
-// trailing slash 가 없어야 하므로 제거 — 결과: production='/H-eries', dev=''.
+// (reader production = '/heries/' — GitHub repo prefix / author build = '/' /
+// dev = '/'). BrowserRouter 의 basename 은 trailing slash 가 없어야 하므로
+// 제거 — 결과: reader production='/heries', author/dev=''.
 const BASENAME = import.meta.env.BASE_URL.replace(/\/$/, '')
 
 function App() {

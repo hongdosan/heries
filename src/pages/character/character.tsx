@@ -9,6 +9,8 @@ const FOLDER_LABEL: Record<string, string> = {
   '1-main-character': '주인공',
   '2-major-supporting': '주연',
   '3-supporting': '조연',
+  '3-antagonist': '빌런·멘토',
+  '4-minor': '단역·카메오',
 }
 
 export function CharacterPage() {

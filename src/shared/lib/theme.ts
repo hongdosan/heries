@@ -6,7 +6,8 @@
 export type Theme = 'light' | 'dark' | 'auto'
 export const THEMES: ReadonlyArray<Theme> = ['auto', 'light', 'dark']
 
-const STORAGE_KEY = 'H-eries.theme'
+// localStorage 키 prefix 일관성: heries:<feature> 소문자
+const STORAGE_KEY = 'heries:theme'
 
 export function getTheme(): Theme {
   try {

@@ -2,7 +2,7 @@ export interface SeriesIndex {
   slug: string
   title: string
   status: string
-  started: string
+  started?: string
   thumbnail?: string
 }
 
@@ -15,6 +15,8 @@ export type CharacterFolder =
   | '1-main-character'
   | '2-major-supporting'
   | '3-supporting'
+  | '3-antagonist'
+  | '4-minor'
 
 export interface CharacterIndex {
   id: string
@@ -34,7 +36,7 @@ export interface SeriesManifest {
   slug: string
   title: string
   status: string
-  started: string
+  started?: string
   thumbnail?: string
   characters: CharacterIndex[]
   chapters: ChapterIndex[]
@@ -60,10 +62,13 @@ export interface ChapterFrontmatter {
 }
 
 export interface CharacterFrontmatter {
+  slug?: string
   name?: string
   origin?: string
   affiliation?: string
   role?: string
+  /** Story arc / appearance span — series-long / phase-long / arc / single-episode / cameo-recurring. */
+  arc_span?: string
   first_appearance?: string
   aliases?: string[]
   heries_arc?: string

@@ -20,6 +20,7 @@
 7. **GitHub 공개 저장소** — 비공개 토큰·시크릿·개인 식별 정보(이메일·주소 등) 산출물 포함 금지.
 8. **누적 산출물 최적화 강제** — append-only 구조는 임계 초과 시 압축 의무. 변경 이력 hot **20행** / 핸드오프 = 단일 파일 `CURRENT.md` 덮어쓰기 (정책 v3). 점검 시점 = *세션 시작 직후* + *세션 종료 직전*. 절차: §누적 산출물.
 9. **스포일러 분리 (작가 모드 vs 독자 모드)** — 독자 (default 빌드) 가 보는 것은 *시리즈 목록 + 등장인물 (원작 정보) + 발행된 챕터* 만. 마스킹 대상 = (a) `_series.md` 의 `## 시놉시스` 절 (b) 캐릭터 카드의 `## H-eries 분기 ~` 이하 모든 절 (c) frontmatter `heries_arc` (d) `worldbuilding/timeline/glossary/`. 작가 모드 = `VITE_AUTHOR_MODE=true` 환경 변수 (`npm run dev:author` / `npm run build:author`). 라이브 GitHub Pages 는 항상 reader 빌드만 배포.
+10. **작가 원칙 SSOT** — 챕터 작성 시 [`../content/series/clash-of-multiverses/worldbuilding/writing-principles.md`](../content/series/clash-of-multiverses/worldbuilding/writing-principles.md) 를 우선 참조. 핵심 = (a) 기승전결 4 단 구조 강제 (b) 묘사 자세히 — 시각·청각·촉각·공간 좌표·시간 박자 (c) 전투씬 *특히* 자세히 — 한 합 분해·호흡 단위·공간 좌표·부상·결과 (d) 모든 등장 인물 정의 의무 — 단독 카드 또는 [`4-minor/_mob-pool.md`](../content/series/clash-of-multiverses/characters/4-minor/_mob-pool.md) 1~2 줄 누적 (e) 한 챕터 한 사건 깊이 (시놉시스 압축 reject).
 
 ## 도구 우선순위
 

@@ -45,7 +45,7 @@ npm run typecheck        # 타입 체크
 ## 배포
 
 `main` 브랜치 push 시 [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) 가 자동으로 GitHub
-Pages 에 reader 빌드를 배포한다 (`https://홍도산.github.io/H-eries/`). 워크플로우는 `VITE_AUTHOR_MODE=""` 강제 — *
+Pages 에 reader 빌드를 배포한다 (`https://hongdosan.github.io/heries/`). 워크플로우는 `VITE_AUTHOR_MODE=""` 강제 — *
 *작가 빌드는 자동 배포 경로에 들어갈 수 없다**. 첫 배포 전 GitHub Repository → Settings → Pages → Source =
 `GitHub Actions` 로 변경 필요.
 

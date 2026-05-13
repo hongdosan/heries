@@ -30,7 +30,9 @@ updated: 2026-05-12
 
 > 각 페이즈의 화별 시놉시스는 작가(`홍도산`)가 그때 그때 제공하며, 페어링·세계관 디테일·용어 통일은 챕터 진행과 동시에 SSOT 로 점진 동기화한다. 본 절은 골격일 뿐, 세부는 작성 사이클에서 결정된다.
 
-## 등장인물 (초기 11 인)
+## 등장인물
+
+### 주연 (페이즈 1 무대 11 인)
 
 | # | 원형 / 키워드 | 자작 캐릭터 |
 |---|---|---|
@@ -46,7 +48,18 @@ updated: 2026-05-12
 | 10 | 환생자 (전생 검신 → 현생 학생) | [현우](./characters/2-major-supporting/hyeon-woo.md) |
 | 11 | 평범한 가정의 학생 (눈으로 본 기술을 따라 하는 카피) | [백무진](./characters/2-major-supporting/baek-mu-jin.md) |
 
-> 초반 등장인물 11 인. 향후 페이즈 진행 중 조연·카메오는 별도 추가 가능.
+### 단역·카메오 (페이즈 1 누적)
+
+| # | 역할 | 자작 캐릭터 | 등장 |
+|---|---|---|---|
+| 1 | 우진혁의 여동생 (카메오, 송금·문자의 수신자) | [우아진](./characters/4-minor/woo-a-jin.md) | ep-01 ~ |
+| 2 | 모집소 첫 동료 + 본 자리 옆 부대원 | [박찬호](./characters/4-minor/park-chan-ho.md) | ep-02 ~ |
+| 3 | 첫 작전 좌익 부대원 (ep-04 사망) | [김주영](./characters/4-minor/kim-ju-yeong.md) | ep-03 ~ ep-04 |
+| 4 | 첫 작전 우익·통신·정찰 부대원 (ep-04 사망) | [정민호](./characters/4-minor/jeong-min-ho.md) | ep-03 ~ ep-04 |
+| 5 | 정민호 자리 합류 신참 (ep-04 사망) | [박지훈](./characters/4-minor/park-ji-hun.md) | ep-04 |
+| 6 | 본 자리 옆 진형 부대원 (ep-04 사망) | [송재훈](./characters/4-minor/song-jae-hun.md) | ep-04 |
+
+> 이름 없는 단역·1 회성 인물은 [`./characters/4-minor/_mob-pool.md`](./characters/4-minor/_mob-pool.md) 에 누적. 모든 등장 인물은 *짧게라도 정의* — 미정의 인물 등장 = reject.
 
 ## 진입점
 
