@@ -34,35 +34,36 @@
 
 ```bash
 npm install              # 1회
-npm run dev              # 개발 서버 (http://localhost:8000) — reader 모드
-npm run dev:author       # 개발 서버 — 작가 모드 (스포일러 마스킹 해제)
+npm run dev              # 개발 서버 (http://localhost:8000)
 npm run build            # 프로덕션 빌드 (dist/) — GitHub Pages 배포용
-npm run build:author     # 작가 빌드 (dist-author/) — 비공개, 로컬 only
 npm run typecheck        # 타입 체크
 npm run storybook        # Storybook dev 서버 (port 6006)
 npm run build-storybook  # Storybook 정적 빌드 (storybook-static/, 미배포)
 ```
 
+`.env.local` (gitignored) 또는 GitHub Secret 으로 `VITE_AUTHOR_KEY=<임의문자열>` 주입 시 `/unlock` 페이지에서 작가 모드 진입 가능.
+
 ## 배포
 
-`main` 브랜치 push 시 [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) 가 자동으로 GitHub Pages 에 reader 빌드를 배포한다 (`https://hongdosan.github.io/heries/`). 워크플로우는 `VITE_AUTHOR_MODE=""` 강제 — **작가 빌드는 자동 배포 경로에 들어갈 수 없다**.
+`main` 브랜치 push 시 [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) 가 자동으로 GitHub Pages 에 단일 빌드를 배포한다 (`https://hongdosan.github.io/heries/`). 워크플로우는 GitHub Secret `VITE_AUTHOR_KEY` 를 빌드 env 로 주입한다.
 
 ---
 
 ## 스포일러 분리 (작가 모드 vs 독자 모드)
 
-라이브 사이트(`dist/`) 에서 **독자가 볼 수 있는 것** = 시리즈 목록 + 등장인물 (공개 절) + 발행된 챕터.
+정책 #9 v2 (2026-05-14) — **단일 라이브 빌드**. 작가 콘텐츠는 dist 산출물에 평문 포함되며, 기본 화면에서는 runtime 마스킹 (`shared/lib/spoiler.ts` + `useAuthorMode` hook) 으로 가려진다. 작가 모드 진입은 [`/unlock`](https://hongdosan.github.io/heries/unlock) 페이지에서 `VITE_AUTHOR_KEY` 검증 통과 시 sessionStorage `heries:author=1` 플래그 set. 탭을 닫으면 자동 잠금.
 
-**마스킹 대상** (reader 빌드에서 자동 제거):
+**마스킹 대상** (비-작가 모드에서 가림):
 
 - `_series.md` 의 `## 시놉시스` 절
 - 캐릭터 카드의 `## H-eries 분기 ~` 이하 모든 절
 - frontmatter `heries_arc` 필드
 - `worldbuilding/`, `timeline/`, `glossary/` 디렉토리
+- 등장인물 상세 페이지 (주인공 제외) — 라우트 가드로 잠금 안내
 
-**작가 모드** = `VITE_AUTHOR_MODE=true` 환경 변수. 마스킹이 모두 해제되며 헤더에 `AUTHOR` 배지 표시. **작가 빌드를 라이브 사이트에 절대 배포하지 말 것**.
+**보안 책임 분리** — 작가는 기본 마스킹과 환경변수 격리를 보장한다. reader 가 devtools / git clone 등으로 능동적으로 우회해 스포일러를 읽는 경우는 reader 자신의 책임 (지손해). 단 **개인정보·API 키·시크릿·작가 키는 절대 코드에 hardcode 금지** (CLAUDE.md #13). 빌드 시 `scripts/check-secrets.mjs` 가 dist 시크릿 패턴 누수를 검증.
 
-정책 SSOT: [`.claude/CLAUDE.md`](./.claude/CLAUDE.md) §원칙 #9.
+정책 SSOT: [`.claude/CLAUDE.md`](./.claude/CLAUDE.md) §원칙 #9 / #13.
 
 ---
 
@@ -95,8 +96,8 @@ heries/
 │       └── chapters/
 ├── scripts/                         # 빌드/운영 보조 (Node 표준, 의존성 0)
 │   ├── check-images.mjs                    # 이미지 사이즈 게이트 (500 KB)
-│   ├── check-masking.mjs                   # 마스킹 누수 게이트
-│   ├── copy-content.mjs                    # 스포 마스킹 + dist 복사
+│   ├── check-secrets.mjs                   # 시크릿 패턴 누수 게이트 (CLAUDE.md #13)
+│   ├── copy-content.mjs                    # content/ → dist/ 복사 (runtime 마스킹)
 │   └── optimize-images.mjs                 # WebP 압축
 ├── src/                             # FSD 6 레이어 — React 19 + TypeScript
 │   ├── README.md                           # FSD 가이드

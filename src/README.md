@@ -33,25 +33,24 @@ import { Header } from '../../widgets/header/header.js'
 
 ```bash
 npm install              # 1회
-npm run dev              # 개발 (http://localhost:8000) — reader 모드
-npm run dev:author       # 개발 — 작가 모드 (스포 마스킹 해제, AUTHOR 배지)
+npm run dev              # 개발 (http://localhost:8000)
 npm run build            # 프로덕션 (dist/) — 라이브 배포용
-npm run build:author     # 작가 빌드 (dist-author/) — 비공개
 npm run typecheck        # 타입 체크만
 ```
 
-`.tsx`/`.ts` 소스만 git 커밋. 빌드 산출물 (`dist/`, `dist-author/`, `node_modules/`) 은 `.gitignore`.
+`.tsx`/`.ts` 소스만 git 커밋. 빌드 산출물 (`dist/`, `node_modules/`, `storybook-static/`) 은 `.gitignore`.
 
-## 스포일러 분리
+## 스포일러 분리 (runtime, 정책 #9 v2)
 
-`shared/lib/spoiler.ts` 가 정책 SSOT. `IS_AUTHOR_MODE` (`shared/lib/env.ts`, `VITE_AUTHOR_MODE` 환경변수) 가 false (default) 면:
+`shared/lib/spoiler.ts` + `shared/lib/use-author-mode.ts` 가 SSOT. 단일 빌드 산출물에 작가 콘텐츠 평문 포함되되, runtime 에 `useAuthorMode()` hook 이 sessionStorage `heries:author=1` 플래그를 구독해 마스킹 분기:
 
 - `_series.md` 의 `## 시놉시스` 절 마스킹
 - 캐릭터 카드의 `## H-eries 분기 ~` 이하 모든 절 마스킹
 - 캐릭터 frontmatter 의 `heries_arc` 필드 제거
+- 캐릭터 상세 페이지 = 주인공 외 라우트 가드 (잠금 안내)
 - 챕터 본문은 마스킹 안 함 (이미 발행됨)
 
-작가 빌드는 라이브 사이트에 *절대* 배포 X. 로컬 `npm run dev:author` 또는 `npm run build:author` 로만 운용.
+작가 모드 진입 = `/unlock` 페이지 폼 또는 `?unlock=KEY` 쿼리. `VITE_AUTHOR_KEY` 환경변수 (`.env.local` / GitHub Secret) 와 평문 비교. 환경변수 미설정 시 영구 잠금.
 
 ## 페이지 디자인 (디자인 시스템 v3)
 
