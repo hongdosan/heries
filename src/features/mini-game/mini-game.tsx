@@ -53,6 +53,43 @@ const SKILL_DURATION_FRAMES = 60      // 1초 발동 (무적 + push)
 const SKILL_PUSH_RADIUS = 100         // 100px 반경
 const SKILL_PUSH_STRENGTH = 34        // 적 밀어내기 강도
 
+// 파티클 색상 — 게임 톤 (모두 hex). CSS var 와 분리된 이유 = JS 안에서
+// 동적 매개변수로 spawnParticles 에 전달. CSS 변수는 stylesheet 한정.
+const COLOR_HIT_NORMAL = '#fda4af'    // 일반 적 피격 파티클
+const COLOR_HIT_ELITE = '#f59e0b'     // 엘리트 적 피격 파티클
+const COLOR_KILL_NORMAL = '#fecaca'   // 일반 적 처치 폭발 파티클
+const COLOR_KILL_ELITE = '#fbbf24'    // 엘리트 적 처치 폭발 파티클
+const COLOR_PLAYER_HIT = '#7dd3fc'    // 플레이어 피격 파티클 (스킬 ring 색과 동일)
+const COLOR_ITEM_HEART = '#fca5a5'    // HP 회복 아이템 픽업 파티클
+const COLOR_ITEM_GEM = '#fde68a'      // 점수 아이템 픽업 파티클
+
+// 파티클 개수 — 적 피격/처치 시 spawn 개수
+const PARTICLES_HIT_NORMAL = 5
+const PARTICLES_HIT_ELITE = 8
+const PARTICLES_KILL = 10
+const PARTICLES_PLAYER_HIT = 8
+const PARTICLES_ITEM_PICKUP = 12
+const PARTICLES_SKILL_ACTIVATE = 20
+
+// 게임 진행 기타 임계
+const ITEM_BLINK_THRESHOLD_FRAMES = 120  // 마지막 2초 (60fps) 깜빡임
+const ITEM_BLINK_INTERVAL_FRAMES = 12    // 깜빡임 주기
+const PARTICLE_FRICTION = 0.92           // 파티클 마찰 계수 (frame 마다)
+const PARTICLE_LIFE_FRAMES = 28          // 파티클 수명
+const PARTICLE_SPEED_MIN = 1
+const PARTICLE_SPEED_RANGE = 2.6
+const SPAWN_JITTER_FRAMES = 8            // spawn 간격 랜덤 편차
+const PLAYER_OPACITY_BLINK_INTERVAL = 6  // 무적 시 깜빡임 주기 (frame)
+const PLAYER_OPACITY_BLINK_DUTY = 3      // 깜빡임 듀티
+const SKILL_RING_BASE_SCALE = 0.6
+const SKILL_RING_SCALE_DELTA = 1.6
+const ANNOUNCE_FADE_MS = 1100
+const FLASH_FADE_MS = 180
+const DT_BASE_MS = 16.67                 // 60fps 기준
+const DT_SCALE_MIN = 0.5
+const DT_SCALE_MAX = 2.5
+const RAW_HIT_PADDING_PX = 20            // 총알이 stage 밖으로 나가는 임계
+
 // ─── 타입 ──────────────────────────────────────────────────────
 interface Vec {
   x: number
@@ -107,22 +144,12 @@ interface AttackFlash {
   angle: number
 }
 
-interface ViewState {
-  width: number
-  height: number
-  isDesktop: boolean
-}
-
 interface InputState {
-  // 정규화 이동 벡터 (-1 ~ 1)
+  // 정규화 이동 벡터 (-1 ~ 1) — 가상 패드 결과.
   mx: number
   my: number
-  // 발사 신호 (this frame)
+  // 발사 신호 (이번 frame 안에서 step 이 소비).
   shoot: boolean
-  // 발사 방향 (정규화)
-  aimX: number
-  aimY: number
-  hasAim: boolean
 }
 
 type Phase = 'idle' | 'playing' | 'over'
@@ -190,7 +217,7 @@ function tryActivateSkill(p: Player, enemies: Enemy[], particles: Particle[]): b
       e.y += n.y * SKILL_PUSH_STRENGTH
     }
   }
-  spawnParticles(particles, pcx, pcy, '#7dd3fc', 20)
+  spawnParticles(particles, pcx, pcy, COLOR_PLAYER_HIT, PARTICLES_SKILL_ACTIVATE)
   return true
 }
 
@@ -243,7 +270,30 @@ function spawnItem(out: Item[], elite: boolean, x: number, y: number): void {
 
 function computePlayerOpacity(invuln: number): string {
   if (invuln <= 0) return '1'
-  return invuln % 6 < 3 ? '0.4' : '1'
+  return invuln % PLAYER_OPACITY_BLINK_INTERVAL < PLAYER_OPACITY_BLINK_DUTY ? '0.4' : '1'
+}
+
+// 아이템 픽업 효과 — pickup 결과에 따라 플레이어 상태 갱신 + 파티클 + 알림.
+// 호출자가 hudDirtyRef / setAnnounce / scoreRef 갱신.
+function applyItemEffect(
+  kind: ItemKind,
+  p: Player,
+  particles: Particle[],
+): { scoreBonus: number; announceText: string } {
+  if (kind === 'heart') {
+    p.hp = Math.min(PLAYER_MAX_HP, p.hp + ITEM_HP_HEAL)
+    spawnParticles(particles, p.x + PLAYER_SIZE / 2, p.y + PLAYER_SIZE / 2, COLOR_ITEM_HEART, PARTICLES_ITEM_PICKUP)
+    return { scoreBonus: 0, announceText: `+${ITEM_HP_HEAL} HP` }
+  }
+  // gem
+  spawnParticles(particles, p.x + PLAYER_SIZE / 2, p.y + PLAYER_SIZE / 2, COLOR_ITEM_GEM, PARTICLES_ITEM_PICKUP)
+  return { scoreBonus: ITEM_SCORE_BONUS, announceText: `+${ITEM_SCORE_BONUS}` }
+}
+
+// 아이템 표시 opacity (마지막 깜빡임 단계 처리). render 안 nested ternary 회피.
+function computeItemOpacity(life: number): string {
+  if (life >= ITEM_BLINK_THRESHOLD_FRAMES) return '1'
+  return life % ITEM_BLINK_INTERVAL_FRAMES < ITEM_BLINK_INTERVAL_FRAMES / 2 ? '0.35' : '1'
 }
 
 // ─── step 분리 — pure helper 함수들 ────────────────────────
@@ -299,6 +349,7 @@ function fireBullet(p: Player, bullets: Bullet[]): { dx: number; dy: number } {
 }
 
 function updateBullets(bullets: Bullet[], scale: number): void {
+  const padding = RAW_HIT_PADDING_PX
   for (let i = bullets.length - 1; i >= 0; i--) {
     const b = bullets[i]
     if (!b) continue
@@ -307,8 +358,8 @@ function updateBullets(bullets: Bullet[], scale: number): void {
     b.life -= scale
     if (
       b.life <= 0 ||
-      b.x < -20 || b.x > WORLD_W + 20 ||
-      b.y < -20 || b.y > WORLD_H + 20
+      b.x < -padding || b.x > WORLD_W + padding ||
+      b.y < -padding || b.y > WORLD_H + padding
     ) {
       bullets.splice(i, 1)
     }
@@ -345,11 +396,12 @@ function resolveBulletEnemyHits(
     bullets.splice(j, 1)
     e.hp -= 1
     spawnParticles(particles, e.x + e.size / 2, e.y + e.size / 2,
-      e.elite ? '#f59e0b' : '#fda4af', e.elite ? 8 : 5)
+      e.elite ? COLOR_HIT_ELITE : COLOR_HIT_NORMAL,
+      e.elite ? PARTICLES_HIT_ELITE : PARTICLES_HIT_NORMAL)
     if (e.hp <= 0) {
       gained += e.elite ? SCORE_ELITE : SCORE_NORMAL
       spawnParticles(particles, e.x + e.size / 2, e.y + e.size / 2,
-        e.elite ? '#fbbf24' : '#fecaca', 10)
+        e.elite ? COLOR_KILL_ELITE : COLOR_KILL_NORMAL, PARTICLES_KILL)
       spawnItem(items, e.elite, e.x + e.size / 2, e.y + e.size / 2)
       dirty = true
       enemies.splice(i, 1)
@@ -375,8 +427,8 @@ function resolvePlayerEnemyHits(p: Player, enemies: Enemy[], particles: Particle
   for (const e of enemies) {
     if (rectsOverlap(p.x, p.y, PLAYER_SIZE, PLAYER_SIZE, e.x, e.y, e.size, e.size)) {
       p.hp -= 1
-      p.invuln = Math.round(PLAYER_IFRAME_MS / 16)
-      spawnParticles(particles, p.x + PLAYER_SIZE / 2, p.y + PLAYER_SIZE / 2, '#7dd3fc', 8)
+      p.invuln = Math.round(PLAYER_IFRAME_MS / DT_BASE_MS)
+      spawnParticles(particles, p.x + PLAYER_SIZE / 2, p.y + PLAYER_SIZE / 2, COLOR_PLAYER_HIT, PARTICLES_PLAYER_HIT)
       return true
     }
   }
@@ -407,8 +459,8 @@ function resolveItemPickup(p: Player, items: Item[]): ItemKind | null {
 }
 
 function updateParticles(particles: Particle[], scale: number): void {
-  // 마찰 0.92 ^ scale 로 dt 보정 (frame 마다 누적 효과 동일).
-  const friction = Math.pow(0.92, scale)
+  // 마찰 ^ scale 로 dt 보정 (frame 마다 누적 효과 동일).
+  const friction = Math.pow(PARTICLE_FRICTION, scale)
   for (let i = particles.length - 1; i >= 0; i--) {
     const q = particles[i]
     if (!q) continue
@@ -424,14 +476,14 @@ function updateParticles(particles: Particle[], scale: number): void {
 function spawnParticles(out: Particle[], x: number, y: number, color: string, n: number): void {
   for (let i = 0; i < n; i++) {
     const a = Math.random() * Math.PI * 2
-    const s = 1 + Math.random() * 2.6
+    const s = PARTICLE_SPEED_MIN + Math.random() * PARTICLE_SPEED_RANGE
     out.push({
       id: nextId(),
       x, y,
       dx: Math.cos(a) * s,
       dy: Math.sin(a) * s,
-      life: 28,
-      max: 28,
+      life: PARTICLE_LIFE_FRAMES,
+      max: PARTICLE_LIFE_FRAMES,
       color,
     })
   }
@@ -463,10 +515,10 @@ function writeBestScore(n: number): void {
 
 export interface MiniGameProps {
   // 외부에서 강제 폭 지정 가능 (스토리북 등)
-  autoFocus?: boolean
+  readonly autoFocus?: boolean
 }
 
-export function MiniGame({autoFocus = false}: MiniGameProps) {
+export function MiniGame({ autoFocus = false }: Readonly<MiniGameProps>) {
   const [phase, setPhase] = useState<Phase>('idle')
   const [score, setScore] = useState<number>(0)
   const [hpView, setHpView] = useState<number>(PLAYER_MAX_HP)
@@ -479,11 +531,6 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
     text: string;
     kind: 'wave' | 'elite' | 'item'
   } | null>(null)
-  const [view, setView] = useState<ViewState>({
-    width: WORLD_W,
-    height: WORLD_H,
-    isDesktop: true,
-  })
 
   // refs (게임 루프 상태 — 리렌더 회피)
   const stageRef = useRef<HTMLDivElement | null>(null)
@@ -492,14 +539,7 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
   const bulletsRef = useRef<Bullet[]>([])
   const particlesRef = useRef<Particle[]>([])
   const itemsRef = useRef<Item[]>([])
-  const inputRef = useRef<InputState>({
-    mx: 0,
-    my: 0,
-    shoot: false,
-    aimX: 0,
-    aimY: -1,
-    hasAim: false
-  })
+  const inputRef = useRef<InputState>({ mx: 0, my: 0, shoot: false })
   const keysRef = useRef<Set<string>>(new Set())
   const frameRef = useRef<number>(0)
   const waveTimerRef = useRef<number>(0)
@@ -512,6 +552,9 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
   // 렌더 동기화용 — rAF 안에서 setState 1회씩만 호출 (HUD 갱신)
   const hudDirtyRef = useRef<boolean>(false)
   const skillReadyRef = useRef<boolean>(true)
+  // best-score 비교용 ref — setState callback 안 side effect 회피.
+  // 초기값 = localStorage 읽기 1회 (state 와 동기화).
+  const bestScoreRef = useRef<number>(readBestScore())
 
   // DOM 노드 ref — 렌더는 rAF 마다 transform 만 갱신 (React 재렌더 회피)
   const playerElRef = useRef<HTMLDivElement | null>(null)
@@ -524,18 +567,6 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
   const enemyElMap = useRef<Map<number, HTMLDivElement>>(new Map())
   const bulletElMap = useRef<Map<number, HTMLDivElement>>(new Map())
   const particleElMap = useRef<Map<number, HTMLDivElement>>(new Map())
-
-  // ─── 뷰포트 분기 ────────────────────────────────────────
-  useLayoutEffect(() => {
-    const onResize = (): void => {
-      const w = window.innerWidth
-      const h = window.innerHeight
-      setView({width: w, height: h, isDesktop: w >= 768})
-    }
-    onResize()
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
-  }, [])
 
   // ─── 박스 크기 → --mg-scale 동기화 ─────────────────────
   const frameRefEl = useRef<HTMLDivElement | null>(null)
@@ -699,9 +730,9 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
     }
   }, [stageRectToWorld])
 
-  const onStagePointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>): void => {
+  const releasePad = useCallback((pointerId: number | null): void => {
     const pad = padActiveRef.current
-    if (pad?.id === e.pointerId) {
+    if (pad && (pointerId == null || pad.id === pointerId)) {
       padActiveRef.current = null
       inputRef.current.mx = 0
       inputRef.current.my = 0
@@ -709,6 +740,23 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
       if (padDotRef.current) padDotRef.current.style.opacity = '0'
     }
   }, [])
+
+  const onStagePointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>): void => {
+    releasePad(e.pointerId)
+  }, [releasePad])
+
+  // window 레벨 pointerup/cancel — pointer 가 stage 밖에서 release 시
+  // stage 의 onPointerUp 이 발화 안 함 (setPointerCapture 폐기 후 정합).
+  // padActive stuck 방지를 위해 window 레벨에서도 release.
+  useEffect(() => {
+    const handler = (e: PointerEvent): void => releasePad(e.pointerId)
+    globalThis.addEventListener('pointerup', handler)
+    globalThis.addEventListener('pointercancel', handler)
+    return () => {
+      globalThis.removeEventListener('pointerup', handler)
+      globalThis.removeEventListener('pointercancel', handler)
+    }
+  }, [releasePad])
 
   // viewport 가시성 + focus — 둘 다 활성이어야 RAF 가동 (CPU 절감 + 사고 방지).
   const [isVisible, setIsVisible] = useState<boolean>(true)
@@ -738,12 +786,12 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
     }
 
     const tick = (t: number): void => {
-      // dt scale = (실제 frame 간격) / (60fps 기준 16.67ms).
-      // 60fps 환경 = 1.0, 30fps 환경 = ~2.0. 모바일/PC 속도 일관화.
-      // 첫 frame 또는 큰 hitch (탭 백그라운드) 는 2.5 로 clamp (catch-up 폭주 방지).
+      // dt scale = (실제 frame 간격) / (60fps 기준). 60fps 환경 = 1.0,
+      // 30fps 환경 = ~2.0. 모바일/PC 속도 일관화. 큰 hitch (탭 백그라운드)
+      // 는 DT_SCALE_MAX 로 clamp (catch-up 폭주 방지).
       const last = lastTickRef.current
-      const dt = last > 0 ? t - last : 16.67
-      const scale = Math.min(2.5, Math.max(0.5, dt / 16.67))
+      const dt = last > 0 ? t - last : DT_BASE_MS
+      const scale = Math.min(DT_SCALE_MAX, Math.max(DT_SCALE_MIN, dt / DT_BASE_MS))
       lastTickRef.current = t
 
       step(scale)
@@ -822,7 +870,7 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
         setAnnounce({id: nextId(), text: '魔 등장', kind: 'elite'})
       }
       const base = Math.max(SPAWN_MIN_FRAMES, SPAWN_BASE_FRAMES - (currentWave - 1) * SPAWN_WAVE_REDUCTION)
-      spawnTimerRef.current = base + Math.floor(rand(-8, 8))
+      spawnTimerRef.current = base + Math.floor(rand(-SPAWN_JITTER_FRAMES, SPAWN_JITTER_FRAMES))
     }
 
     // 이동 + 충돌 + 아이템 + 파티클
@@ -836,16 +884,11 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
     }
     updateItems(itemsRef.current, scale)
     const picked = resolveItemPickup(p, itemsRef.current)
-    if (picked === 'heart') {
-      p.hp = Math.min(PLAYER_MAX_HP, p.hp + ITEM_HP_HEAL)
-      spawnParticles(particlesRef.current, p.x + PLAYER_SIZE / 2, p.y + PLAYER_SIZE / 2, '#fca5a5', 12)
+    if (picked) {
+      const effect = applyItemEffect(picked, p, particlesRef.current)
+      scoreRef.current += effect.scoreBonus
       hudDirtyRef.current = true
-      setAnnounce({id: nextId(), text: '+1 HP', kind: 'item'})
-    } else if (picked === 'gem') {
-      scoreRef.current += ITEM_SCORE_BONUS
-      spawnParticles(particlesRef.current, p.x + PLAYER_SIZE / 2, p.y + PLAYER_SIZE / 2, '#fde68a', 12)
-      hudDirtyRef.current = true
-      setAnnounce({id: nextId(), text: `+${ITEM_SCORE_BONUS}`, kind: 'item'})
+      setAnnounce({ id: nextId(), text: effect.announceText, kind: 'item' })
     }
     updateParticles(particlesRef.current, scale)
 
@@ -855,13 +898,13 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
       setPhase('over')
       setScore(scoreRef.current)
       setHpView(0)
-      setBestScore((prev) => {
-        if (scoreRef.current > prev) {
-          writeBestScore(scoreRef.current)
-          return scoreRef.current
-        }
-        return prev
-      })
+      // setState callback 안 side effect 회피 (StrictMode 중복 호출 방지).
+      const finalScore = scoreRef.current
+      if (finalScore > bestScoreRef.current) {
+        bestScoreRef.current = finalScore
+        writeBestScore(finalScore)
+        setBestScore(finalScore)
+      }
     } else if (hudDirtyRef.current) {
       setScore(scoreRef.current)
       setHpView(p.hp)
@@ -888,7 +931,7 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
       if (p.skillActive > 0) {
         const t = 1 - p.skillActive / SKILL_DURATION_FRAMES // 0 → 1
         skillRingRef.current.style.opacity = String(1 - t)
-        skillRingRef.current.style.transform = `translate(-50%, -50%) scale(${0.6 + t * 1.6})`
+        skillRingRef.current.style.transform = `translate(-50%, -50%) scale(${SKILL_RING_BASE_SCALE + t * SKILL_RING_SCALE_DELTA})`
       } else {
         skillRingRef.current.style.opacity = '0'
       }
@@ -906,13 +949,14 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
       el.style.transform = `translate(${e.x}px, ${e.y}px)`
     })
 
-    // 총알
+    // 검기 (총알) — 진행 방향으로 회전, 꼬리 trail
     syncEntityLayer(bulletsRef.current, bulletElMap.current, bulletsLayerRef.current, () => {
       const el = document.createElement('div')
       el.className = 'mg-bullet'
       return el
     }, (b, el) => {
-      el.style.transform = `translate(${b.x}px, ${b.y}px)`
+      const angle = Math.atan2(b.dy, b.dx)
+      el.style.transform = `translate(${b.x}px, ${b.y}px) rotate(${angle}rad)`
     })
 
     // 아이템 (적보다 먼저 그려서 적이 위로 오게)
@@ -925,8 +969,7 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
       return el
     }, (it, el) => {
       el.style.transform = `translate(${it.x}px, ${it.y}px)`
-      // 마지막 2초 동안 깜빡임 (수명 = 120 frame 이하)
-      el.style.opacity = it.life < 120 ? (it.life % 12 < 6 ? '0.35' : '1') : '1'
+      el.style.opacity = computeItemOpacity(it.life)
     })
 
     // 파티클
@@ -951,17 +994,17 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
     if (autoFocus && phase === 'idle') start()
   }, [autoFocus, phase, start])
 
-  // 공격 플래시 자동 소멸
+  // 공격 플래시 자동 소멸 (CSS animation 끝나는 시점에 맞춰 unmount)
   useEffect(() => {
     if (!flash) return
-    const t = globalThis.setTimeout(() => setFlash(null), 120)
+    const t = globalThis.setTimeout(() => setFlash(null), FLASH_FADE_MS)
     return () => globalThis.clearTimeout(t)
   }, [flash])
 
-  // 알림 (wave / elite) 자동 소멸
+  // 알림 (wave / elite / item) 자동 소멸
   useEffect(() => {
     if (!announce) return
-    const t = globalThis.setTimeout(() => setAnnounce(null), 1100)
+    const t = globalThis.setTimeout(() => setAnnounce(null), ANNOUNCE_FADE_MS)
     return () => globalThis.clearTimeout(t)
   }, [announce])
 
@@ -970,7 +1013,7 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
   const hpEmpty = '🖤'.repeat(Math.max(0, PLAYER_MAX_HP - hpView))
 
   return (
-    <div className={'mini-game' + (view.isDesktop ? '' : ' is-mobile')}>
+    <div className="mini-game">
       <div className="mini-game-frame" ref={frameRefEl}>
         <div
           ref={stageRef}
@@ -1041,7 +1084,7 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
             </div>
           )}
 
-          {/* 공격 플래시 */}
+          {/* 공격 시 검광 슬래시 (이모지 X, gradient streak — 무협 검기 톤) */}
           {flash && (
             <div
               key={flash.id}
@@ -1049,10 +1092,10 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
               style={{
                 left: flash.x,
                 top: flash.y,
-                transform: `translate(-50%, -50%) rotate(${flash.angle}rad)`,
+                transform: `rotate(${flash.angle}rad)`,
               }}
               aria-hidden="true"
-            >☯️</div>
+            />
           )}
 
           {/* 가상 패드 표시 (모바일) */}
