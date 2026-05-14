@@ -118,11 +118,33 @@
   height: auto;
 }
 @media (max-width: 640px) {
-  .mini-game-dialog { width: calc(100vw - 12px); max-height: calc(100dvh - 12px); }
-  .mini-game-dialog-card { max-height: calc(100dvh - 12px); }
-  .mini-game-dialog-body { padding: 8px; }
+  /* 모바일 = 전체화면 고정. 헤더만 sticky, 게임 영역 = viewport 전체에 fit. */
+  .mini-game-dialog {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+  .mini-game-dialog-card {
+    width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    border: 0;
+  }
+  .mini-game-dialog-head {
+    padding: 10px 12px;
+  }
+  .mini-game-dialog-body {
+    padding: 6px;
+  }
   .mini-game-dialog-body .mini-game-frame {
-    width: min(100%, calc((100dvh - 12px - 56px - 16px) * 9 / 16));
+    /* 헤더(약 48px) + body padding (12px) 빼고 height 우선 fit (9:16). */
+    width: min(100%, calc((100dvh - 48px - 12px) * 9 / 16));
+    max-width: 100%;
+    /* iOS Safari address bar 변동 대응 — height 도 명시 */
+    max-height: calc(100dvh - 48px - 12px);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -446,14 +468,21 @@
 .mg-skill-btn.is-ready:hover { transform: scale(1.06); }
 .mg-skill-btn.is-ready:active { transform: scale(0.94); }
 @media (max-width: 640px), (pointer: coarse) {
-  /* 모바일 / 터치 환경 = 더 크게 + 손가락 접근 좋은 자리 (우측 가운데).
-     상단 HUD 와 겹치지 않도록 top 위치는 그대로 두되, 사이즈 ↑ + 우측 여백 ↑. */
+  /* 모바일 / 터치 환경 = 엄지 자연 자리 = 좌하단.
+     좌측 = 이동 패드 영역이지만 버튼 위 탭 = onClick 우선 (e.stopPropagation),
+     패드 활성과 충돌하지 않음. 우하단은 발사 탭과 시각적 혼동 위험. */
   .mg-skill-btn {
-    width: 58px;
-    height: 58px;
-    font-size: 26px;
-    top: 64px;
-    right: 14px;
+    width: 62px;
+    height: 62px;
+    font-size: 28px;
+    top: auto;
+    right: auto;
+    bottom: 16px;
+    left: 16px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  }
+  .mg-skill-btn.is-ready {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45), 0 0 16px rgba(125, 211, 252, 0.5);
   }
 }
 
