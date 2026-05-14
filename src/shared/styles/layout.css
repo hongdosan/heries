@@ -1,0 +1,32 @@
+/* H-eries — Page shells + Breadcrumb */
+/* ─── Page shells ───────────────────────────────────────── */
+main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--w-page);
+  margin: 0 auto;
+  padding: var(--s-7) var(--gutter) var(--s-9);
+}
+main.page-chapter { max-width: var(--w-reader); padding-top: var(--s-6); }
+main.page-about { max-width: var(--w-reader); padding-top: var(--s-6); }
+.about-meta {
+  margin: 0 0 var(--s-5);
+  font-size: var(--fs-xs);
+  color: var(--fg-4);
+  font-family: var(--font-mono);
+}
+
+/* ─── Breadcrumb ────────────────────────────────────────── */
+.breadcrumb {
+  font-size: var(--fs-sm);
+  color: var(--fg-3);
+  margin: 0 0 var(--s-5);
+}
+.breadcrumb a { color: var(--fg-3); }
+.breadcrumb a:hover { color: var(--accent); }
+.breadcrumb .sep { margin: 0 var(--s-2); color: var(--fg-4); }
+.breadcrumb span { color: var(--fg-2); }
+
+@media (max-width: 640px) {
+  main { padding-top: var(--s-5); }
+}

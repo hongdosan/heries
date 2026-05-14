@@ -1,0 +1,62 @@
+/* H-eries — Headings */
+/* ─── Headings ──────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--fg);
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+main h1 {
+  font-size: var(--fs-3xl);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin: 0 0 var(--s-3);
+}
+main h2 {
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  margin: var(--s-7) 0 var(--s-3);
+}
+main h3 {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  margin: var(--s-5) 0 var(--s-2);
+}
+main h4 {
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--fg-2);
+  margin: var(--s-4) 0 var(--s-2);
+}
+main .subtitle {
+  color: var(--fg-3);
+  font-size: var(--fs-md);
+  margin: 0 0 var(--s-5);
+}
+
+/* ─── Heading anchor link (h2/h3 hover #) ──────────────── */
+/* markdown 렌더러가 h2/h3 에 자동 부착. hover 시만 노출.
+   클릭 시 URL fragment 갱신 + 같은 페이지 내 스크롤 (브라우저 기본 동작). */
+.heading-anchor {
+  margin-left: var(--s-2);
+  color: var(--fg-4);
+  opacity: 0;
+  transition: opacity var(--t-fast), color var(--t-fast);
+  font-weight: 400;
+  text-decoration: none;
+}
+h2:hover .heading-anchor,
+h3:hover .heading-anchor,
+.heading-anchor:focus-visible {
+  opacity: 1;
+}
+.heading-anchor:hover { color: var(--accent); }
+
+/* 챕터 본문 (.article-prose) 안에서는 anchor 자체를 숨김 — 가독성 우선 */
+.article-prose .heading-anchor { display: none; }
+
+@media (max-width: 640px) {
+  main h1 { font-size: var(--fs-2xl); }
+  /* 모바일은 hover 가 없어 anchor 가 항상 보이게 (터치 후 사용 가능) */
+  .heading-anchor { opacity: 0.4; }
+}

@@ -1,0 +1,65 @@
+/* H-eries — Reset */
+/* ─── Reset ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg-2);
+  font-family: var(--font);
+  font-size: var(--fs-base);
+  line-height: 1.7;
+  font-feature-settings: "ss01", "tnum";
+  min-height: 100vh;
+}
+
+body { display: flex; flex-direction: column; }
+#app { display: flex; flex-direction: column; flex: 1; }
+
+img, svg { max-width: 100%; display: block; }
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color var(--t-fast);
+}
+a:hover { color: var(--accent-hover); }
+
+::selection { background: var(--accent-soft); color: var(--fg); }
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+/* 키보드 탐색 a11y — 모든 interactive 에 일관 focus indicator.
+   :focus-visible = 마우스 클릭은 무시, 키보드 Tab 만 발화. */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 3px;
+  border-radius: var(--r-sm);
+}
+
+.loading {
+  color: var(--fg-3);
+  text-align: center;
+  padding: var(--s-8) 0;
+  font-size: var(--fs-sm);
+}

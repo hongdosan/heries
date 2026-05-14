@@ -1,0 +1,300 @@
+/* H-eries — Chapter page (reader) + prev/next */
+/* ─── Chapter page (reader) ─────────────────────────────── */
+.chapter-outline {
+  margin: 0 0 var(--s-5);
+  padding: var(--s-3) var(--s-4);
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+}
+.chapter-outline summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  color: var(--fg-2);
+  letter-spacing: 0.02em;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.chapter-outline summary::-webkit-details-marker { display: none; }
+.chapter-outline summary::before {
+  content: '▸';
+  font-size: var(--fs-xs);
+  color: var(--fg-3);
+  transition: transform var(--t-fast);
+}
+.chapter-outline[open] summary::before {
+  transform: rotate(90deg);
+}
+.chapter-outline ol {
+  margin: var(--s-3) 0 0;
+  padding-left: var(--s-5);
+  font-size: var(--fs-sm);
+  color: var(--fg-3);
+}
+.chapter-outline ol li {
+  margin: var(--s-2) 0;
+}
+.chapter-outline ol li a {
+  color: var(--fg-2);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color var(--t-fast), border-color var(--t-fast);
+}
+.chapter-outline ol li a:hover {
+  color: var(--accent);
+  border-color: var(--accent-ring);
+}
+
+.scroll-nav {
+  /*
+   * 챕터 페이지 본문 (max-width = var(--w-reader) = 680px) 의 우측 가장자리에
+   * 가까이 붙도록 배치. 화면이 본문보다 넓을 때는 *본문 + gutter* 직후에
+   * 떠 있고, 화면이 좁아지면 viewport 우측에 붙는다.
+   */
+  position: fixed;
+  bottom: var(--s-5);
+  right: max(var(--s-5), calc((100vw - var(--w-reader)) / 2 - 48px - var(--s-2)));
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  z-index: 30;
+}
+.scroll-nav-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--fg-2);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow);
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: color var(--t-fast), background var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
+}
+.scroll-nav-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent-ring);
+  transform: translateY(-1px);
+}
+@media (max-width: 640px) {
+  .scroll-nav {
+    right: var(--s-3);
+    bottom: var(--s-3);
+  }
+}
+
+.chapter-cover {
+  margin: 0 0 var(--s-5);
+  aspect-ratio: 16 / 9;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+}
+.chapter-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.chapter-hero {
+  margin: 0 0 var(--s-6);
+  padding-bottom: var(--s-5);
+  border-bottom: 1px solid var(--rule);
+}
+.ep-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.18em;
+  color: var(--fg-3);
+  margin: 0 0 var(--s-3);
+  text-transform: uppercase;
+}
+.chapter-hero h1 {
+  font-size: var(--fs-2xl);
+  margin: 0 0 var(--s-3);
+}
+.chapter-meta {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--fg-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.article {
+  font-size: var(--fs-md);
+  line-height: 1.95;
+  color: var(--fg-2);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.article p { margin: var(--s-4) 0; text-wrap: pretty; }
+.article ul, .article ol { padding-left: var(--s-6); margin: var(--s-4) 0; }
+.article li { margin: var(--s-2) 0; }
+.article hr {
+  border: 0;
+  height: 1px;
+  background: var(--rule);
+  margin: var(--s-7) auto;
+  width: 30%;
+}
+/* ───────────────────────────────────────────────────────────
+ * 블록·표 시각은 위키(.article-wiki) 본문에만 적용.
+ * 챕터 본문(.article-prose) 은 강조 시각 0 — 읽기 방해 제거.
+ * ─────────────────────────────────────────────────────────── */
+
+/* Character article — wiki 톤, 강조 시각 유지 */
+.article-wiki { font-size: var(--fs-base); line-height: 1.75; }
+.article-wiki p { margin: var(--s-3) 0; }
+.article-wiki h2 { margin-top: var(--s-6); }
+.article-wiki blockquote {
+  margin: var(--s-5) 0;
+  padding: var(--s-3) var(--s-5);
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  color: var(--fg-2);
+}
+.article-wiki blockquote p { margin: var(--s-1) 0; }
+.article-wiki code {
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  color: var(--fg);
+}
+.article-wiki pre {
+  background: var(--bg-sunken);
+  padding: var(--s-4) var(--s-5);
+  border-radius: var(--r-md);
+  border: 1px solid var(--rule);
+  overflow-x: auto;
+  font-size: var(--fs-sm);
+}
+.article-wiki pre code { background: transparent; padding: 0; }
+.article-wiki table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: var(--s-5) 0;
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+}
+.article-wiki th, .article-wiki td {
+  border-bottom: 1px solid var(--rule);
+  padding: var(--s-2) var(--s-3);
+  text-align: left;
+  vertical-align: top;
+}
+.article-wiki th {
+  background: var(--bg-soft);
+  font-weight: 600;
+  color: var(--fg);
+}
+.article-wiki strong { color: var(--fg); font-weight: 600; }
+.article-wiki em { font-style: normal; color: var(--accent); }
+.article-wiki a { border-bottom: 1px solid var(--accent-ring); }
+.article-wiki a:hover { border-bottom-color: var(--accent); }
+
+/* Chapter prose — 강조 시각 평탄화 (사용자 요청: 읽기 방해 제거) */
+.article-prose strong,
+.article-prose em,
+.article-prose b,
+.article-prose i {
+  font-weight: inherit;
+  font-style: inherit;
+  color: inherit;
+}
+.article-prose code,
+.article-prose pre {
+  background: transparent;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+.article-prose blockquote {
+  margin: var(--s-4) 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+  color: inherit;
+}
+.article-prose blockquote p { margin: var(--s-4) 0; }
+.article-prose a {
+  color: inherit;
+  border-bottom: 0;
+}
+.article-prose a:hover { color: var(--accent); }
+.article-prose abbr {
+  text-decoration: none;
+  cursor: inherit;
+  border-bottom: 0;
+}
+
+/* ─── Chapter prev / next ───────────────────────────────── */
+.chapter-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-3);
+  margin-top: var(--s-8);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--rule);
+}
+.chapter-nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding: var(--s-4) var(--s-5);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  color: var(--fg-2);
+  transition: transform var(--t-fast), border-color var(--t-fast),
+              box-shadow var(--t-fast);
+}
+.chapter-nav-link:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent-ring);
+  box-shadow: var(--shadow);
+  color: var(--fg-2);
+}
+.chapter-nav-link.next { text-align: right; }
+.chapter-nav-link .dir {
+  font-size: var(--fs-xs);
+  color: var(--accent);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.chapter-nav-link .title {
+  font-size: var(--fs-md);
+  color: var(--fg);
+  font-weight: 500;
+}
+.chapter-nav-spacer { display: block; }
+
+.chapter-back {
+  text-align: center;
+  margin-top: var(--s-5);
+  font-size: var(--fs-sm);
+}
+.chapter-back a { color: var(--fg-3); }
+.chapter-back a:hover { color: var(--accent); }
+
+@media (max-width: 640px) {
+  .article { font-size: var(--fs-base); line-height: 1.85; }
+  .chapter-nav { grid-template-columns: 1fr; }
+}

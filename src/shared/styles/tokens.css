@@ -1,0 +1,133 @@
+/* H-eries — Design tokens */
+/* ============================================================
+   H-eries — design system v3 (clean modern, Pretendard-only)
+   - Single typeface (Pretendard) for Korean readability
+   - Quiet monochrome palette + minimal accent
+   - Layout: tabbed series page, narrow chapter reader,
+            split character page (meta | body)
+   - Auto dark mode
+   ============================================================ */
+
+:root {
+  /* Surface */
+  --bg: #ffffff;
+  --bg-soft: #f7f7f5;
+  --bg-sunken: #efefec;
+  --surface: #ffffff;
+
+  /* Text */
+  --fg: #16161a;
+  --fg-2: #3a3a40;
+  --fg-3: #6e6e76;
+  --fg-4: #9e9ea6;
+
+  /* Accent — quiet ink blue, low chroma */
+  --accent: #3050a0;
+  --accent-hover: #1f3878;
+  --accent-soft: rgba(48, 80, 160, 0.08);
+  --accent-ring: rgba(48, 80, 160, 0.28);
+
+  --rule: #e6e6e2;
+  --rule-strong: #cfcfcb;
+
+  --warn-bg: #fff7df;
+  --warn-rule: #c89417;
+  --warn-fg: #745812;
+
+  --code-bg: #f0efea;
+
+  /* Spacing */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px;
+
+  /* Type */
+  --font: "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo",
+          -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --fs-xs: 12px;
+  --fs-sm: 14px;
+  --fs-base: 16px;
+  --fs-md: 17px;
+  --fs-lg: 19px;
+  --fs-xl: 22px;
+  --fs-2xl: 28px;
+  --fs-3xl: 38px;
+  --fs-display: clamp(40px, 6vw, 56px);
+
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+
+  --shadow: 0 1px 2px rgba(20, 20, 26, 0.04),
+            0 4px 12px rgba(20, 20, 26, 0.06);
+
+  --t-fast: 140ms ease;
+
+  --w-reader: 680px;
+  --w-page: 1100px;
+  --gutter: clamp(16px, 4vw, 32px);
+}
+
+/* Dark token block — applied by either:
+   (a) system preference (prefers-color-scheme: dark) when no manual override
+   (b) explicit data-theme="dark" on <html>                                  */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111114;
+    --bg-soft: #18181c;
+    --bg-sunken: #0c0c0f;
+    --surface: #18181c;
+
+    --fg: #ececef;
+    --fg-2: #c8c8cd;
+    --fg-3: #92929a;
+    --fg-4: #5e5e66;
+
+    --accent: #8aaaff;
+    --accent-hover: #b0c5ff;
+    --accent-soft: rgba(138, 170, 255, 0.10);
+    --accent-ring: rgba(138, 170, 255, 0.30);
+
+    --rule: #2a2a30;
+    --rule-strong: #3a3a42;
+
+    --warn-bg: #2a2210;
+    --warn-rule: #c89417;
+    --warn-fg: #e6c172;
+
+    --code-bg: #1f1f23;
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.5),
+              0 6px 20px rgba(0, 0, 0, 0.45);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111114;
+  --bg-soft: #18181c;
+  --bg-sunken: #0c0c0f;
+  --surface: #18181c;
+
+  --fg: #ececef;
+  --fg-2: #c8c8cd;
+  --fg-3: #92929a;
+  --fg-4: #5e5e66;
+
+  --accent: #8aaaff;
+  --accent-hover: #b0c5ff;
+  --accent-soft: rgba(138, 170, 255, 0.10);
+  --accent-ring: rgba(138, 170, 255, 0.30);
+
+  --rule: #2a2a30;
+  --rule-strong: #3a3a42;
+
+  --warn-bg: #2a2210;
+  --warn-rule: #c89417;
+  --warn-fg: #e6c172;
+
+  --code-bg: #1f1f23;
+
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.5),
+            0 6px 20px rgba(0, 0, 0, 0.45);
+}
