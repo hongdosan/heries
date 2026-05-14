@@ -14,7 +14,7 @@ const WORLD_H = 640
 // 플레이어
 const PLAYER_SIZE = 30
 const PLAYER_SPEED = 3.2
-const PLAYER_MAX_HP = 6
+const PLAYER_MAX_HP = 3
 const PLAYER_IFRAME_MS = 900
 
 // 적 — 초반 난이도 완화 (사용자 피드백 = 처음부터 너무 빠름)
