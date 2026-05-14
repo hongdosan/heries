@@ -1,31 +1,27 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { MINI_GAMES, findGame } from '../catalog.js'
 
-// floating 트리거 버튼 + native <dialog> 로 게임 호출.
-// dialog 안에서 catalog 의 선택된 게임 컴포넌트 마운트 (close 시 unmount).
-// 게임 1 개 = dialog 즉시 그 게임. 게임 N 개 = 선택 화면 → 게임 마운트.
+// floating 트리거 + native <dialog>.
+// 흐름: 트리거 → 게임 선택 화면 → 카드 클릭 → 게임 마운트 → ← 메뉴 → 선택 화면 ...
+// 1 entry 든 N entry 든 일관 UX (사용자가 "미니 게임 컬렉션" 인식).
 // best-score 등 게임 상태는 각 게임 컴포넌트가 자체 관리 (localStorage).
 export function MiniGameLauncher() {
   const [open, setOpen] = useState<boolean>(false)
-  // 선택된 게임 id. catalog 1 entry 면 자동 선택. N entry 면 사용자 선택.
-  const [selectedId, setSelectedId] = useState<string | null>(
-    MINI_GAMES.length === 1 ? MINI_GAMES[0]?.id ?? null : null,
-  )
+  // null = 선택 화면 표시. id = 해당 게임 마운트.
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const dialogRef = useRef<HTMLDialogElement | null>(null)
 
   const openDialog = useCallback(() => {
     setOpen(true)
-    // 게임 1 개 = 항상 그 게임으로 자동 선택.
-    if (MINI_GAMES.length === 1) {
-      setSelectedId(MINI_GAMES[0]?.id ?? null)
-    } else {
-      // N 개 = 매번 선택 화면부터.
-      setSelectedId(null)
-    }
+    setSelectedId(null) // 매번 선택 화면부터 시작
   }, [])
 
   const closeDialog = useCallback(() => {
     setOpen(false)
+  }, [])
+
+  const backToMenu = useCallback(() => {
+    setSelectedId(null)
   }, [])
 
   // open state ↔ dialog showModal / close 동기화.
@@ -72,20 +68,16 @@ export function MiniGameLauncher() {
   const selected = selectedId ? findGame(selectedId) : null
   const dialogTitle = selected?.title ?? '미니 게임'
 
-  // launcher 버튼 표시 — 게임 1 개 = 그 게임 emoji + 제목, N 개 = 일반 라벨.
-  const launcherEmoji = MINI_GAMES.length === 1 ? MINI_GAMES[0]?.emoji ?? '🎮' : '🎮'
-  const launcherLabel = MINI_GAMES.length === 1 ? MINI_GAMES[0]?.title ?? '미니 게임' : '미니 게임'
-
   return (
     <>
       <button
         type="button"
         className="mini-game-launcher"
-        aria-label={`미니 게임 열기 — ${launcherLabel}`}
+        aria-label="미니 게임 열기"
         onClick={openDialog}
       >
-        <span className="mini-game-launcher-emoji" aria-hidden="true">{launcherEmoji}</span>
-        <span className="mini-game-launcher-label">{launcherLabel}</span>
+        <span className="mini-game-launcher-emoji" aria-hidden="true">🎮</span>
+        <span className="mini-game-launcher-label">미니 게임</span>
       </button>
 
       <dialog
@@ -93,11 +85,21 @@ export function MiniGameLauncher() {
         className="mini-game-dialog"
         onClose={onDialogClose}
         onClick={onDialogClick}
-        aria-label={`${dialogTitle} 미니 게임`}
+        aria-label="미니 게임"
       >
         <div className="mini-game-dialog-card">
           <header className="mini-game-dialog-head">
-            <h2 className="mini-game-dialog-title">{dialogTitle}</h2>
+            <div className="mini-game-dialog-head-left">
+              {selected && (
+                <button
+                  type="button"
+                  className="mini-game-dialog-back"
+                  aria-label="메뉴로 돌아가기"
+                  onClick={backToMenu}
+                >← 메뉴</button>
+              )}
+              <h2 className="mini-game-dialog-title">{dialogTitle}</h2>
+            </div>
             <button
               type="button"
               className="mini-game-dialog-close"
@@ -105,13 +107,15 @@ export function MiniGameLauncher() {
               onClick={closeDialog}
             >✕</button>
           </header>
-          {open && selected && (
-            <div className="mini-game-dialog-body">
-              <selected.component autoFocus={false} />
-            </div>
-          )}
+
+          {/* 게임 선택 화면 — selected 없을 때 항상 표시 */}
           {open && !selected && (
             <div className="mini-game-dialog-body mini-game-select">
+              <p className="mini-game-select-intro">
+                {MINI_GAMES.length === 1
+                  ? '게임을 골라 시작하세요.'
+                  : `${MINI_GAMES.length} 개의 게임 중 하나를 골라 시작하세요.`}
+              </p>
               <ul className="mini-game-select-list">
                 {MINI_GAMES.map((g) => (
                   <li key={g.id}>
@@ -129,6 +133,13 @@ export function MiniGameLauncher() {
                   </li>
                 ))}
               </ul>
+            </div>
+          )}
+
+          {/* 선택된 게임 마운트 */}
+          {open && selected && (
+            <div className="mini-game-dialog-body">
+              <selected.component autoFocus={false} />
             </div>
           )}
         </div>

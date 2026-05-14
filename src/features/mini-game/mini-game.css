@@ -97,9 +97,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--s-3);
   padding: var(--s-3) var(--s-4);
   border-bottom: 1px solid var(--rule);
   background: var(--bg-soft);
+}
+
+.mini-game-dialog-head-left {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-width: 0;
+  flex: 1;
 }
 
 .mini-game-dialog-title {
@@ -107,6 +116,38 @@
   font-size: var(--fs-md);
   font-weight: 700;
   color: var(--fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mini-game-dialog-back {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  padding: var(--s-1) var(--s-3);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--fg-2);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.mini-game-dialog-back:hover {
+  background: var(--bg-sunken);
+  color: var(--fg);
+  border-color: var(--accent-ring);
+}
+@media (max-width: 640px), (pointer: coarse) {
+  .mini-game-dialog-back {
+    padding: var(--s-2) var(--s-3);
+    font-size: var(--fs-sm);
+  }
 }
 
 .mini-game-dialog-close {
@@ -203,11 +244,21 @@
   }
 }
 
-/* ─── 게임 선택 화면 (catalog 2+ 일 때 dialog body 안 표시) ─── */
+/* ─── 게임 선택 화면 (dialog open 시 항상 먼저 표시) ─── */
 .mini-game-select {
-  /* dialog body 의 flex/center 정합. 선택 카드 그리드. */
+  /* dialog body 의 flex/center 정합. 선택 카드 그리드 + 인트로 텍스트. */
+  flex-direction: column;
   align-items: stretch;
+  justify-content: flex-start;
   padding: var(--s-5);
+  gap: var(--s-4);
+}
+
+.mini-game-select-intro {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--fg-3);
+  text-align: center;
 }
 
 .mini-game-select-list {
