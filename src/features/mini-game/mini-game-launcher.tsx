@@ -16,7 +16,8 @@ export function MiniGameLauncher() {
     setOpen(false)
   }, [])
 
-  // open state ↔ dialog showModal / close 동기화.
+  // open state ↔ dialog showModal / close 동기화 + body scroll lock.
+  // 모바일에서 게임 가상 패드 드래그 시 page scroll 새는 현상 차단.
   useEffect(() => {
     const dlg = dialogRef.current
     if (!dlg) return
@@ -24,6 +25,28 @@ export function MiniGameLauncher() {
       try { dlg.showModal() } catch { /* 일부 환경 fallback */ dlg.setAttribute('open', '') }
     } else if (!open && dlg.open) {
       dlg.close()
+    }
+  }, [open])
+
+  // body scroll lock (모바일 드래그 시 화면 흔들림 차단).
+  // dialog showModal() 자체로 inert 적용되지만 일부 모바일 브라우저는 body 스크롤 새는
+  // 케이스가 있어 명시 lock + 차단. cleanup 으로 원상복구.
+  useEffect(() => {
+    if (!open) return
+    const body = document.body
+    const previousOverflow = body.style.overflow
+    const previousTouchAction = body.style.touchAction
+    body.style.overflow = 'hidden'
+    body.style.touchAction = 'none'
+    const blockTouch = (e: TouchEvent) => {
+      if (e.target instanceof Node && dialogRef.current?.contains(e.target)) return
+      e.preventDefault()
+    }
+    window.addEventListener('touchmove', blockTouch, { passive: false })
+    return () => {
+      body.style.overflow = previousOverflow
+      body.style.touchAction = previousTouchAction
+      window.removeEventListener('touchmove', blockTouch)
     }
   }, [open])
 
