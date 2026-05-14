@@ -2,13 +2,15 @@ import {Link} from 'react-router-dom'
 import {assetUrl} from '../../shared/lib/env.js'
 import {fetchSeriesIndex} from '../../shared/lib/manifest.js'
 import {useAsync} from '../../shared/lib/use-async.js'
+import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
 import {SeriesList} from '../../widgets/series-list'
+import {MiniGame} from '../../features/mini-game'
 
 const HERO_IMAGE = assetUrl('content/_shared/thumbnail-placeholder.webp')
-const HERO_ALT =
-  'H-eries — 작가(홍도산) 의 오리지널 다중/평행 세계 웹 시리즈'
+const HERO_ALT = 'H-eries — 작가(홍도산) 의 오리지널 웹 시리즈 컬렉션'
 
 export function HomePage() {
+  useDocumentTitle('')
   const state = useAsync(() => fetchSeriesIndex(), [])
 
   return (
@@ -21,11 +23,10 @@ export function HomePage() {
         </div>
 
         <div className="home-hero-text">
-          <p className="home-hero-eyebrow">MULTIVERSE · ORIGINAL · WEB SERIES</p>
+          <p className="home-hero-eyebrow">ORIGINAL · WEB SERIES</p>
 
           <h1 className="home-hero-title">
-            여러 우주의 주인공이 한 무대에서 부딪히는<br/>
-            작가(홍도산) 의 오리지널 다중/평행 세계 시리즈.
+            작가(홍도산) 의 오리지널 웹 시리즈 컬렉션.
           </h1>
 
           <p className="home-hero-cta">
@@ -33,6 +34,18 @@ export function HomePage() {
           </p>
         </div>
       </header>
+
+      <details className="home-mini-game">
+        <summary>
+          <span className="home-mini-game-emoji" aria-hidden="true">🎮</span>
+          미니 게임 — 검기생존록
+          <span className="home-mini-game-hint">펼치기</span>
+        </summary>
+        <div className="home-mini-game-body">
+          <MiniGame/>
+        </div>
+      </details>
+
       <h2>작품 목록</h2>
       {state.status === 'loading' && <p className="loading">불러오는 중…</p>}
       {state.status === 'error' && <p className="empty">오류: {state.error.message}</p>}

@@ -1,0 +1,314 @@
+/* H-eries — Mini game (검기생존록) */
+/* 게임 박스는 사이트 토큰 무시 (어두운 게임 톤 자체 정의). */
+
+.mini-game {
+  --mg-bg: #0c0a09;
+  --mg-bg-2: #1c1917;
+  --mg-fg: #f5f5f4;
+  --mg-fg-2: #d6d3d1;
+  --mg-fg-3: #a8a29e;
+  --mg-rule: #292524;
+  --mg-accent: #fbbf24;
+  --mg-accent-2: #f59e0b;
+  --mg-danger: #fda4af;
+  --mg-elite: #f97316;
+  --mg-bullet: #fef3c7;
+  --mg-player: #7dd3fc;
+
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.mini-game-frame {
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 360 / 640;
+  background: var(--mg-bg);
+  border: 1px solid var(--mg-rule);
+  border-radius: var(--r-lg, 12px);
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 12px 32px -16px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+
+/* 게임 좌표계는 WORLD_W × WORLD_H (360x640) px 고정.
+ * 박스 크기에 맞추기 위해 ResizeObserver 가 --mg-scale 을 동적으로 설정.
+ * scale = box_width / 360. aspect-ratio 가 9:16 = stage 비율과 동일하므로 단일 scale 충분. */
+.mini-game-stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 360px;
+  height: 640px;
+  transform-origin: top left;
+  transform: scale(var(--mg-scale, 1));
+  background:
+    radial-gradient(ellipse at 50% 0%, #1f1b18 0%, var(--mg-bg) 70%),
+    var(--mg-bg);
+  color: var(--mg-fg);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.mg-hud {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--mg-fg-2);
+  pointer-events: none;
+  z-index: 10;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+.mg-hud-score { color: var(--mg-accent); }
+.mg-hud-wave { color: var(--mg-fg-3); }
+.mg-hud-hp { letter-spacing: 0.04em; }
+.mg-hud-hp-empty { opacity: 0.7; }
+
+.mg-player {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 35% 30%, #bae6fd, var(--mg-player) 60%, #0c4a6e);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #082f49, 0 0 12px rgba(125,211,252,0.4);
+  transition: opacity 80ms linear;
+  z-index: 5;
+}
+.mg-player-face {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.mg-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.mg-enemy {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 35%, #fecaca, var(--mg-danger) 60%, #7f1d1d);
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 700;
+  color: #450a0a;
+  box-shadow: 0 0 0 1px #450a0a, 0 0 8px rgba(253,164,175,0.35);
+}
+.mg-enemy-elite {
+  background: radial-gradient(circle at 50% 35%, #fde68a, var(--mg-elite) 55%, #7c2d12);
+  color: #431407;
+  font-size: 20px;
+  box-shadow: 0 0 0 1px #7c2d12, 0 0 14px rgba(251,146,60,0.55);
+}
+
+.mg-bullet {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  background: var(--mg-bullet);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--mg-accent), 0 0 14px rgba(251,191,36,0.4);
+}
+
+.mg-particle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.mg-flash {
+  position: absolute;
+  font-size: 22px;
+  pointer-events: none;
+  animation: mg-flash-fade 120ms linear forwards;
+  z-index: 6;
+}
+@keyframes mg-flash-fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.mg-pad-base, .mg-pad-dot {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms linear;
+  transform: translate(-50%, -50%);
+  z-index: 8;
+}
+.mg-pad-base {
+  width: 80px;
+  height: 80px;
+  border: 1px dashed rgba(245,245,244,0.3);
+  background: rgba(245,245,244,0.04);
+}
+.mg-pad-dot {
+  width: 28px;
+  height: 28px;
+  background: rgba(125,211,252,0.5);
+  border: 1px solid rgba(125,211,252,0.8);
+}
+
+.mg-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12,10,9,0.74);
+  backdrop-filter: blur(2px);
+  z-index: 20;
+}
+.mg-overlay-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: 20px 22px;
+  background: var(--mg-bg-2);
+  border: 1px solid var(--mg-rule);
+  border-radius: 10px;
+  max-width: 280px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+.mg-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--mg-accent);
+}
+.mg-sub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--mg-fg-2);
+  line-height: 1.5;
+}
+.mg-help {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+  font-size: 12px;
+  color: var(--mg-fg-3);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mg-help b { color: var(--mg-fg); font-weight: 700; }
+
+.mg-best {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--mg-fg-3);
+}
+.mg-best b {
+  color: var(--mg-accent);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+.mg-best-new {
+  color: var(--mg-accent-2);
+  margin-left: 6px;
+  font-weight: 700;
+}
+
+.mg-overlay-pause { background: rgba(12, 10, 9, 0.85); }
+
+.mg-announce {
+  position: absolute;
+  top: 92px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: rgba(28, 25, 23, 0.9);
+  color: var(--mg-fg);
+  border: 1px solid var(--mg-rule);
+  pointer-events: none;
+  z-index: 30;
+  animation: mg-announce-fade 1100ms ease-out forwards;
+}
+.mg-announce-wave {
+  color: var(--mg-player);
+  border-color: rgba(125, 211, 252, 0.5);
+}
+.mg-announce-elite {
+  color: var(--mg-elite);
+  border-color: rgba(249, 115, 22, 0.5);
+}
+@keyframes mg-announce-fade {
+  0% { opacity: 0; transform: translate(-50%, -8px); }
+  18% { opacity: 1; transform: translate(-50%, 0); }
+  82% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -4px); }
+}
+.mg-paused-tag {
+  margin: 0 0 6px;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mg-accent);
+  font-weight: 700;
+}
+
+.mini-game-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid var(--mg-rule);
+  background: var(--mg-bg);
+  color: var(--mg-fg);
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease, transform 80ms ease;
+}
+.mini-game-btn:hover {
+  background: #1f1b18;
+  border-color: var(--mg-fg-3);
+}
+.mini-game-btn:active { transform: translateY(1px); }
+.mini-game-btn-primary {
+  background: var(--mg-accent);
+  color: #1c1917;
+  border-color: var(--mg-accent-2);
+}
+.mini-game-btn-primary:hover {
+  background: var(--mg-accent-2);
+  border-color: var(--mg-accent-2);
+  color: #1c1917;
+}
+
+/* 홈 페이지에서 박스로 들어갈 자리용 wrapper 는 home.css 에 정의. */

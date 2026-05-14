@@ -1,0 +1,962 @@
+import type {KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent} from 'react'
+import {useCallback, useEffect, useLayoutEffect, useRef, useState,} from 'react'
+
+// ─────────────────────────────────────────────────────────────────
+// 검기생존록 — 무협 아이작풍 탄막 슈터 (H-eries 메인 페이지 미니 게임)
+// 의존 0 (react 만). framer-motion / shadcn / tailwind 미사용.
+// 게임 좌표계 SSOT = WORLD_W × WORLD_H. 박스 안에서 CSS scale 로 fit.
+// ─────────────────────────────────────────────────────────────────
+
+// 월드 상수 (게임 SSOT 좌표계)
+const WORLD_W = 360
+const WORLD_H = 640
+
+// 플레이어
+const PLAYER_SIZE = 30
+const PLAYER_SPEED = 3.2
+const PLAYER_MAX_HP = 6
+const PLAYER_IFRAME_MS = 900
+
+// 적
+const ENEMY_SIZE = 28
+const ELITE_SIZE = 40
+const ENEMY_BASE_SPEED = 1.05
+const ENEMY_HP = 1
+const ELITE_HP = 3
+const SCORE_NORMAL = 10
+const SCORE_ELITE = 45
+
+// 총알
+const BULLET_SIZE = 10
+const BULLET_SPEED = 7.4
+const BULLET_LIFE = 72
+const FIRE_COOLDOWN_FRAMES = 12
+
+// 파상 (wave) — 시간 진행에 따른 난이도 곡선
+const WAVE_DURATION_FRAMES = 60 * 22 // 약 22초/파상 (60fps 가정)
+const SPAWN_BASE_FRAMES = 70
+const SPAWN_MIN_FRAMES = 18
+
+// ─── 타입 ──────────────────────────────────────────────────────
+interface Vec {
+  x: number
+  y: number
+}
+
+interface Player extends Vec {
+  hp: number
+  invuln: number
+  fireCd: number
+  facing: Vec
+}
+
+interface Enemy extends Vec {
+  id: number
+  hp: number
+  size: number
+  speed: number
+  elite: boolean
+}
+
+interface Bullet extends Vec {
+  id: number
+  dx: number
+  dy: number
+  life: number
+}
+
+interface Particle extends Vec {
+  id: number
+  dx: number
+  dy: number
+  life: number
+  max: number
+  color: string
+}
+
+interface AttackFlash {
+  id: number
+  x: number
+  y: number
+  angle: number
+}
+
+interface ViewState {
+  width: number
+  height: number
+  isDesktop: boolean
+}
+
+interface InputState {
+  // 정규화 이동 벡터 (-1 ~ 1)
+  mx: number
+  my: number
+  // 발사 신호 (this frame)
+  shoot: boolean
+  // 발사 방향 (정규화)
+  aimX: number
+  aimY: number
+  hasAim: boolean
+}
+
+type Phase = 'idle' | 'playing' | 'over'
+
+// ─── 유틸 ──────────────────────────────────────────────────────
+function clamp(v: number, lo: number, hi: number): number {
+  return v < lo ? lo : Math.min(v, hi)
+}
+
+function rand(min: number, max: number): number {
+  return min + Math.random() * (max - min)
+}
+
+let _idSeq = 1
+
+function nextId(): number {
+  _idSeq = (_idSeq + 1) & 0x7fffffff
+  return _idSeq
+}
+
+function normalize(x: number, y: number): { x: number; y: number; len: number } {
+  const len = Math.hypot(x, y)
+  if (len < 0.0001) return {x: 0, y: 0, len: 0}
+  return {x: x / len, y: y / len, len}
+}
+
+function rectsOverlap(
+  ax: number, ay: number, aw: number, ah: number,
+  bx: number, by: number, bw: number, bh: number,
+): boolean {
+  return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by
+}
+
+function makePlayer(): Player {
+  return {
+    x: WORLD_W / 2 - PLAYER_SIZE / 2,
+    y: WORLD_H / 2 - PLAYER_SIZE / 2,
+    hp: PLAYER_MAX_HP,
+    invuln: 0,
+    fireCd: 0,
+    facing: {x: 0, y: -1},
+  }
+}
+
+function spawnEnemy(level: number): Enemy {
+  const elite = level >= 2 && Math.random() < 0.18
+  const size = elite ? ELITE_SIZE : ENEMY_SIZE
+  // 화면 가장자리에서 spawn
+  const side = Math.floor(Math.random() * 4)
+  let x = 0
+  let y = 0
+  if (side === 0) {
+    x = rand(0, WORLD_W - size);
+    y = -size
+  } else if (side === 1) {
+    x = WORLD_W;
+    y = rand(0, WORLD_H - size)
+  } else if (side === 2) {
+    x = rand(0, WORLD_W - size);
+    y = WORLD_H
+  } else {
+    x = -size;
+    y = rand(0, WORLD_H - size)
+  }
+  return {
+    id: nextId(),
+    x, y,
+    size,
+    hp: elite ? ELITE_HP : ENEMY_HP,
+    speed: ENEMY_BASE_SPEED + (level - 1) * 0.18 + (elite ? 0 : rand(-0.1, 0.2)),
+    elite,
+  }
+}
+
+function computePlayerOpacity(invuln: number): string {
+  if (invuln <= 0) return '1'
+  return invuln % 6 < 3 ? '0.4' : '1'
+}
+
+// ─── step 분리 — pure helper 함수들 ────────────────────────
+function readKeyboardMove(keys: Set<string>): { x: number; y: number; shoot: boolean } {
+  let x = 0
+  let y = 0
+  if (keys.has('ArrowLeft')) x -= 1
+  if (keys.has('ArrowRight')) x += 1
+  if (keys.has('ArrowUp')) y -= 1
+  if (keys.has('ArrowDown')) y += 1
+  const shoot = keys.has(' ') || keys.has('Spacebar')
+  return { x, y, shoot }
+}
+
+function combineMove(kx: number, ky: number, pad: InputState): { x: number; y: number } {
+  if (kx !== 0 || ky !== 0) {
+    const n = normalize(kx, ky)
+    return { x: n.x, y: n.y }
+  }
+  if (Math.abs(pad.mx) > 0.05 || Math.abs(pad.my) > 0.05) {
+    return { x: pad.mx, y: pad.my }
+  }
+  return { x: 0, y: 0 }
+}
+
+function movePlayer(p: Player, mx: number, my: number): void {
+  if (mx !== 0 || my !== 0) {
+    p.x += mx * PLAYER_SPEED
+    p.y += my * PLAYER_SPEED
+    const n = normalize(mx, my)
+    p.facing.x = n.x
+    p.facing.y = n.y
+  }
+  p.x = clamp(p.x, 0, WORLD_W - PLAYER_SIZE)
+  p.y = clamp(p.y, 0, WORLD_H - PLAYER_SIZE)
+}
+
+function fireBullet(p: Player, bullets: Bullet[]): { dx: number; dy: number } {
+  const dir = normalize(p.facing.x, p.facing.y)
+  const dx = dir.len === 0 ? 0 : dir.x
+  const dy = dir.len === 0 ? -1 : dir.y
+  const cx = p.x + PLAYER_SIZE / 2 - BULLET_SIZE / 2
+  const cy = p.y + PLAYER_SIZE / 2 - BULLET_SIZE / 2
+  bullets.push({
+    id: nextId(),
+    x: cx, y: cy,
+    dx: dx * BULLET_SPEED,
+    dy: dy * BULLET_SPEED,
+    life: BULLET_LIFE,
+  })
+  p.fireCd = FIRE_COOLDOWN_FRAMES
+  return { dx, dy }
+}
+
+function updateBullets(bullets: Bullet[]): void {
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    const b = bullets[i]
+    if (!b) continue
+    b.x += b.dx
+    b.y += b.dy
+    b.life -= 1
+    if (
+      b.life <= 0 ||
+      b.x < -20 || b.x > WORLD_W + 20 ||
+      b.y < -20 || b.y > WORLD_H + 20
+    ) {
+      bullets.splice(i, 1)
+    }
+  }
+}
+
+function chaseEnemies(enemies: Enemy[], p: Player): void {
+  for (const e of enemies) {
+    const ecx = e.x + e.size / 2
+    const ecy = e.y + e.size / 2
+    const pcx = p.x + PLAYER_SIZE / 2
+    const pcy = p.y + PLAYER_SIZE / 2
+    const dir = normalize(pcx - ecx, pcy - ecy)
+    e.x += dir.x * e.speed
+    e.y += dir.y * e.speed
+  }
+}
+
+// 총알 ↔ 적 충돌. 처치 시 점수 누적, hudDirty 마킹.
+// 반환 = 누적 점수 증가량 (호출자가 scoreRef 에 합산).
+function resolveBulletEnemyHits(
+  bullets: Bullet[],
+  enemies: Enemy[],
+  particles: Particle[],
+): { gained: number; dirty: boolean } {
+  let gained = 0
+  let dirty = false
+  for (let i = enemies.length - 1; i >= 0; i--) {
+    const e = enemies[i]
+    if (!e) continue
+    const j = findHittingBullet(bullets, e)
+    if (j < 0) continue
+    bullets.splice(j, 1)
+    e.hp -= 1
+    spawnParticles(particles, e.x + e.size / 2, e.y + e.size / 2,
+      e.elite ? '#f59e0b' : '#fda4af', e.elite ? 8 : 5)
+    if (e.hp <= 0) {
+      gained += e.elite ? SCORE_ELITE : SCORE_NORMAL
+      spawnParticles(particles, e.x + e.size / 2, e.y + e.size / 2,
+        e.elite ? '#fbbf24' : '#fecaca', 10)
+      dirty = true
+      enemies.splice(i, 1)
+    }
+  }
+  return { gained, dirty }
+}
+
+function findHittingBullet(bullets: Bullet[], e: Enemy): number {
+  for (let j = bullets.length - 1; j >= 0; j--) {
+    const b = bullets[j]
+    if (!b) continue
+    if (rectsOverlap(b.x, b.y, BULLET_SIZE, BULLET_SIZE, e.x, e.y, e.size, e.size)) {
+      return j
+    }
+  }
+  return -1
+}
+
+// 적 ↔ 플레이어 충돌. 무적·HP 변경 시 dirty 반환.
+function resolvePlayerEnemyHits(p: Player, enemies: Enemy[], particles: Particle[]): boolean {
+  if (p.invuln > 0) return false
+  for (const e of enemies) {
+    if (rectsOverlap(p.x, p.y, PLAYER_SIZE, PLAYER_SIZE, e.x, e.y, e.size, e.size)) {
+      p.hp -= 1
+      p.invuln = Math.round(PLAYER_IFRAME_MS / 16)
+      spawnParticles(particles, p.x + PLAYER_SIZE / 2, p.y + PLAYER_SIZE / 2, '#7dd3fc', 8)
+      return true
+    }
+  }
+  return false
+}
+
+function updateParticles(particles: Particle[]): void {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const q = particles[i]
+    if (!q) continue
+    q.x += q.dx
+    q.y += q.dy
+    q.dx *= 0.92
+    q.dy *= 0.92
+    q.life -= 1
+    if (q.life <= 0) particles.splice(i, 1)
+  }
+}
+
+function spawnParticles(out: Particle[], x: number, y: number, color: string, n: number): void {
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2
+    const s = 1 + Math.random() * 2.6
+    out.push({
+      id: nextId(),
+      x, y,
+      dx: Math.cos(a) * s,
+      dy: Math.sin(a) * s,
+      life: 28,
+      max: 28,
+      color,
+    })
+  }
+}
+
+// ─── best-score 보존 (localStorage) ──────────────────────
+const BEST_KEY = 'heries:mini-game:best-score'
+
+function readBestScore(): number {
+  try {
+    const v = globalThis.localStorage?.getItem(BEST_KEY)
+    if (!v) return 0
+    const n = Number(v)
+    return Number.isFinite(n) && n >= 0 ? n : 0
+  } catch {
+    return 0
+  }
+}
+
+function writeBestScore(n: number): void {
+  try {
+    globalThis.localStorage?.setItem(BEST_KEY, String(n))
+  } catch {
+    // localStorage 비활성 환경 — silent
+  }
+}
+
+// ─── 컴포넌트 ──────────────────────────────────────────────────
+
+export interface MiniGameProps {
+  // 외부에서 강제 폭 지정 가능 (스토리북 등)
+  autoFocus?: boolean
+}
+
+export function MiniGame({autoFocus = false}: MiniGameProps) {
+  const [phase, setPhase] = useState<Phase>('idle')
+  const [score, setScore] = useState<number>(0)
+  const [hpView, setHpView] = useState<number>(PLAYER_MAX_HP)
+  const [wave, setWave] = useState<number>(1)
+  const [bestScore, setBestScore] = useState<number>(() => readBestScore())
+  const [flash, setFlash] = useState<AttackFlash | null>(null)
+  const [announce, setAnnounce] = useState<{ id: number; text: string; kind: 'wave' | 'elite' } | null>(null)
+  const [view, setView] = useState<ViewState>({
+    width: WORLD_W,
+    height: WORLD_H,
+    isDesktop: true,
+  })
+
+  // refs (게임 루프 상태 — 리렌더 회피)
+  const stageRef = useRef<HTMLDivElement | null>(null)
+  const playerRef = useRef<Player>(makePlayer())
+  const enemiesRef = useRef<Enemy[]>([])
+  const bulletsRef = useRef<Bullet[]>([])
+  const particlesRef = useRef<Particle[]>([])
+  const inputRef = useRef<InputState>({
+    mx: 0,
+    my: 0,
+    shoot: false,
+    aimX: 0,
+    aimY: -1,
+    hasAim: false
+  })
+  const keysRef = useRef<Set<string>>(new Set())
+  const frameRef = useRef<number>(0)
+  const waveTimerRef = useRef<number>(0)
+  const spawnTimerRef = useRef<number>(0)
+  const phaseRef = useRef<Phase>('idle')
+  const scoreRef = useRef<number>(0)
+  const rafRef = useRef<number | null>(null)
+  const lastTickRef = useRef<number>(0)
+
+  // 렌더 동기화용 — rAF 안에서 setState 1회씩만 호출 (HUD 갱신)
+  const hudDirtyRef = useRef<boolean>(false)
+
+  // DOM 노드 ref — 렌더는 rAF 마다 transform 만 갱신 (React 재렌더 회피)
+  const playerElRef = useRef<HTMLDivElement | null>(null)
+  const enemiesLayerRef = useRef<HTMLDivElement | null>(null)
+  const bulletsLayerRef = useRef<HTMLDivElement | null>(null)
+  const particlesLayerRef = useRef<HTMLDivElement | null>(null)
+  const enemyElMap = useRef<Map<number, HTMLDivElement>>(new Map())
+  const bulletElMap = useRef<Map<number, HTMLDivElement>>(new Map())
+  const particleElMap = useRef<Map<number, HTMLDivElement>>(new Map())
+
+  // ─── 뷰포트 분기 ────────────────────────────────────────
+  useLayoutEffect(() => {
+    const onResize = (): void => {
+      const w = window.innerWidth
+      const h = window.innerHeight
+      setView({width: w, height: h, isDesktop: w >= 768})
+    }
+    onResize()
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
+  // ─── 박스 크기 → --mg-scale 동기화 ─────────────────────
+  const frameRefEl = useRef<HTMLDivElement | null>(null)
+  useLayoutEffect(() => {
+    const frameEl = frameRefEl.current
+    const stageEl = stageRef.current
+    if (!frameEl || !stageEl) return
+    const apply = (): void => {
+      const rect = frameEl.getBoundingClientRect()
+      if (rect.width <= 0) return
+      const scale = rect.width / WORLD_W
+      stageEl.style.setProperty('--mg-scale', String(scale))
+    }
+    apply()
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', apply)
+      return () => window.removeEventListener('resize', apply)
+    }
+    const ro = new ResizeObserver(apply)
+    ro.observe(frameEl)
+    return () => ro.disconnect()
+  }, [])
+
+  // ─── 게임 리셋 ──────────────────────────────────────────
+  const reset = useCallback((): void => {
+    playerRef.current = makePlayer()
+    // 기존 DOM 모두 제거
+    enemyElMap.current.forEach((el) => el.remove())
+    enemyElMap.current.clear()
+    bulletElMap.current.forEach((el) => el.remove())
+    bulletElMap.current.clear()
+    particleElMap.current.forEach((el) => el.remove())
+    particleElMap.current.clear()
+    enemiesRef.current = []
+    bulletsRef.current = []
+    particlesRef.current = []
+    frameRef.current = 0
+    waveTimerRef.current = 0
+    spawnTimerRef.current = 30
+    scoreRef.current = 0
+    setScore(0)
+    setHpView(PLAYER_MAX_HP)
+    setWave(1)
+    setFlash(null)
+  }, [])
+
+  const start = useCallback((): void => {
+    reset()
+    phaseRef.current = 'playing'
+    setPhase('playing')
+    // 시작 시 stage 자동 focus — 사용자가 시작 버튼 누른 직후 키보드 즉시 반응.
+    globalThis.requestAnimationFrame(() => stageRef.current?.focus())
+  }, [reset])
+
+  // 키보드 입력은 stage div 에서 직접 처리 (onKeyDown / onKeyUp).
+  // 글로벌 window 핸들러 회피 — 페이지 다른 UI (폼·링크) 영향 0.
+  // stage 가 focus 받은 상태에서만 키 입력 응답 = a11y 정합.
+  // PC 입력 = 방향키 (이동) + Space (발사) + Enter (재시작). WASD 미사용.
+  const isGameKey = useCallback((k: string): boolean => {
+    return (
+      k === 'ArrowUp' || k === 'ArrowDown' || k === 'ArrowLeft' || k === 'ArrowRight' ||
+      k === ' ' || k === 'Spacebar' ||
+      k === 'Enter'
+    )
+  }, [])
+
+  const onStageKeyDown = useCallback((e: ReactKeyboardEvent<HTMLDivElement>): void => {
+    if (phaseRef.current !== 'playing') {
+      if (e.key === 'Enter') {
+        start()
+        e.preventDefault()
+      }
+      return
+    }
+    if (isGameKey(e.key)) e.preventDefault()
+    keysRef.current.add(e.key)
+  }, [isGameKey, start])
+
+  const onStageKeyUp = useCallback((e: ReactKeyboardEvent<HTMLDivElement>): void => {
+    keysRef.current.delete(e.key)
+  }, [])
+
+  // 게임이 over 또는 idle 로 떨어지면 잔여 키 입력 상태 정리 (포커스 잃을 때 ghost key 방지).
+  useEffect(() => {
+    if (phase !== 'playing') keysRef.current.clear()
+  }, [phase])
+
+  // ─── 입력 — 가상 패드 (좌측 드래그 = 이동, 우측 탭 = 발사) ─
+  // 박스 안 좌표 → 월드 좌표 변환은 stageRef 크기 사용
+  const padActiveRef = useRef<{ id: number; ox: number; oy: number } | null>(null)
+  const padDotRef = useRef<HTMLDivElement | null>(null)
+  const padBaseRef = useRef<HTMLDivElement | null>(null)
+
+  const stageRectToWorld = useCallback((clientX: number, clientY: number): Vec | null => {
+    const stage = stageRef.current
+    if (!stage) return null
+    const rect = stage.getBoundingClientRect()
+    if (rect.width <= 0 || rect.height <= 0) return null
+    const localX = ((clientX - rect.left) / rect.width) * WORLD_W
+    const localY = ((clientY - rect.top) / rect.height) * WORLD_H
+    return {x: localX, y: localY}
+  }, [])
+
+  const onStagePointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>): void => {
+    if (phaseRef.current !== 'playing') return
+    const pt = stageRectToWorld(e.clientX, e.clientY)
+    if (!pt) return
+    const half = WORLD_W / 2
+    if (pt.x < half) {
+      // 좌측 = 가상 패드 시작
+      padActiveRef.current = {id: e.pointerId, ox: pt.x, oy: pt.y}
+      if (padBaseRef.current) {
+        padBaseRef.current.style.left = `${pt.x}px`
+        padBaseRef.current.style.top = `${pt.y}px`
+        padBaseRef.current.style.opacity = '1'
+      }
+      if (padDotRef.current) {
+        padDotRef.current.style.left = `${pt.x}px`
+        padDotRef.current.style.top = `${pt.y}px`
+        padDotRef.current.style.opacity = '1'
+      }
+    } else {
+      // 우측 = 탭 발사 — 플레이어의 현재 facing 방향
+      inputRef.current.shoot = true
+    }
+    try {
+      (e.target as Element).setPointerCapture?.(e.pointerId)
+    } catch { /* noop */
+    }
+  }, [stageRectToWorld])
+
+  const onStagePointerMove = useCallback((e: ReactPointerEvent<HTMLDivElement>): void => {
+    if (phaseRef.current !== 'playing') return
+    const pad = padActiveRef.current
+    if (pad?.id !== e.pointerId) return
+    const pt = stageRectToWorld(e.clientX, e.clientY)
+    if (!pt) return
+    const dx = pt.x - pad.ox
+    const dy = pt.y - pad.oy
+    const maxR = 40
+    const n = normalize(dx, dy)
+    const len = Math.min(n.len, maxR)
+    inputRef.current.mx = n.x * (len / maxR)
+    inputRef.current.my = n.y * (len / maxR)
+    if (padDotRef.current) {
+      padDotRef.current.style.left = `${pad.ox + n.x * len}px`
+      padDotRef.current.style.top = `${pad.oy + n.y * len}px`
+    }
+  }, [stageRectToWorld])
+
+  const onStagePointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>): void => {
+    const pad = padActiveRef.current
+    if (pad?.id === e.pointerId) {
+      padActiveRef.current = null
+      inputRef.current.mx = 0
+      inputRef.current.my = 0
+      if (padBaseRef.current) padBaseRef.current.style.opacity = '0'
+      if (padDotRef.current) padDotRef.current.style.opacity = '0'
+    }
+  }, [])
+
+  // viewport 가시성 + focus — 둘 다 활성이어야 RAF 가동 (CPU 절감 + 사고 방지).
+  const [isVisible, setIsVisible] = useState<boolean>(true)
+  const [isFocused, setIsFocused] = useState<boolean>(false)
+  useEffect(() => {
+    const stage = stageRef.current
+    if (!stage || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) setIsVisible(entry.isIntersecting)
+      },
+      {threshold: 0.1},
+    )
+    io.observe(stage)
+    return () => io.disconnect()
+  }, [])
+
+  // ─── 게임 루프 ──────────────────────────────────────────
+  useEffect(() => {
+    const shouldRun = phase === 'playing' && isVisible && isFocused
+    if (!shouldRun) {
+      if (rafRef.current != null) {
+        cancelAnimationFrame(rafRef.current)
+        rafRef.current = null
+      }
+      return
+    }
+
+    const tick = (t: number): void => {
+      // dt 는 사용하지 않음 (frame 카운트로 박자 결정) — 60fps 가정
+      lastTickRef.current = t
+
+      step()
+      render()
+
+      if (phaseRef.current === 'playing') {
+        rafRef.current = requestAnimationFrame(tick)
+      } else {
+        rafRef.current = null
+      }
+    }
+    lastTickRef.current = 0
+    rafRef.current = requestAnimationFrame(tick)
+    return () => {
+      if (rafRef.current != null) {
+        cancelAnimationFrame(rafRef.current)
+        rafRef.current = null
+      }
+    }
+    // 의도적으로 phase/isVisible/isFocused 만 의존 — step/render 는 클로저 안에서 ref 기반
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, isVisible, isFocused])
+
+  // ─── 1 frame step — pure helper 함수 위임 ─────────────────
+  const step = useCallback((): void => {
+    frameRef.current += 1
+    waveTimerRef.current += 1
+    if (waveTimerRef.current >= WAVE_DURATION_FRAMES) {
+      waveTimerRef.current = 0
+      setWave((w) => {
+        const next = w + 1
+        setAnnounce({ id: nextId(), text: `파상 ${next}`, kind: 'wave' })
+        return next
+      })
+    }
+    const currentWave = Math.max(1, Math.floor(frameRef.current / WAVE_DURATION_FRAMES) + 1)
+
+    const p = playerRef.current
+    if (p.invuln > 0) p.invuln -= 1
+    if (p.fireCd > 0) p.fireCd -= 1
+
+    // 입력 — 키보드 + 가상 패드
+    const kb = readKeyboardMove(keysRef.current)
+    if (kb.shoot) inputRef.current.shoot = true
+    const inp = inputRef.current
+    const mv = combineMove(kb.x, kb.y, inp)
+    movePlayer(p, mv.x, mv.y)
+
+    // 발사
+    if (inp.shoot && p.fireCd <= 0) {
+      const aim = fireBullet(p, bulletsRef.current)
+      setFlash({
+        id: nextId(),
+        x: p.x + PLAYER_SIZE / 2,
+        y: p.y + PLAYER_SIZE / 2,
+        angle: Math.atan2(aim.dy, aim.dx),
+      })
+    }
+    inp.shoot = false
+
+    // 적 spawn
+    spawnTimerRef.current -= 1
+    if (spawnTimerRef.current <= 0) {
+      const enemy = spawnEnemy(currentWave)
+      enemiesRef.current.push(enemy)
+      if (enemy.elite) {
+        setAnnounce({ id: nextId(), text: '魔 등장', kind: 'elite' })
+      }
+      const base = Math.max(SPAWN_MIN_FRAMES, SPAWN_BASE_FRAMES - (currentWave - 1) * 6)
+      spawnTimerRef.current = base + Math.floor(rand(-8, 8))
+    }
+
+    // 이동 + 충돌 + 파티클
+    updateBullets(bulletsRef.current)
+    chaseEnemies(enemiesRef.current, p)
+    const hit = resolveBulletEnemyHits(bulletsRef.current, enemiesRef.current, particlesRef.current)
+    scoreRef.current += hit.gained
+    if (hit.dirty) hudDirtyRef.current = true
+    if (resolvePlayerEnemyHits(p, enemiesRef.current, particlesRef.current)) {
+      hudDirtyRef.current = true
+    }
+    updateParticles(particlesRef.current)
+
+    // 사망 체크 — best-score 갱신 포함
+    if (p.hp <= 0) {
+      phaseRef.current = 'over'
+      setPhase('over')
+      setScore(scoreRef.current)
+      setHpView(0)
+      setBestScore((prev) => {
+        if (scoreRef.current > prev) {
+          writeBestScore(scoreRef.current)
+          return scoreRef.current
+        }
+        return prev
+      })
+    } else if (hudDirtyRef.current) {
+      setScore(scoreRef.current)
+      setHpView(p.hp)
+      hudDirtyRef.current = false
+    }
+  }, [])
+
+  // ─── 렌더 (DOM 직접 갱신 — React 재렌더 회피) ─────────────
+  const render = useCallback((): void => {
+    // 플레이어
+    const p = playerRef.current
+    if (playerElRef.current) {
+      playerElRef.current.style.transform = `translate(${p.x}px, ${p.y}px)`
+      playerElRef.current.style.opacity = computePlayerOpacity(p.invuln)
+    }
+
+    // 적
+    syncEntityLayer(enemiesRef.current, enemyElMap.current, enemiesLayerRef.current, (e) => {
+      const el = document.createElement('div')
+      el.className = e.elite ? 'mg-enemy mg-enemy-elite' : 'mg-enemy'
+      el.style.width = `${e.size}px`
+      el.style.height = `${e.size}px`
+      el.textContent = e.elite ? '魔' : '邪'
+      return el
+    }, (e, el) => {
+      el.style.transform = `translate(${e.x}px, ${e.y}px)`
+    })
+
+    // 총알
+    syncEntityLayer(bulletsRef.current, bulletElMap.current, bulletsLayerRef.current, () => {
+      const el = document.createElement('div')
+      el.className = 'mg-bullet'
+      return el
+    }, (b, el) => {
+      el.style.transform = `translate(${b.x}px, ${b.y}px)`
+    })
+
+    // 파티클
+    syncEntityLayer(particlesRef.current, particleElMap.current, particlesLayerRef.current, (q) => {
+      const el = document.createElement('div')
+      el.className = 'mg-particle'
+      el.style.background = q.color
+      return el
+    }, (q, el) => {
+      el.style.transform = `translate(${q.x}px, ${q.y}px)`
+      el.style.opacity = `${q.life / q.max}`
+    })
+  }, [])
+
+  // ─── 게임 시작 안내 — 키보드 Enter 핸들러 (idle / over 화면) ─
+  useEffect(() => {
+    phaseRef.current = phase
+  }, [phase])
+
+  // autoFocus — 스토리북·외부 마운트 직후 자동 시작 옵션
+  useEffect(() => {
+    if (autoFocus && phase === 'idle') start()
+  }, [autoFocus, phase, start])
+
+  // 공격 플래시 자동 소멸
+  useEffect(() => {
+    if (!flash) return
+    const t = globalThis.setTimeout(() => setFlash(null), 120)
+    return () => globalThis.clearTimeout(t)
+  }, [flash])
+
+  // 알림 (wave / elite) 자동 소멸
+  useEffect(() => {
+    if (!announce) return
+    const t = globalThis.setTimeout(() => setAnnounce(null), 1100)
+    return () => globalThis.clearTimeout(t)
+  }, [announce])
+
+  // ─── 화면 ──────────────────────────────────────────────
+  const hpFull = '❤️'.repeat(hpView)
+  const hpEmpty = '🖤'.repeat(Math.max(0, PLAYER_MAX_HP - hpView))
+
+  return (
+    <div className={'mini-game' + (view.isDesktop ? '' : ' is-mobile')}>
+      <div className="mini-game-frame" ref={frameRefEl}>
+        <div
+          ref={stageRef}
+          className="mini-game-stage"
+          tabIndex={0}
+          role="application"
+          aria-label="검기생존록 — 미니 게임. 방향키 이동, Space 발사, Enter 재시작."
+          onPointerDown={onStagePointerDown}
+          onPointerMove={onStagePointerMove}
+          onPointerUp={onStagePointerUp}
+          onPointerCancel={onStagePointerUp}
+          onKeyDown={onStageKeyDown}
+          onKeyUp={onStageKeyUp}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => {
+            setIsFocused(false)
+            keysRef.current.clear()
+          }}
+        >
+          {/* HUD */}
+          <div className="mg-hud">
+            <span className="mg-hud-score">점수 {score}</span>
+            <span className="mg-hud-wave">파상 {wave}</span>
+            <span className="mg-hud-hp" aria-label={`체력 ${hpView} / ${PLAYER_MAX_HP}`}>
+              {hpFull}<span className="mg-hud-hp-empty">{hpEmpty}</span>
+            </span>
+          </div>
+
+          {/* 플레이어 */}
+          <div
+            ref={playerElRef}
+            className="mg-player"
+            style={{width: PLAYER_SIZE, height: PLAYER_SIZE}}
+            aria-hidden="true"
+          >
+            <span className="mg-player-face">🥋</span>
+          </div>
+
+          {/* 엔티티 레이어 (DOM 직접 갱신) */}
+          <div ref={enemiesLayerRef} className="mg-layer" aria-hidden="true"/>
+          <div ref={bulletsLayerRef} className="mg-layer" aria-hidden="true"/>
+          <div ref={particlesLayerRef} className="mg-layer" aria-hidden="true"/>
+
+          {/* 알림 (wave 진입 / elite spawn) */}
+          {announce && (
+            <div key={announce.id} className={`mg-announce mg-announce-${announce.kind}`} aria-live="polite">
+              {announce.text}
+            </div>
+          )}
+
+          {/* 공격 플래시 */}
+          {flash && (
+            <div
+              key={flash.id}
+              className="mg-flash"
+              style={{
+                left: flash.x,
+                top: flash.y,
+                transform: `translate(-50%, -50%) rotate(${flash.angle}rad)`,
+              }}
+              aria-hidden="true"
+            >☯️</div>
+          )}
+
+          {/* 가상 패드 표시 (모바일) */}
+          <div ref={padBaseRef} className="mg-pad-base" aria-hidden="true"/>
+          <div ref={padDotRef} className="mg-pad-dot" aria-hidden="true"/>
+
+          {/* 오버레이 — idle */}
+          {phase === 'idle' && (
+            <div className="mg-overlay">
+              <div className="mg-overlay-card">
+                <h3 className="mg-title">검기생존록</h3>
+                <p className="mg-sub">파상의 邪 와 魔 를 베고 살아남으라.</p>
+                <ul className="mg-help">
+                  <li>이동 — <b>방향키</b> · 좌측 드래그 (모바일)</li>
+                  <li>발사 — <b>Space</b> · 우측 탭 (이동 방향)</li>
+                  <li>재시작 — <b>Enter</b></li>
+                </ul>
+                {bestScore > 0 && (
+                  <p className="mg-best">최고 점수 <b>{bestScore}</b></p>
+                )}
+                <button
+                  type="button"
+                  className="mini-game-btn mini-game-btn-primary"
+                  onClick={start}
+                >시작
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* 오버레이 — 일시정지 (focus 이탈 또는 viewport 밖) */}
+          {phase === 'playing' && (!isFocused || !isVisible) && (
+            <div className="mg-overlay mg-overlay-pause">
+              <div className="mg-overlay-card">
+                <p className="mg-paused-tag">일시정지</p>
+                <p className="mg-sub">
+                  {isVisible
+                    ? '게임 영역을 다시 클릭하면 재개됩니다.'
+                    : '게임 영역을 화면에 두면 자동 재개됩니다.'}
+                </p>
+                <button
+                  type="button"
+                  className="mini-game-btn mini-game-btn-primary"
+                  onClick={() => stageRef.current?.focus()}
+                >재개</button>
+              </div>
+            </div>
+          )}
+
+          {/* 오버레이 — over */}
+          {phase === 'over' && (
+            <div className="mg-overlay">
+              <div className="mg-overlay-card">
+                <h3 className="mg-title">생존 실패</h3>
+                <p className="mg-sub">베어낸 邪魔 점수 <b>{score}</b> · 파상 <b>{wave}</b></p>
+                {bestScore > 0 && (
+                  <p className="mg-best">
+                    최고 점수 <b>{bestScore}</b>
+                    {score === bestScore && score > 0 && <span className="mg-best-new"> 신기록</span>}
+                  </p>
+                )}
+                <button
+                  type="button"
+                  className="mini-game-btn mini-game-btn-primary"
+                  onClick={start}
+                >다시 — Enter
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─── DOM 동기화 헬퍼 ────────────────────────────────────
+function syncEntityLayer<T extends { id: number }>(
+  list: T[],
+  map: Map<number, HTMLDivElement>,
+  layer: HTMLDivElement | null,
+  create: (item: T) => HTMLDivElement,
+  update: (item: T, el: HTMLDivElement) => void,
+): void {
+  if (!layer) return
+  const alive = new Set<number>()
+  for (const item of list) {
+    alive.add(item.id)
+    let el = map.get(item.id)
+    if (!el) {
+      el = create(item)
+      map.set(item.id, el)
+      layer.appendChild(el)
+    }
+    update(item, el)
+  }
+  // 죽은 것 제거
+  for (const [id, el] of map) {
+    if (!alive.has(id)) {
+      el.remove()
+      map.delete(id)
+    }
+  }
+}

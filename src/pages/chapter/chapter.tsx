@@ -1,22 +1,50 @@
+import {useEffect, useState} from 'react'
 import {Link, useParams} from 'react-router-dom'
 import {loadChapter} from '../../entities/chapter'
-import {CharacterMentionHost} from '../../features/character-mention'
 import {assetUrl} from '../../shared/lib/env.js'
+import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
 import {fetchSeriesManifest} from '../../shared/lib/manifest.js'
 import {useAsync} from '../../shared/lib/use-async.js'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
 import {extractOutline} from '../../shared/lib/markdown.js'
 import type {ChapterIndex} from '../../shared/lib/types.js'
 
+// 본문이 viewport 보다 길어야 scroll-nav 표시 (스크롤 가치).
+function useIsScrollable(): boolean {
+  const [scrollable, setScrollable] = useState<boolean>(false)
+  useEffect(() => {
+    const check = (): void => {
+      setScrollable(document.documentElement.scrollHeight > window.innerHeight + 80)
+    }
+    check()
+    const ro = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(check)
+      : null
+    ro?.observe(document.documentElement)
+    window.addEventListener('resize', check)
+    return () => {
+      ro?.disconnect()
+      window.removeEventListener('resize', check)
+    }
+  }, [])
+  return scrollable
+}
+
 export function ChapterPage() {
   const {slug = '', episode = ''} = useParams<{ slug: string; episode: string }>()
   const cover = useImgFallback()
+  const isScrollable = useIsScrollable()
 
   const state = useAsync(async () => {
     const manifest = await fetchSeriesManifest(slug)
     const data = await loadChapter(slug, episode, manifest)
     return {manifest, data}
   }, [slug, episode])
+
+  const chapterTitle = state.status === 'success'
+    ? `${state.data.data.frontmatter.title || state.data.data.index.title} · ${state.data.manifest.title}`
+    : ''
+  useDocumentTitle(chapterTitle)
 
   if (state.status === 'loading') return <main className="page-chapter"><p className="loading">불러오는
     중…</p></main>
@@ -60,7 +88,8 @@ export function ChapterPage() {
 
       {(() => {
         const outline = extractOutline(data.bodyHtml, 2)
-        if (outline.length === 0) return null
+        // 1 절 이하는 목차 가치 작음 — 2 절부터 노출.
+        if (outline.length < 2) return null
         return (
           <details className="chapter-outline">
             <summary>목차 · {outline.length}개 절</summary>
@@ -86,12 +115,10 @@ export function ChapterPage() {
         )
       })()}
 
-      <CharacterMentionHost slug={slug} manifest={manifest}>
-        <article
-          className="article article-prose"
-          dangerouslySetInnerHTML={{__html: data.bodyHtml}}
-        />
-      </CharacterMentionHost>
+      <article
+        className="article article-prose"
+        dangerouslySetInnerHTML={{__html: data.bodyHtml}}
+      />
 
       <nav className="chapter-nav" aria-label="에피소드 이동">
         {prev ? (
@@ -112,27 +139,29 @@ export function ChapterPage() {
         <Link to={`/series/${slug}?tab=chapters`}>← 목차로 돌아가기</Link>
       </p>
 
-      <div className="scroll-nav" aria-label="페이지 이동">
-        <button
-          type="button"
-          className="scroll-nav-btn"
-          aria-label="맨 위로"
-          onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
-        >
-          ↑
-        </button>
-        <button
-          type="button"
-          className="scroll-nav-btn"
-          aria-label="맨 아래로"
-          onClick={() => window.scrollTo({
-            top: document.documentElement.scrollHeight,
-            behavior: 'smooth'
-          })}
-        >
-          ↓
-        </button>
-      </div>
+      {isScrollable && (
+        <div className="scroll-nav" aria-label="페이지 이동">
+          <button
+            type="button"
+            className="scroll-nav-btn"
+            aria-label="맨 위로"
+            onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}
+          >
+            ↑
+          </button>
+          <button
+            type="button"
+            className="scroll-nav-btn"
+            aria-label="맨 아래로"
+            onClick={() => window.scrollTo({
+              top: document.documentElement.scrollHeight,
+              behavior: 'smooth'
+            })}
+          >
+            ↓
+          </button>
+        </div>
+      )}
     </main>
   )
 }
