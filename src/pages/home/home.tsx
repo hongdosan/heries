@@ -4,7 +4,7 @@ import {fetchSeriesIndex} from '../../shared/lib/manifest.js'
 import {useAsync} from '../../shared/lib/use-async.js'
 import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
 import {SeriesList} from '../../widgets/series-list'
-import {MiniGame} from '../../features/mini-game'
+import {MiniGameLauncher} from '../../features/mini-game'
 
 const HERO_IMAGE = assetUrl('content/_shared/thumbnail-placeholder.webp')
 const HERO_ALT = 'H-eries — 작가(홍도산) 의 오리지널 웹 시리즈 컬렉션'
@@ -35,16 +35,7 @@ export function HomePage() {
         </div>
       </header>
 
-      <details className="home-mini-game">
-        <summary>
-          <span className="home-mini-game-emoji" aria-hidden="true">🎮</span>
-          미니 게임 — 검기생존록
-          <span className="home-mini-game-hint">펼치기</span>
-        </summary>
-        <div className="home-mini-game-body">
-          <MiniGame/>
-        </div>
-      </details>
+      <MiniGameLauncher/>
 
       <h2>작품 목록</h2>
       {state.status === 'loading' && <p className="loading">불러오는 중…</p>}

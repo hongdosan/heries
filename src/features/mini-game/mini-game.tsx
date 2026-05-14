@@ -17,10 +17,11 @@ const PLAYER_SPEED = 3.2
 const PLAYER_MAX_HP = 6
 const PLAYER_IFRAME_MS = 900
 
-// 적
+// 적 — 초반 난이도 완화 (사용자 피드백 = 처음부터 너무 빠름)
 const ENEMY_SIZE = 28
 const ELITE_SIZE = 40
-const ENEMY_BASE_SPEED = 1.05
+const ENEMY_BASE_SPEED = 0.65    // 1.05 → 0.65 (38% 완화, 첫 wave 여유)
+const ENEMY_WAVE_INCREMENT = 0.12 // wave 별 +0.12 (이전 0.18 → 33% 완화)
 const ENEMY_HP = 1
 const ELITE_HP = 3
 const SCORE_NORMAL = 10
@@ -33,9 +34,24 @@ const BULLET_LIFE = 72
 const FIRE_COOLDOWN_FRAMES = 12
 
 // 파상 (wave) — 시간 진행에 따른 난이도 곡선
-const WAVE_DURATION_FRAMES = 60 * 22 // 약 22초/파상 (60fps 가정)
-const SPAWN_BASE_FRAMES = 70
-const SPAWN_MIN_FRAMES = 18
+const WAVE_DURATION_FRAMES = 60 * 22  // 약 22초/파상 (60fps 가정)
+const SPAWN_BASE_FRAMES = 110         // 70 → 110 (첫 wave spawn 간격 약 1.8s)
+const SPAWN_MIN_FRAMES = 20           // 최소 간격 18 → 20
+const SPAWN_WAVE_REDUCTION = 8        // wave 별 -8 frames
+
+// 아이템 — 적 처치 시 확률 drop
+const ITEM_SIZE = 22
+const ITEM_LIFE_FRAMES = 60 * 8       // 8초 후 자동 소멸
+const ITEM_DROP_NORMAL = 0.08         // 일반 적 8% drop
+const ITEM_DROP_ELITE = 0.35          // 엘리트 적 35% drop
+const ITEM_SCORE_BONUS = 30
+const ITEM_HP_HEAL = 1
+
+// 스킬 — 검막 (Active, Shift / 상단 우측 버튼)
+const SKILL_CD_FRAMES = 60 * 8        // 8초 쿨다운
+const SKILL_DURATION_FRAMES = 36      // 0.6초 발동 (무적 + push)
+const SKILL_PUSH_RADIUS = 100         // 100px 반경
+const SKILL_PUSH_STRENGTH = 14        // 적 밀어내기 강도
 
 // ─── 타입 ──────────────────────────────────────────────────────
 interface Vec {
@@ -48,6 +64,8 @@ interface Player extends Vec {
   invuln: number
   fireCd: number
   facing: Vec
+  skillCd: number      // 0 = 사용 가능
+  skillActive: number  // > 0 = 발동 중 (남은 frame)
 }
 
 interface Enemy extends Vec {
@@ -56,6 +74,14 @@ interface Enemy extends Vec {
   size: number
   speed: number
   elite: boolean
+}
+
+type ItemKind = 'heart' | 'gem'
+
+interface Item extends Vec {
+  id: number
+  kind: ItemKind
+  life: number
 }
 
 interface Bullet extends Vec {
@@ -138,11 +164,40 @@ function makePlayer(): Player {
     invuln: 0,
     fireCd: 0,
     facing: {x: 0, y: -1},
+    skillCd: 0,
+    skillActive: 0,
   }
 }
 
+// 스킬 발동 — 가능 조건 검사 + 효과 적용 (반환 = 발동 여부).
+// 효과 = SKILL_DURATION_FRAMES 동안 무적 + 반경 안 적 밀어내기 (즉시 1회).
+function tryActivateSkill(p: Player, enemies: Enemy[], particles: Particle[]): boolean {
+  if (p.skillCd > 0 || p.skillActive > 0) return false
+  p.skillActive = SKILL_DURATION_FRAMES
+  p.skillCd = SKILL_CD_FRAMES
+  p.invuln = Math.max(p.invuln, SKILL_DURATION_FRAMES)
+  const pcx = p.x + PLAYER_SIZE / 2
+  const pcy = p.y + PLAYER_SIZE / 2
+  for (const e of enemies) {
+    const ecx = e.x + e.size / 2
+    const ecy = e.y + e.size / 2
+    const dx = ecx - pcx
+    const dy = ecy - pcy
+    const dist = Math.hypot(dx, dy)
+    if (dist < SKILL_PUSH_RADIUS && dist > 0.001) {
+      const n = normalize(dx, dy)
+      e.x += n.x * SKILL_PUSH_STRENGTH
+      e.y += n.y * SKILL_PUSH_STRENGTH
+    }
+  }
+  spawnParticles(particles, pcx, pcy, '#7dd3fc', 20)
+  return true
+}
+
 function spawnEnemy(level: number): Enemy {
-  const elite = level >= 2 && Math.random() < 0.18
+  // wave 1 = 엘리트 X, wave 2 부터 15% → 22% 점진
+  const eliteChance = level >= 2 ? Math.min(0.15 + (level - 2) * 0.02, 0.25) : 0
+  const elite = Math.random() < eliteChance
   const size = elite ? ELITE_SIZE : ENEMY_SIZE
   // 화면 가장자리에서 spawn
   const side = Math.floor(Math.random() * 4)
@@ -166,9 +221,24 @@ function spawnEnemy(level: number): Enemy {
     x, y,
     size,
     hp: elite ? ELITE_HP : ENEMY_HP,
-    speed: ENEMY_BASE_SPEED + (level - 1) * 0.18 + (elite ? 0 : rand(-0.1, 0.2)),
+    speed: ENEMY_BASE_SPEED + (level - 1) * ENEMY_WAVE_INCREMENT + (elite ? 0 : rand(-0.05, 0.1)),
     elite,
   }
+}
+
+function spawnItem(out: Item[], elite: boolean, x: number, y: number): void {
+  const dropChance = elite ? ITEM_DROP_ELITE : ITEM_DROP_NORMAL
+  if (Math.random() >= dropChance) return
+  // elite 는 HP 회복 우선 (귀한 자원), 일반은 점수 보너스 우선
+  const heartChance = elite ? 0.55 : 0.3
+  const kind: ItemKind = Math.random() < heartChance ? 'heart' : 'gem'
+  out.push({
+    id: nextId(),
+    x: x - ITEM_SIZE / 2,
+    y: y - ITEM_SIZE / 2,
+    kind,
+    life: ITEM_LIFE_FRAMES,
+  })
 }
 
 function computePlayerOpacity(invuln: number): string {
@@ -185,24 +255,24 @@ function readKeyboardMove(keys: Set<string>): { x: number; y: number; shoot: boo
   if (keys.has('ArrowUp')) y -= 1
   if (keys.has('ArrowDown')) y += 1
   const shoot = keys.has(' ') || keys.has('Spacebar')
-  return { x, y, shoot }
+  return {x, y, shoot}
 }
 
 function combineMove(kx: number, ky: number, pad: InputState): { x: number; y: number } {
   if (kx !== 0 || ky !== 0) {
     const n = normalize(kx, ky)
-    return { x: n.x, y: n.y }
+    return {x: n.x, y: n.y}
   }
   if (Math.abs(pad.mx) > 0.05 || Math.abs(pad.my) > 0.05) {
-    return { x: pad.mx, y: pad.my }
+    return {x: pad.mx, y: pad.my}
   }
-  return { x: 0, y: 0 }
+  return {x: 0, y: 0}
 }
 
-function movePlayer(p: Player, mx: number, my: number): void {
+function movePlayer(p: Player, mx: number, my: number, scale: number): void {
   if (mx !== 0 || my !== 0) {
-    p.x += mx * PLAYER_SPEED
-    p.y += my * PLAYER_SPEED
+    p.x += mx * PLAYER_SPEED * scale
+    p.y += my * PLAYER_SPEED * scale
     const n = normalize(mx, my)
     p.facing.x = n.x
     p.facing.y = n.y
@@ -225,16 +295,16 @@ function fireBullet(p: Player, bullets: Bullet[]): { dx: number; dy: number } {
     life: BULLET_LIFE,
   })
   p.fireCd = FIRE_COOLDOWN_FRAMES
-  return { dx, dy }
+  return {dx, dy}
 }
 
-function updateBullets(bullets: Bullet[]): void {
+function updateBullets(bullets: Bullet[], scale: number): void {
   for (let i = bullets.length - 1; i >= 0; i--) {
     const b = bullets[i]
     if (!b) continue
-    b.x += b.dx
-    b.y += b.dy
-    b.life -= 1
+    b.x += b.dx * scale
+    b.y += b.dy * scale
+    b.life -= scale
     if (
       b.life <= 0 ||
       b.x < -20 || b.x > WORLD_W + 20 ||
@@ -245,24 +315,25 @@ function updateBullets(bullets: Bullet[]): void {
   }
 }
 
-function chaseEnemies(enemies: Enemy[], p: Player): void {
+function chaseEnemies(enemies: Enemy[], p: Player, scale: number): void {
   for (const e of enemies) {
     const ecx = e.x + e.size / 2
     const ecy = e.y + e.size / 2
     const pcx = p.x + PLAYER_SIZE / 2
     const pcy = p.y + PLAYER_SIZE / 2
     const dir = normalize(pcx - ecx, pcy - ecy)
-    e.x += dir.x * e.speed
-    e.y += dir.y * e.speed
+    e.x += dir.x * e.speed * scale
+    e.y += dir.y * e.speed * scale
   }
 }
 
-// 총알 ↔ 적 충돌. 처치 시 점수 누적, hudDirty 마킹.
+// 총알 ↔ 적 충돌. 처치 시 점수 누적, hudDirty 마킹 + 아이템 drop 가능.
 // 반환 = 누적 점수 증가량 (호출자가 scoreRef 에 합산).
 function resolveBulletEnemyHits(
   bullets: Bullet[],
   enemies: Enemy[],
   particles: Particle[],
+  items: Item[],
 ): { gained: number; dirty: boolean } {
   let gained = 0
   let dirty = false
@@ -279,11 +350,12 @@ function resolveBulletEnemyHits(
       gained += e.elite ? SCORE_ELITE : SCORE_NORMAL
       spawnParticles(particles, e.x + e.size / 2, e.y + e.size / 2,
         e.elite ? '#fbbf24' : '#fecaca', 10)
+      spawnItem(items, e.elite, e.x + e.size / 2, e.y + e.size / 2)
       dirty = true
       enemies.splice(i, 1)
     }
   }
-  return { gained, dirty }
+  return {gained, dirty}
 }
 
 function findHittingBullet(bullets: Bullet[], e: Enemy): number {
@@ -311,15 +383,40 @@ function resolvePlayerEnemyHits(p: Player, enemies: Enemy[], particles: Particle
   return false
 }
 
-function updateParticles(particles: Particle[]): void {
+// 아이템 진행 (수명만 감소, 정지). pickup 은 별도.
+function updateItems(items: Item[], scale: number): void {
+  for (let i = items.length - 1; i >= 0; i--) {
+    const it = items[i]
+    if (!it) continue
+    it.life -= scale
+    if (it.life <= 0) items.splice(i, 1)
+  }
+}
+
+// 플레이어 ↔ 아이템 pickup. 효과 발동 + 처리한 아이템 종류 반환.
+function resolveItemPickup(p: Player, items: Item[]): ItemKind | null {
+  for (let i = items.length - 1; i >= 0; i--) {
+    const it = items[i]
+    if (!it) continue
+    if (rectsOverlap(p.x, p.y, PLAYER_SIZE, PLAYER_SIZE, it.x, it.y, ITEM_SIZE, ITEM_SIZE)) {
+      items.splice(i, 1)
+      return it.kind
+    }
+  }
+  return null
+}
+
+function updateParticles(particles: Particle[], scale: number): void {
+  // 마찰 0.92 ^ scale 로 dt 보정 (frame 마다 누적 효과 동일).
+  const friction = Math.pow(0.92, scale)
   for (let i = particles.length - 1; i >= 0; i--) {
     const q = particles[i]
     if (!q) continue
-    q.x += q.dx
-    q.y += q.dy
-    q.dx *= 0.92
-    q.dy *= 0.92
-    q.life -= 1
+    q.x += q.dx * scale
+    q.y += q.dy * scale
+    q.dx *= friction
+    q.dy *= friction
+    q.life -= scale
     if (q.life <= 0) particles.splice(i, 1)
   }
 }
@@ -375,8 +472,13 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
   const [hpView, setHpView] = useState<number>(PLAYER_MAX_HP)
   const [wave, setWave] = useState<number>(1)
   const [bestScore, setBestScore] = useState<number>(() => readBestScore())
+  const [skillReady, setSkillReady] = useState<boolean>(true)
   const [flash, setFlash] = useState<AttackFlash | null>(null)
-  const [announce, setAnnounce] = useState<{ id: number; text: string; kind: 'wave' | 'elite' } | null>(null)
+  const [announce, setAnnounce] = useState<{
+    id: number;
+    text: string;
+    kind: 'wave' | 'elite' | 'item'
+  } | null>(null)
   const [view, setView] = useState<ViewState>({
     width: WORLD_W,
     height: WORLD_H,
@@ -389,6 +491,7 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
   const enemiesRef = useRef<Enemy[]>([])
   const bulletsRef = useRef<Bullet[]>([])
   const particlesRef = useRef<Particle[]>([])
+  const itemsRef = useRef<Item[]>([])
   const inputRef = useRef<InputState>({
     mx: 0,
     my: 0,
@@ -408,12 +511,16 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
 
   // 렌더 동기화용 — rAF 안에서 setState 1회씩만 호출 (HUD 갱신)
   const hudDirtyRef = useRef<boolean>(false)
+  const skillReadyRef = useRef<boolean>(true)
 
   // DOM 노드 ref — 렌더는 rAF 마다 transform 만 갱신 (React 재렌더 회피)
   const playerElRef = useRef<HTMLDivElement | null>(null)
+  const skillRingRef = useRef<HTMLSpanElement | null>(null)
   const enemiesLayerRef = useRef<HTMLDivElement | null>(null)
   const bulletsLayerRef = useRef<HTMLDivElement | null>(null)
   const particlesLayerRef = useRef<HTMLDivElement | null>(null)
+  const itemsLayerRef = useRef<HTMLDivElement | null>(null)
+  const itemElMap = useRef<Map<number, HTMLDivElement>>(new Map())
   const enemyElMap = useRef<Map<number, HTMLDivElement>>(new Map())
   const bulletElMap = useRef<Map<number, HTMLDivElement>>(new Map())
   const particleElMap = useRef<Map<number, HTMLDivElement>>(new Map())
@@ -465,6 +572,9 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
     enemiesRef.current = []
     bulletsRef.current = []
     particlesRef.current = []
+    itemElMap.current.forEach((el) => el.remove())
+    itemElMap.current.clear()
+    itemsRef.current = []
     frameRef.current = 0
     waveTimerRef.current = 0
     spawnTimerRef.current = 30
@@ -473,6 +583,9 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
     setHpView(PLAYER_MAX_HP)
     setWave(1)
     setFlash(null)
+    skillReadyRef.current = true
+    setSkillReady(true)
+    skillRequestRef.current = false
   }, [])
 
   const start = useCallback((): void => {
@@ -486,13 +599,21 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
   // 키보드 입력은 stage div 에서 직접 처리 (onKeyDown / onKeyUp).
   // 글로벌 window 핸들러 회피 — 페이지 다른 UI (폼·링크) 영향 0.
   // stage 가 focus 받은 상태에서만 키 입력 응답 = a11y 정합.
-  // PC 입력 = 방향키 (이동) + Space (발사) + Enter (재시작). WASD 미사용.
+  // PC 입력 = 방향키 (이동) + Space (발사) + Shift (스킬) + Enter (재시작). WASD 미사용.
   const isGameKey = useCallback((k: string): boolean => {
     return (
       k === 'ArrowUp' || k === 'ArrowDown' || k === 'ArrowLeft' || k === 'ArrowRight' ||
       k === ' ' || k === 'Spacebar' ||
+      k === 'Shift' ||
       k === 'Enter'
     )
+  }, [])
+
+  // 스킬 사용 신호 (이번 frame 안에서 step 이 소비)
+  const skillRequestRef = useRef<boolean>(false)
+  const triggerSkill = useCallback(() => {
+    if (phaseRef.current !== 'playing') return
+    skillRequestRef.current = true
   }, [])
 
   const onStageKeyDown = useCallback((e: ReactKeyboardEvent<HTMLDivElement>): void => {
@@ -618,10 +739,15 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
     }
 
     const tick = (t: number): void => {
-      // dt 는 사용하지 않음 (frame 카운트로 박자 결정) — 60fps 가정
+      // dt scale = (실제 frame 간격) / (60fps 기준 16.67ms).
+      // 60fps 환경 = 1.0, 30fps 환경 = ~2.0. 모바일/PC 속도 일관화.
+      // 첫 frame 또는 큰 hitch (탭 백그라운드) 는 2.5 로 clamp (catch-up 폭주 방지).
+      const last = lastTickRef.current
+      const dt = last > 0 ? t - last : 16.67
+      const scale = Math.min(2.5, Math.max(0.5, dt / 16.67))
       lastTickRef.current = t
 
-      step()
+      step(scale)
       render()
 
       if (phaseRef.current === 'playing') {
@@ -642,30 +768,39 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, isVisible, isFocused])
 
-  // ─── 1 frame step — pure helper 함수 위임 ─────────────────
-  const step = useCallback((): void => {
-    frameRef.current += 1
-    waveTimerRef.current += 1
+  // ─── 1 frame step — pure helper 함수 위임 (scale = dt 보정) ──
+  const step = useCallback((scale: number): void => {
+    frameRef.current += scale
+    waveTimerRef.current += scale
     if (waveTimerRef.current >= WAVE_DURATION_FRAMES) {
       waveTimerRef.current = 0
       setWave((w) => {
         const next = w + 1
-        setAnnounce({ id: nextId(), text: `파상 ${next}`, kind: 'wave' })
+        setAnnounce({id: nextId(), text: `파상 ${next}`, kind: 'wave'})
         return next
       })
     }
     const currentWave = Math.max(1, Math.floor(frameRef.current / WAVE_DURATION_FRAMES) + 1)
 
     const p = playerRef.current
-    if (p.invuln > 0) p.invuln -= 1
-    if (p.fireCd > 0) p.fireCd -= 1
+    if (p.invuln > 0) p.invuln -= scale
+    if (p.fireCd > 0) p.fireCd -= scale
+    if (p.skillCd > 0) p.skillCd -= scale
+    if (p.skillActive > 0) p.skillActive -= scale
 
     // 입력 — 키보드 + 가상 패드
     const kb = readKeyboardMove(keysRef.current)
     if (kb.shoot) inputRef.current.shoot = true
+    // Shift 키 또는 외부 버튼 = 스킬 신호 → 본 frame 에서 1회 발동 시도
+    if (keysRef.current.has('Shift') || skillRequestRef.current) {
+      skillRequestRef.current = false
+      if (tryActivateSkill(p, enemiesRef.current, particlesRef.current)) {
+        hudDirtyRef.current = true
+      }
+    }
     const inp = inputRef.current
     const mv = combineMove(kb.x, kb.y, inp)
-    movePlayer(p, mv.x, mv.y)
+    movePlayer(p, mv.x, mv.y, scale)
 
     // 발사
     if (inp.shoot && p.fireCd <= 0) {
@@ -680,27 +815,40 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
     inp.shoot = false
 
     // 적 spawn
-    spawnTimerRef.current -= 1
+    spawnTimerRef.current -= scale
     if (spawnTimerRef.current <= 0) {
       const enemy = spawnEnemy(currentWave)
       enemiesRef.current.push(enemy)
       if (enemy.elite) {
-        setAnnounce({ id: nextId(), text: '魔 등장', kind: 'elite' })
+        setAnnounce({id: nextId(), text: '魔 등장', kind: 'elite'})
       }
-      const base = Math.max(SPAWN_MIN_FRAMES, SPAWN_BASE_FRAMES - (currentWave - 1) * 6)
+      const base = Math.max(SPAWN_MIN_FRAMES, SPAWN_BASE_FRAMES - (currentWave - 1) * SPAWN_WAVE_REDUCTION)
       spawnTimerRef.current = base + Math.floor(rand(-8, 8))
     }
 
-    // 이동 + 충돌 + 파티클
-    updateBullets(bulletsRef.current)
-    chaseEnemies(enemiesRef.current, p)
-    const hit = resolveBulletEnemyHits(bulletsRef.current, enemiesRef.current, particlesRef.current)
+    // 이동 + 충돌 + 아이템 + 파티클
+    updateBullets(bulletsRef.current, scale)
+    chaseEnemies(enemiesRef.current, p, scale)
+    const hit = resolveBulletEnemyHits(bulletsRef.current, enemiesRef.current, particlesRef.current, itemsRef.current)
     scoreRef.current += hit.gained
     if (hit.dirty) hudDirtyRef.current = true
     if (resolvePlayerEnemyHits(p, enemiesRef.current, particlesRef.current)) {
       hudDirtyRef.current = true
     }
-    updateParticles(particlesRef.current)
+    updateItems(itemsRef.current, scale)
+    const picked = resolveItemPickup(p, itemsRef.current)
+    if (picked === 'heart') {
+      p.hp = Math.min(PLAYER_MAX_HP, p.hp + ITEM_HP_HEAL)
+      spawnParticles(particlesRef.current, p.x + PLAYER_SIZE / 2, p.y + PLAYER_SIZE / 2, '#fca5a5', 12)
+      hudDirtyRef.current = true
+      setAnnounce({id: nextId(), text: '+1 HP', kind: 'item'})
+    } else if (picked === 'gem') {
+      scoreRef.current += ITEM_SCORE_BONUS
+      spawnParticles(particlesRef.current, p.x + PLAYER_SIZE / 2, p.y + PLAYER_SIZE / 2, '#fde68a', 12)
+      hudDirtyRef.current = true
+      setAnnounce({id: nextId(), text: `+${ITEM_SCORE_BONUS}`, kind: 'item'})
+    }
+    updateParticles(particlesRef.current, scale)
 
     // 사망 체크 — best-score 갱신 포함
     if (p.hp <= 0) {
@@ -720,6 +868,12 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
       setHpView(p.hp)
       hudDirtyRef.current = false
     }
+    // 스킬 ready 상태 변화만 HUD 갱신 (매 frame setState 회피)
+    const nowReady = p.skillCd <= 0
+    if (nowReady !== skillReadyRef.current) {
+      skillReadyRef.current = nowReady
+      setSkillReady(nowReady)
+    }
   }, [])
 
   // ─── 렌더 (DOM 직접 갱신 — React 재렌더 회피) ─────────────
@@ -729,6 +883,16 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
     if (playerElRef.current) {
       playerElRef.current.style.transform = `translate(${p.x}px, ${p.y}px)`
       playerElRef.current.style.opacity = computePlayerOpacity(p.invuln)
+    }
+    // 스킬 ring (skillActive > 0 일 때만 보임, 점진 fade out + expand)
+    if (skillRingRef.current) {
+      if (p.skillActive > 0) {
+        const t = 1 - p.skillActive / SKILL_DURATION_FRAMES // 0 → 1
+        skillRingRef.current.style.opacity = String(1 - t)
+        skillRingRef.current.style.transform = `translate(-50%, -50%) scale(${0.6 + t * 1.6})`
+      } else {
+        skillRingRef.current.style.opacity = '0'
+      }
     }
 
     // 적
@@ -750,6 +914,20 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
       return el
     }, (b, el) => {
       el.style.transform = `translate(${b.x}px, ${b.y}px)`
+    })
+
+    // 아이템 (적보다 먼저 그려서 적이 위로 오게)
+    syncEntityLayer(itemsRef.current, itemElMap.current, itemsLayerRef.current, (it) => {
+      const el = document.createElement('div')
+      el.className = `mg-item mg-item-${it.kind}`
+      el.style.width = `${ITEM_SIZE}px`
+      el.style.height = `${ITEM_SIZE}px`
+      el.textContent = it.kind === 'heart' ? '❤' : '💎'
+      return el
+    }, (it, el) => {
+      el.style.transform = `translate(${it.x}px, ${it.y}px)`
+      // 마지막 2초 동안 깜빡임 (수명 = 120 frame 이하)
+      el.style.opacity = it.life < 120 ? (it.life % 12 < 6 ? '0.35' : '1') : '1'
     })
 
     // 파티클
@@ -822,7 +1000,24 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
             </span>
           </div>
 
-          {/* 플레이어 */}
+          {/* 스킬 버튼 (상단 우측). 데스크탑 = Shift 키 대안, 모바일 = 주된 트리거. */}
+          {phase === 'playing' && (
+            <button
+              type="button"
+              className={`mg-skill-btn${skillReady ? ' is-ready' : ''}`}
+              aria-label={skillReady ? '스킬 검막 — 사용 가능' : '스킬 검막 — 충전 중'}
+              onClick={(e) => {
+                e.preventDefault();
+                triggerSkill()
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+              tabIndex={-1}
+            >
+              <span aria-hidden="true">⚔️</span>
+            </button>
+          )}
+
+          {/* 플레이어 + 스킬 발동 ring */}
           <div
             ref={playerElRef}
             className="mg-player"
@@ -830,16 +1025,19 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
             aria-hidden="true"
           >
             <span className="mg-player-face">🥋</span>
+            <span ref={skillRingRef} className="mg-skill-ring" aria-hidden="true"/>
           </div>
 
           {/* 엔티티 레이어 (DOM 직접 갱신) */}
+          <div ref={itemsLayerRef} className="mg-layer" aria-hidden="true"/>
           <div ref={enemiesLayerRef} className="mg-layer" aria-hidden="true"/>
           <div ref={bulletsLayerRef} className="mg-layer" aria-hidden="true"/>
           <div ref={particlesLayerRef} className="mg-layer" aria-hidden="true"/>
 
           {/* 알림 (wave 진입 / elite spawn) */}
           {announce && (
-            <div key={announce.id} className={`mg-announce mg-announce-${announce.kind}`} aria-live="polite">
+            <div key={announce.id} className={`mg-announce mg-announce-${announce.kind}`}
+                 aria-live="polite">
               {announce.text}
             </div>
           )}
@@ -871,6 +1069,7 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
                 <ul className="mg-help">
                   <li>이동 — <b>방향키</b> · 좌측 드래그 (모바일)</li>
                   <li>발사 — <b>Space</b> · 우측 탭 (이동 방향)</li>
+                  <li>스킬 검막 — <b>Shift</b> · 우상단 ⚔️ (무적 + 적 밀어내기)</li>
                   <li>재시작 — <b>Enter</b></li>
                 </ul>
                 {bestScore > 0 && (
@@ -900,7 +1099,8 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
                   type="button"
                   className="mini-game-btn mini-game-btn-primary"
                   onClick={() => stageRef.current?.focus()}
-                >재개</button>
+                >재개
+                </button>
               </div>
             </div>
           )}

@@ -1,6 +1,135 @@
 /* H-eries — Mini game (검기생존록) */
 /* 게임 박스는 사이트 토큰 무시 (어두운 게임 톤 자체 정의). */
 
+/* ─── Launcher (floating 우측 트리거 버튼) ─────────────── */
+.mini-game-launcher {
+  position: fixed;
+  right: clamp(12px, 3vw, 28px);
+  bottom: clamp(12px, 4vw, 32px);
+  z-index: 80;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px 10px 14px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 0;
+  box-shadow: 0 6px 18px rgba(48, 80, 160, 0.32), 0 2px 6px rgba(20, 20, 26, 0.18);
+  transition: transform var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
+  cursor: pointer;
+}
+.mini-game-launcher:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(48, 80, 160, 0.4), 0 3px 8px rgba(20, 20, 26, 0.22);
+}
+.mini-game-launcher-emoji { font-size: 16px; line-height: 1; }
+@media (max-width: 640px) {
+  .mini-game-launcher-label { display: none; }
+  .mini-game-launcher { padding: 12px 14px; }
+  .mini-game-launcher-emoji { font-size: 18px; }
+}
+
+/* ─── Dialog (native &lt;dialog&gt;) ──────────────────────────
+ * 비율 정합: 게임 stage 는 aspect-ratio 9:16 고정. dialog 자체는
+ * viewport 폭·높이 둘 다 고려해 fit.
+ *   - dialog width  = min(viewport 폭 - 안전 여백, 가능한 한 큰 box)
+ *   - dialog height = 헤더(약 56px) + 게임 9:16 + 여백 → max-height: dvh-32px
+ *   - dvh (dynamic viewport height) = 모바일 주소창 변동 대응
+ * 터치 UX: dialog 자체 + body 에 touch-action: none → Y축 드래그가
+ * page scroll / dialog scroll 로 새지 않고 게임 가상 패드에 도달.
+ */
+.mini-game-dialog {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  margin: auto;
+  width: clamp(280px, 92vw, 540px);
+  max-height: calc(100dvh - 24px);
+  height: auto;
+  color: var(--fg);
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+.mini-game-dialog::backdrop {
+  background: rgba(12, 10, 9, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.mini-game-dialog-card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 24px);
+}
+.mini-game-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg-soft);
+}
+.mini-game-dialog-title {
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--fg);
+}
+.mini-game-dialog-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: var(--fg-3);
+  font-size: 16px;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.mini-game-dialog-close:hover {
+  background: var(--bg-sunken);
+  color: var(--fg);
+}
+.mini-game-dialog-body {
+  padding: 12px;
+  background: var(--bg-sunken);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+/* mini-game-frame 은 9:16 고정. width 우선 fit 후, height 가 부족하면 height 우선. */
+.mini-game-dialog-body .mini-game-frame {
+  width: min(100%, calc((100dvh - 24px - 56px - 24px) * 9 / 16));
+  max-width: 480px;
+  height: auto;
+}
+@media (max-width: 640px) {
+  .mini-game-dialog { width: calc(100vw - 12px); max-height: calc(100dvh - 12px); }
+  .mini-game-dialog-card { max-height: calc(100dvh - 12px); }
+  .mini-game-dialog-body { padding: 8px; }
+  .mini-game-dialog-body .mini-game-frame {
+    width: min(100%, calc((100dvh - 12px - 56px - 16px) * 9 / 16));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mini-game-launcher { transition: none; }
+  .mini-game-launcher:hover { transform: none; }
+}
+
 .mini-game {
   --mg-bg: #0c0a09;
   --mg-bg-2: #1c1917;
@@ -265,6 +394,72 @@
 .mg-announce-elite {
   color: var(--mg-elite);
   border-color: rgba(249, 115, 22, 0.5);
+}
+.mg-announce-item {
+  color: var(--mg-accent);
+  border-color: rgba(251, 191, 36, 0.5);
+}
+
+.mg-item {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.45));
+  will-change: transform, opacity;
+  animation: mg-item-float 1.4s ease-in-out infinite alternate;
+}
+.mg-item-heart { color: var(--mg-danger); }
+.mg-item-gem { color: var(--mg-accent); }
+
+/* 스킬 — 검막 */
+.mg-skill-btn {
+  position: absolute;
+  top: 60px;
+  right: 8px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(28, 25, 23, 0.85);
+  border: 1px solid var(--mg-rule);
+  color: var(--mg-fg-3);
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 25;
+  transition: color 200ms, border-color 200ms, transform 120ms;
+  -webkit-tap-highlight-color: transparent;
+}
+.mg-skill-btn.is-ready {
+  color: var(--mg-player);
+  border-color: rgba(125, 211, 252, 0.7);
+  box-shadow: 0 0 12px rgba(125, 211, 252, 0.4);
+}
+.mg-skill-btn:not(.is-ready) { opacity: 0.55; cursor: wait; }
+.mg-skill-btn.is-ready:hover { transform: scale(1.06); }
+.mg-skill-btn.is-ready:active { transform: scale(0.94); }
+
+.mg-skill-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 2px solid var(--mg-player);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.6);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+@keyframes mg-item-float {
+  from { filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.3)); }
+  to { filter: drop-shadow(0 0 10px currentColor); }
 }
 @keyframes mg-announce-fade {
   0% { opacity: 0; transform: translate(-50%, -8px); }
