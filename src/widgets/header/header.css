@@ -110,6 +110,13 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  text-decoration: none;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.author-badge:hover,
+.author-badge:focus-visible {
+  background: var(--warn-rule);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 640px) {

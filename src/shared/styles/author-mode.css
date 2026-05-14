@@ -77,3 +77,70 @@
   font-size: var(--fs-xs);
   color: var(--fg-3);
 }
+
+/* ─── /unlock 페이지 ─────────────────────────────── */
+.page-unlock { max-width: 480px; margin: 0 auto; padding: var(--s-5) var(--s-4) var(--s-7); }
+.page-unlock h1 { margin: var(--s-4) 0 var(--s-5); font-size: var(--fs-h2); }
+.unlock-form,
+.unlock-status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-5);
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+}
+.unlock-desc {
+  margin: 0 0 var(--s-2);
+  font-size: var(--fs-sm);
+  color: var(--fg-2);
+  line-height: 1.6;
+}
+.unlock-label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--fg-2);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.unlock-input {
+  padding: var(--s-3) var(--s-3);
+  font: inherit;
+  font-family: var(--font-mono);
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  outline: none;
+}
+.unlock-input:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent); }
+.unlock-error {
+  margin: 0;
+  padding: var(--s-2) var(--s-3);
+  font-size: var(--fs-sm);
+  color: var(--warn-fg);
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-rule);
+  border-radius: var(--r-sm);
+}
+.unlock-actions { display: flex; gap: var(--s-2); flex-wrap: wrap; margin-top: var(--s-2); }
+.unlock-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s-2) var(--s-4);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.unlock-btn:hover { border-color: var(--accent); }
+.unlock-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.unlock-btn-primary:hover { background: color-mix(in srgb, var(--accent) 85%, #000); }

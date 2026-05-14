@@ -34,7 +34,9 @@ export function Header() {
         <div className="brand">
           <div className="brand-row">
             <Link to="/" className="brand-link">H-eries</Link>
-            {isAuthor && <span className="author-badge" title="작가 모드">AUTHOR</span>}
+            {isAuthor && (
+              <Link to="/unlock" className="author-badge" title="작가 모드 — 클릭하여 잠금 관리">AUTHOR</Link>
+            )}
           </div>
           <p className="meta">오리지널 웹 시리즈 컬렉션</p>
         </div>

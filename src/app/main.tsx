@@ -16,6 +16,7 @@ import {NoticePage} from '../pages/notice'
 import {SeriesPage} from '../pages/series'
 import {ChapterPage} from '../pages/chapter'
 import {CharacterPage} from '../pages/character'
+import {UnlockPage} from '../pages/unlock'
 import {NotFoundPage} from '../pages/not-found'
 import {applyTheme, getTheme} from '../shared/lib/theme.js'
 import {useScrollbarAutoHide} from '../shared/lib/use-scrollbar-autohide.js'
@@ -54,6 +55,7 @@ function App() {
             <Route path="/" element={<ErrorBoundary><HomePage/></ErrorBoundary>}/>
             <Route path="/about" element={<ErrorBoundary><AboutPage/></ErrorBoundary>}/>
             <Route path="/notice" element={<ErrorBoundary><NoticePage/></ErrorBoundary>}/>
+            <Route path="/unlock" element={<ErrorBoundary><UnlockPage/></ErrorBoundary>}/>
             <Route path="/series/:slug" element={<ErrorBoundary><SeriesPage/></ErrorBoundary>}/>
             <Route path="/series/:slug/chapter/:episode"
                    element={<ErrorBoundary><ChapterPage/></ErrorBoundary>}/>
