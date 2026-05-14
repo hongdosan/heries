@@ -104,20 +104,30 @@
 }
 
 .mini-game-dialog-close {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 999px;
   border: 0;
   background: transparent;
   color: var(--fg-3);
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
   transition: background var(--t-fast), color var(--t-fast);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mini-game-dialog-close:hover {
   background: var(--bg-sunken);
   color: var(--fg);
+}
+@media (max-width: 640px), (pointer: coarse) {
+  /* 모바일 = 닫기 버튼 손가락 정확 터치 (44 권장 → 48 로 여유). */
+  .mini-game-dialog-close {
+    width: 48px;
+    height: 48px;
+    font-size: 22px;
+  }
 }
 
 .mini-game-dialog-body {

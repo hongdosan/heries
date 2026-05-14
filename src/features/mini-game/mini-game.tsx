@@ -675,10 +675,9 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
       // 우측 = 탭 발사 — 플레이어의 현재 facing 방향
       inputRef.current.shoot = true
     }
-    try {
-      (e.target as Element).setPointerCapture?.(e.pointerId)
-    } catch { /* noop */
-    }
+    // setPointerCapture 폐기 — 이전엔 e.target (동적 자식, 예: mg-enemy)
+    // 에 capture 부여해 stuck 발생 가능. 본 게임은 stage 좌표만 사용하므로
+    // capture 없이도 pointermove / up 이 bubbling 으로 도달.
   }, [stageRectToWorld])
 
   const onStagePointerMove = useCallback((e: ReactPointerEvent<HTMLDivElement>): void => {
