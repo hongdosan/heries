@@ -35,7 +35,7 @@ export function Header() {
             <Link to="/" className="brand-link">H-eries</Link>
             {IS_AUTHOR_MODE && <span className="author-badge" title="작가 모드">AUTHOR</span>}
           </div>
-          <p className="meta">오리지널 다중/평행 세계 시리즈</p>
+          <p className="meta">오리지널 웹 시리즈 컬렉션</p>
         </div>
         <div className="site-header-actions">
           <a

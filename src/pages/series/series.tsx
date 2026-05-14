@@ -2,6 +2,7 @@ import {Link, useParams, useSearchParams} from 'react-router-dom'
 import {loadSeries} from '../../entities/series'
 import {assetUrl, IS_AUTHOR_MODE} from '../../shared/lib/env.js'
 import {useAsync} from '../../shared/lib/use-async.js'
+import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
 import {ChapterToc} from '../../widgets/chapter-toc'
 import {CharacterList} from '../../widgets/character-list'
@@ -14,6 +15,7 @@ export function SeriesPage() {
   const state = useAsync(() => loadSeries(slug), [slug])
   const cover = useImgFallback()
   const [searchParams, setSearchParams] = useSearchParams()
+  useDocumentTitle(state.status === 'success' ? state.data.manifest.title : '')
 
   const rawTab = searchParams.get('tab') as Tab | null
   const tab: Tab = rawTab && TABS.includes(rawTab) ? rawTab : 'overview'
@@ -53,7 +55,9 @@ export function SeriesPage() {
           <h1>{manifest.title}</h1>
           <div className="meta-row">
             <span className="status-pill">{manifest.status}</span>
-            {manifest.started && <time dateTime={manifest.started}>시작 {manifest.started}</time>}
+            {manifest.started && /^\d{4}-\d{2}-\d{2}$/.test(manifest.started) && (
+              <time dateTime={manifest.started}>시작 {manifest.started}</time>
+            )}
           </div>
         </div>
       </header>
@@ -94,15 +98,12 @@ export function SeriesPage() {
             작가 전용 자료 인덱스입니다. 시놉시스·세계관·연표·용어집·캐릭터 카드의 <em>H-eries 분기</em> 절은 reader 빌드에서 마스킹되므로, 본 탭에서 한곳에 모아 추적합니다.
           </p>
           <ul className="author-tab-list">
-            <li><strong>시놉시스</strong> — 개요 탭의 <em>## 시놉시스</em> 절 (3 페이즈 골격) 참조</li>
-            <li><strong>세계관</strong> — <code>content/series/{slug}/worldbuilding/</code> (향후 진영 SSOT 11 본문)</li>
+            <li><strong>시놉시스</strong> — 개요 탭의 <em>## 시놉시스</em> 절</li>
+            <li><strong>세계관</strong> — <code>content/series/{slug}/worldbuilding/</code></li>
             <li><strong>연표</strong> — <code>content/series/{slug}/timeline/</code></li>
             <li><strong>용어집</strong> — <code>content/series/{slug}/glossary/</code></li>
-            <li><strong>캐릭터 H-eries 분기</strong> — 각 캐릭터 페이지의 <em>## H-eries 분기 ~</em> 절 + frontmatter <code>heries_arc</code> (소환 시점)</li>
+            <li><strong>캐릭터 H-eries 분기</strong> — 각 캐릭터 페이지의 <em>## H-eries 분기 ~</em> 절 + frontmatter <code>heries_arc</code></li>
           </ul>
-          <p className="author-tab-note">
-            ※ 신규 author 전용 페이지 (timeline·glossary 등) 는 향후 worldsmith 사이클에서 추가됩니다.
-          </p>
         </section>
       )}
     </main>

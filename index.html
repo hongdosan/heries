@@ -4,10 +4,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!--
+    Content-Security-Policy — 외부 스크립트 / iframe / object 차단.
+    'unsafe-inline' 은 index.html 의 SPA redirect script + theme apply 인라인 필수.
+    img-src self + data: (webp 디코딩 일부 환경 + base64 fallback).
+    object-src 'none' / base-uri 'self' = clickjacking 보호.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>H-eries — hongdosan의 웹 시리즈</title>
-  <meta name="description" content="홍도산 의 오리지널 다중/평행 세계 웹 시리즈." />
+  <meta name="description" content="홍도산 의 오리지널 웹 시리즈 컬렉션." />
+  <meta name="theme-color" content="#3050a0" />
   <link rel="icon" type="image/webp" href="/src/shared/img/favicon.webp" />
-  <link rel="stylesheet" href="/src/shared/styles/style.css" />
+
+  <!-- Open Graph + Twitter Card (링크 미리보기) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="H-eries — hongdosan의 웹 시리즈" />
+  <meta property="og:description" content="홍도산 의 오리지널 웹 시리즈 컬렉션." />
+  <meta property="og:site_name" content="H-eries" />
+  <meta property="og:locale" content="ko_KR" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="H-eries — hongdosan의 웹 시리즈" />
+  <meta name="twitter:description" content="홍도산 의 오리지널 웹 시리즈 컬렉션." />
   <!--
     SPA 라우팅 복원 — GitHub Pages 의 404.html 이 잘못된 경로를
     `/?/<original-path>` 형태로 redirect 해 보낸다. 본 inline script 는
@@ -30,6 +48,18 @@
       }
     })(window.location)
   </script>
+  <!--
+    CSS module 이 import 되기 전 0~수십 ms 동안 사용자에게 보이는 첫 paint 톤.
+    base.css 가 로드되면 body { background: var(--bg) } 가 우선 적용되어 본 inline 룰이 덮인다.
+    다크 모드 prefers-color-scheme = 사용자 OS 설정 자동 반영 (theme.ts 의 manual override 보다 먼저).
+  -->
+  <style>
+    html, body { margin: 0; background: #ffffff; color: #6e6e76; }
+    @media (prefers-color-scheme: dark) {
+      html:not([data-theme="light"]), body { background: #111114; color: #9e9ea6; }
+    }
+    html[data-theme="dark"], html[data-theme="dark"] body { background: #111114; color: #9e9ea6; }
+  </style>
 </head>
 <body>
   <div id="app">

@@ -3,7 +3,9 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>H-eries</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" />
+  <title>H-eries — 이동 중…</title>
   <!--
     GitHub Pages SPA fallback — 알 수 없는 path 진입 시 (`/heries/about` 등)
     GitHub Pages 가 본 404.html 을 서빙한다. 본 script 는 path 를
@@ -24,6 +26,24 @@
       l.hash
     )
   </script>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #ffffff;
+      color: #6e6e76;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-size: 14px;
+    }
+    @media (prefers-color-scheme: dark) {
+      body { background: #111114; color: #b1b1b8; }
+    }
+  </style>
 </head>
-<body></body>
+<body>
+  <p>이동 중…</p>
+</body>
 </html>

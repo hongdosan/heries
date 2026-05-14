@@ -27,14 +27,28 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
+      - name: Type check
+        run: npm run typecheck
+
       - name: Build (reader mode)
         run: npm run build
+
+      - name: Build Storybook (sanity check, not deployed)
+        run: npm run build-storybook
+
+      - name: Verify reader dist isolation (Storybook artifacts must NOT be in dist)
+        run: |
+          if grep -rli "storybook" dist/ 2>/dev/null | grep -v "^$"; then
+            echo "::error::Storybook artifacts leaked into dist/"
+            exit 1
+          fi
+          echo "✓ dist/ clean (no storybook artifacts)"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

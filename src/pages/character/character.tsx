@@ -3,12 +3,11 @@ import { loadCharacter } from '../../entities/character'
 import { fetchSeriesManifest } from '../../shared/lib/manifest.js'
 import { renderInline } from '../../shared/lib/markdown.js'
 import { useAsync } from '../../shared/lib/use-async.js'
+import { useDocumentTitle } from '../../shared/lib/use-document-title.js'
 
 const FOLDER_LABEL: Record<string, string> = {
   '1-protagonist': '주인공',
-  '1-main-character': '주인공',
   '2-major-supporting': '주연',
-  '3-supporting': '조연',
   '3-antagonist': '빌런·멘토',
   '4-minor': '단역·카메오',
 }
@@ -21,6 +20,11 @@ export function CharacterPage() {
     const data = await loadCharacter(slug, id, manifest)
     return { manifest, data }
   }, [slug, id])
+
+  const characterTitle = state.status === 'success'
+    ? `${state.data.data.frontmatter.name || state.data.data.index.name} · ${state.data.manifest.title}`
+    : ''
+  useDocumentTitle(characterTitle)
 
   if (state.status === 'loading') return <main className="page-character"><p className="loading">불러오는 중…</p></main>
   if (state.status === 'error') return <main className="page-character"><p className="empty">오류: {state.error.message}</p></main>

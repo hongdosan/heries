@@ -3,10 +3,12 @@ import { assetUrl } from '../../shared/lib/env.js'
 import { renderMarkdown } from '../../shared/lib/markdown.js'
 import { parseFrontmatter } from '../../shared/lib/frontmatter.js'
 import { useAsync } from '../../shared/lib/use-async.js'
+import { useDocumentTitle } from '../../shared/lib/use-document-title.js'
 
 type NoticeFrontmatter = { title?: string; updated?: string }
 
 export function NoticePage() {
+  useDocumentTitle('저작권')
   const state = useAsync(async () => {
     const res = await fetch(assetUrl('content/notice.md'))
     if (!res.ok) throw new Error(`notice.md 로드 실패 (${res.status})`)
