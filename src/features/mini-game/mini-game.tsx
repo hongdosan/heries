@@ -1,5 +1,6 @@
 import type {KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent} from 'react'
 import {useCallback, useEffect, useLayoutEffect, useRef, useState,} from 'react'
+import {assetUrl} from '../../shared/lib/env.js'
 
 // ─────────────────────────────────────────────────────────────────
 // 검기생존록 — 무협 아이작풍 탄막 슈터 (H-eries 메인 페이지 미니 게임)
@@ -46,6 +47,13 @@ const ITEM_DROP_NORMAL = 0.08         // 일반 적 8% drop
 const ITEM_DROP_ELITE = 0.35          // 엘리트 적 35% drop
 const ITEM_SCORE_BONUS = 30
 const ITEM_HP_HEAL = 1
+
+// 무협 액션 sprite — BASE_URL prefix 위해 assetUrl 헬퍼.
+// JSX 의 inline style 에서 backgroundImage 로 적용.
+const SLASH_SPRITE = assetUrl('content/_shared/mini-game/mg-slash.webp')
+const IMPACT_ELITE_SPRITE = assetUrl('content/_shared/mini-game/mg-impact-amber.webp')
+const IMPACT_NORMAL_SPRITE = assetUrl('content/_shared/mini-game/mg-impact-crimson.webp')
+const IMPACT_FADE_MS = 280
 
 // 스킬 — 검막 (Active, Shift / 상단 우측 버튼)
 const SKILL_CD_FRAMES = 60 * 8        // 8초 쿨다운
@@ -142,6 +150,13 @@ interface AttackFlash {
   x: number
   y: number
   angle: number
+}
+
+interface Impact {
+  id: number
+  x: number
+  y: number
+  elite: boolean
 }
 
 interface InputState {
@@ -283,11 +298,11 @@ function applyItemEffect(
   if (kind === 'heart') {
     p.hp = Math.min(PLAYER_MAX_HP, p.hp + ITEM_HP_HEAL)
     spawnParticles(particles, p.x + PLAYER_SIZE / 2, p.y + PLAYER_SIZE / 2, COLOR_ITEM_HEART, PARTICLES_ITEM_PICKUP)
-    return { scoreBonus: 0, announceText: `+${ITEM_HP_HEAL} HP` }
+    return {scoreBonus: 0, announceText: `+${ITEM_HP_HEAL} HP`}
   }
   // gem
   spawnParticles(particles, p.x + PLAYER_SIZE / 2, p.y + PLAYER_SIZE / 2, COLOR_ITEM_GEM, PARTICLES_ITEM_PICKUP)
-  return { scoreBonus: ITEM_SCORE_BONUS, announceText: `+${ITEM_SCORE_BONUS}` }
+  return {scoreBonus: ITEM_SCORE_BONUS, announceText: `+${ITEM_SCORE_BONUS}`}
 }
 
 // 아이템 표시 opacity (마지막 깜빡임 단계 처리). render 안 nested ternary 회피.
@@ -378,16 +393,18 @@ function chaseEnemies(enemies: Enemy[], p: Player, scale: number): void {
   }
 }
 
-// 총알 ↔ 적 충돌. 처치 시 점수 누적, hudDirty 마킹 + 아이템 drop 가능.
-// 반환 = 누적 점수 증가량 (호출자가 scoreRef 에 합산).
+// 총알 ↔ 적 충돌. 처치 시 점수 누적, hudDirty 마킹 + 아이템 drop 가능
+// + impact sprite spawn (적 처치 시).
+// 반환 = 누적 점수 증가량 + impact 큐 (호출자가 setImpacts 갱신).
 function resolveBulletEnemyHits(
   bullets: Bullet[],
   enemies: Enemy[],
   particles: Particle[],
   items: Item[],
-): { gained: number; dirty: boolean } {
+): { gained: number; dirty: boolean; impacts: Impact[] } {
   let gained = 0
   let dirty = false
+  const impacts: Impact[] = []
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e = enemies[i]
     if (!e) continue
@@ -403,11 +420,17 @@ function resolveBulletEnemyHits(
       spawnParticles(particles, e.x + e.size / 2, e.y + e.size / 2,
         e.elite ? COLOR_KILL_ELITE : COLOR_KILL_NORMAL, PARTICLES_KILL)
       spawnItem(items, e.elite, e.x + e.size / 2, e.y + e.size / 2)
+      impacts.push({
+        id: nextId(),
+        x: e.x + e.size / 2,
+        y: e.y + e.size / 2,
+        elite: e.elite,
+      })
       dirty = true
       enemies.splice(i, 1)
     }
   }
-  return {gained, dirty}
+  return {gained, dirty, impacts}
 }
 
 function findHittingBullet(bullets: Bullet[], e: Enemy): number {
@@ -518,7 +541,7 @@ export interface MiniGameProps {
   readonly autoFocus?: boolean
 }
 
-export function MiniGame({ autoFocus = false }: Readonly<MiniGameProps>) {
+export function MiniGame({autoFocus = false}: Readonly<MiniGameProps>) {
   const [phase, setPhase] = useState<Phase>('idle')
   const [score, setScore] = useState<number>(0)
   const [hpView, setHpView] = useState<number>(PLAYER_MAX_HP)
@@ -526,6 +549,7 @@ export function MiniGame({ autoFocus = false }: Readonly<MiniGameProps>) {
   const [bestScore, setBestScore] = useState<number>(() => readBestScore())
   const [skillReady, setSkillReady] = useState<boolean>(true)
   const [flash, setFlash] = useState<AttackFlash | null>(null)
+  const [impacts, setImpacts] = useState<Impact[]>([])
   const [announce, setAnnounce] = useState<{
     id: number;
     text: string;
@@ -539,7 +563,7 @@ export function MiniGame({ autoFocus = false }: Readonly<MiniGameProps>) {
   const bulletsRef = useRef<Bullet[]>([])
   const particlesRef = useRef<Particle[]>([])
   const itemsRef = useRef<Item[]>([])
-  const inputRef = useRef<InputState>({ mx: 0, my: 0, shoot: false })
+  const inputRef = useRef<InputState>({mx: 0, my: 0, shoot: false})
   const keysRef = useRef<Set<string>>(new Set())
   const frameRef = useRef<number>(0)
   const waveTimerRef = useRef<number>(0)
@@ -879,6 +903,9 @@ export function MiniGame({ autoFocus = false }: Readonly<MiniGameProps>) {
     const hit = resolveBulletEnemyHits(bulletsRef.current, enemiesRef.current, particlesRef.current, itemsRef.current)
     scoreRef.current += hit.gained
     if (hit.dirty) hudDirtyRef.current = true
+    if (hit.impacts.length > 0) {
+      setImpacts((prev) => [...prev, ...hit.impacts])
+    }
     if (resolvePlayerEnemyHits(p, enemiesRef.current, particlesRef.current)) {
       hudDirtyRef.current = true
     }
@@ -888,7 +915,7 @@ export function MiniGame({ autoFocus = false }: Readonly<MiniGameProps>) {
       const effect = applyItemEffect(picked, p, particlesRef.current)
       scoreRef.current += effect.scoreBonus
       hudDirtyRef.current = true
-      setAnnounce({ id: nextId(), text: effect.announceText, kind: 'item' })
+      setAnnounce({id: nextId(), text: effect.announceText, kind: 'item'})
     }
     updateParticles(particlesRef.current, scale)
 
@@ -1001,6 +1028,15 @@ export function MiniGame({ autoFocus = false }: Readonly<MiniGameProps>) {
     return () => globalThis.clearTimeout(t)
   }, [flash])
 
+  // impact sprite 자동 소멸 — 가장 오래된 것부터 IMPACT_FADE_MS 후 제거.
+  useEffect(() => {
+    if (impacts.length === 0) return
+    const t = globalThis.setTimeout(() => {
+      setImpacts((prev) => prev.slice(1))
+    }, IMPACT_FADE_MS)
+    return () => globalThis.clearTimeout(t)
+  }, [impacts])
+
   // 알림 (wave / elite / item) 자동 소멸
   useEffect(() => {
     if (!announce) return
@@ -1042,17 +1078,19 @@ export function MiniGame({ autoFocus = false }: Readonly<MiniGameProps>) {
             </span>
           </div>
 
-          {/* 스킬 버튼 (상단 우측). 데스크탑 = Shift 키 대안, 모바일 = 주된 트리거. */}
+          {/* 스킬 버튼. 데스크탑 = Shift 키 대안, 모바일 = 주된 트리거.
+              onClick 은 모바일에서 down→up 사이 손가락 미세 이동 시 cancel 됨.
+              onPointerDown 으로 즉시 발동 + stopPropagation 으로 stage 발사 차단. */}
           {phase === 'playing' && (
             <button
               type="button"
               className={`mg-skill-btn${skillReady ? ' is-ready' : ''}`}
               aria-label={skillReady ? '스킬 검막 — 사용 가능' : '스킬 검막 — 충전 중'}
-              onClick={(e) => {
-                e.preventDefault();
+              onPointerDown={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
                 triggerSkill()
               }}
-              onPointerDown={(e) => e.stopPropagation()}
               tabIndex={-1}
             >
               <span aria-hidden="true">⚔️</span>
@@ -1084,7 +1122,7 @@ export function MiniGame({ autoFocus = false }: Readonly<MiniGameProps>) {
             </div>
           )}
 
-          {/* 공격 시 검광 슬래시 (이모지 X, gradient streak — 무협 검기 톤) */}
+          {/* 공격 시 검광 슬래시 (sprite mg-slash.webp) */}
           {flash && (
             <div
               key={flash.id}
@@ -1093,10 +1131,25 @@ export function MiniGame({ autoFocus = false }: Readonly<MiniGameProps>) {
                 left: flash.x,
                 top: flash.y,
                 transform: `rotate(${flash.angle}rad)`,
+                backgroundImage: `url(${SLASH_SPRITE})`,
               }}
               aria-hidden="true"
             />
           )}
+
+          {/* 적 처치 impact (sprite mg-impact-{amber|crimson}.webp) */}
+          {impacts.map((it) => (
+            <div
+              key={it.id}
+              className={`mg-impact ${it.elite ? 'mg-impact-elite' : 'mg-impact-normal'}`}
+              style={{
+                left: it.x,
+                top: it.y,
+                backgroundImage: `url(${it.elite ? IMPACT_ELITE_SPRITE : IMPACT_NORMAL_SPRITE})`,
+              }}
+              aria-hidden="true"
+            />
+          ))}
 
           {/* 가상 패드 표시 (모바일) */}
           <div ref={padBaseRef} className="mg-pad-base" aria-hidden="true"/>
@@ -1163,7 +1216,7 @@ export function MiniGame({ autoFocus = false }: Readonly<MiniGameProps>) {
                   type="button"
                   className="mini-game-btn mini-game-btn-primary"
                   onClick={start}
-                >다시 — Enter
+                >다시하기
                 </button>
               </div>
             </div>

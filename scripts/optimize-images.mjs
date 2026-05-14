@@ -18,10 +18,12 @@ const SHARP_CLI = 'sharp-cli@latest'
 
 function findImageDirs(root) {
   // Returns all directories that hold thumbnail/cover images. Recurses into
-  // content/series/*/thumbnails so subfolders (e.g. chapter-images/) are picked up.
+  // content/_shared/** (mini-game/ 등 하위 sprite 폴더 포함) +
+  // content/series/*/thumbnails (chapter-images/ 등 포함).
   const out = []
   try {
-    if (statSync(join(root, '_shared')).isDirectory()) out.push(join(root, '_shared'))
+    const sharedDir = join(root, '_shared')
+    if (statSync(sharedDir).isDirectory()) walkDirs(sharedDir, out)
   } catch {}
   try {
     const seriesDir = join(root, 'series')
@@ -76,19 +78,31 @@ for (const dir of dirs) {
     // the source mid-write, we stage to a tmp dir, then swap in.
     const tmpDir = mkdtempSync(join(tmpdir(), 'H-eries-img-'))
     try {
+      // --withoutEnlargement = 원본보다 큰 크기로 upscale 방지.
+      // 작은 sprite (예: mini-game/mg-impact-*) 가 1600 강제 resize 로
+      // 오히려 커지는 현상 방지.
       const cmd = [
         'npx', '-y', SHARP_CLI,
         '-i', JSON.stringify(inPath),
         '-o', JSON.stringify(tmpDir),
         '-f', 'webp',
         '-q', '80',
-        'resize', '1600',
+        'resize', '1600', '--withoutEnlargement',
       ].join(' ')
       execSync(cmd, { stdio: ['ignore', 'pipe', 'pipe'] })
 
       // sharp-cli output: <tmpDir>/<stem>.webp (regardless of input extension)
       const outPath = join(tmpDir, `${stem}.webp`)
       statSync(outPath) // throws if missing
+      const outSize = statSync(outPath).size
+
+      // 결과가 원본보다 크면 원본 유지 (이미 최적화된 작은 이미지 케이스).
+      if (extname(f).toLowerCase() === '.webp' && outSize >= before) {
+        totalBefore += before
+        totalAfter += before
+        console.log(`  · ${stem}: ${humanKB(before)} (이미 최적화됨, 보존)`)
+        continue
+      }
 
       // Replace original. If source had non-.webp extension, remove it.
       if (extname(f).toLowerCase() !== '.webp') {
