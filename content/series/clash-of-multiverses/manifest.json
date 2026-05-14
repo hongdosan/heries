@@ -1,55 +1,10 @@
 {
   "slug": "clash-of-multiverses",
   "title": "차원의 격돌",
-  "status": "페이즈 1 진입 — 프롤로그 발행",
+  "status": "tba",
   "thumbnail": "thumbnails/cover.webp",
   "characters": [
-    { "id": "woo-jin-hyeok", "folder": "1-protagonist", "name": "우진혁 (禹鎭赫)" },
-    { "id": "eira", "folder": "2-major-supporting", "name": "에이라 (Eira)" },
-    { "id": "yamura-tou", "folder": "2-major-supporting", "name": "야무라 토우 (野邑 透)" },
-    { "id": "seo-un-ryong", "folder": "2-major-supporting", "name": "서운룡 (徐雲龍)" },
-    { "id": "cheon-ryeong-geuk", "folder": "2-major-supporting", "name": "천령극 (天靈極)" },
-    { "id": "go-cheon-han", "folder": "2-major-supporting", "name": "고천한 (高天恨)" },
-    { "id": "yu-baek-gyeong", "folder": "2-major-supporting", "name": "유백경 (柳白卿)" },
-    { "id": "mak-mu-ryeon", "folder": "2-major-supporting", "name": "막무련 (莫武連)" },
-    { "id": "rim-woo-gyeong", "folder": "2-major-supporting", "name": "림우경 (林禹卿)" },
-    { "id": "hyeon-woo", "folder": "2-major-supporting", "name": "현우 (玄宇)" },
-    { "id": "baek-mu-jin", "folder": "2-major-supporting", "name": "백무진 (白茂進)" },
-    { "id": "woo-a-jin", "folder": "4-minor", "name": "우아진 (禹娥珍)" },
-    { "id": "park-chan-ho", "folder": "4-minor", "name": "박찬호 (朴贊浩)" },
-    { "id": "kim-ju-yeong", "folder": "4-minor", "name": "김주영 (金柱榮)" },
-    { "id": "jeong-min-ho", "folder": "4-minor", "name": "정민호 (鄭民豪)" },
-    { "id": "park-ji-hun", "folder": "4-minor", "name": "박지훈 (朴志勳)" },
-    { "id": "song-jae-hun", "folder": "4-minor", "name": "송재훈 (宋宰勳)" }
+    { "id": "woo-jin-hyeok", "folder": "1-protagonist", "name": "우진혁" }
   ],
-  "chapters": [
-    {
-      "episode": 1,
-      "slug": "prologue",
-      "title": "프롤로그 — 운동장의 마지막 한 바퀴",
-      "published": "2026-05-13",
-      "thumbnail": "thumbnails/ep-01-prologue.webp"
-    },
-    {
-      "episode": 2,
-      "slug": "recruitment",
-      "title": "ep-02 — 던전이라는 단어의 첫 줄",
-      "published": "2026-05-13",
-      "thumbnail": "thumbnails/ep-02-recruitment.webp"
-    },
-    {
-      "episode": 3,
-      "slug": "first-mission",
-      "title": "ep-03 — 첫 작전, 첫 마수, 첫 잃음",
-      "published": "2026-05-13",
-      "thumbnail": "thumbnails/ep-03-first-mission.webp"
-    },
-    {
-      "episode": 4,
-      "slug": "uncountable",
-      "title": "ep-04 — 셀 수 없는 마지막 표정들",
-      "published": "2026-05-13",
-      "thumbnail": "thumbnails/ep-04-uncountable.webp"
-    }
-  ]
+  "chapters": []
 }
