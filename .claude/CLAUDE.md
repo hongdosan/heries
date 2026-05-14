@@ -36,16 +36,14 @@ static (`.nojekyll`) 로 발행.
 7. **GitHub 공개 저장소** — 비공개 토큰·시크릿·개인 식별 정보(이메일·주소 등) 산출물 포함 금지.
 8. **누적 산출물 최적화 강제** — append-only 구조는 임계 초과 시 압축 의무. 변경 이력 hot **20행** / 핸드오프 = 단일 파일 `CURRENT.md`
    덮어쓰기 (정책 v3). 점검 시점 = *세션 시작 직후* + *세션 종료 직전*. 절차: §누적 산출물.
-9. **스포일러 분리 (작가 모드 vs 독자 모드)** — 독자 (default 빌드) 가 보는 것은 *시리즈 목록 + 등장인물 (원작 정보) + 발행된 챕터* 만. 마스킹
-   대상 = (a) `_series.md` 의 `## 시놉시스` 절 (b) 캐릭터 카드의 `## H-eries 분기 ~` 이하 모든 절 (c) frontmatter
-   `heries_arc` (d) `worldbuilding/timeline/glossary/`. 작가 모드 = `VITE_AUTHOR_MODE=true` 환경 변수 (
-   `npm run dev:author` / `npm run build:author`). 라이브 GitHub Pages 는 항상 reader 빌드만 배포.
+9. **스포일러 분리 (작가 모드 unlock)** *(2026-05-14 정책 v2)* — 라이브 사이트는 **단일 빌드**. 작가 콘텐츠도 dist 에 평문 포함되나 *기본 화면에서는 마스킹*. 작가 모드 진입 = `/unlock` 페이지에서 **암호 입력** (또는 `?unlock=KEY` 쿼리). 검증 통과 시 sessionStorage `heries:author=1` set → 마스킹 해제 + AUTHOR 배지. 탭 닫으면 자동 잠금. 마스킹 대상 = (a) `_series.md` 의 `## 시놉시스` 절 (b) 캐릭터 카드의 `## H-eries 분기 ~` 이하 모든 절 (c) frontmatter `heries_arc` (d) `worldbuilding/timeline/glossary/` 페이지·라우트 진입 차단 (e) 등장인물 상세 페이지 — 주인공 (`1-protagonist`) 외 차단. **보안 수준**: devtools 우회 가능 (능동 우회는 *독자 자기 책임* — 본인이 스포 보면 자기 손해). 키 = `VITE_AUTHOR_KEY` 빌드 환경변수 (`.env.local` gitignore + GitHub Secret), 코드/git 노출 0.
 10. **작가 원칙 SSOT** — *(예약, 무대 컨셉 결정 후 작성)*. 새 무대 컨셉이 결정되면
     `content/series/{slug}/worldbuilding/writing-principles.md` 에 SSOT 작성 후 본 원칙에 챕터 작성 가이드 항목 추가.
 11. **공통 컴포넌트 (`shared/ui/`) 스토리북 강제** (2026-05-14 신설) — `src/shared/ui/{name}/` 신규 컴포넌트 추가 시 동일
     슬라이스에 `{name}.stories.tsx` **반드시** 함께 작성. 누락 = 정책 위반. 스토리는 의미 있는 variant 최소 2 개 + 정상 케이스 1 개 (=
     최소 3 스토리). `widgets/`, `features/` 슬라이스는 권장 (강제 X). `pages/` 는 라우팅 의존이라 미적용.
 12. **AI 개발 흐름 강제** (2026-05-14 신설) — auto-mode (자율 진행) 또는 3 파일 이상 변경 / 신규 슬라이스 도입 / 콘텐츠 SSOT 갱신 시 [`./workflow/workflow.md`](./workflow/workflow.md) 의 6 단계 흐름 (Context → Prompt QA → Roadmap → Tech Review → Adaptive Execution → Commit/Close) 강제. 트랙별 프롬프트 템플릿: [`develop`](./workflow/template/prompt-template-develop.md) / [`improvement`](./workflow/template/prompt-template-improvement.md) / [`review`](./workflow/template/prompt-template-review.md). 단일 기준점: [`prompt-reference.md`](./workflow/template/prompt-reference.md).
+13. **개인 정보 / 시크릿 절대 비공개** *(2026-05-14 신설)* — 다음 데이터는 **코드 / git / dist 에 절대 포함 금지**: (a) 개인 식별 정보 — 실주소·실전화·실생년월일·실명 (이메일 `contact_hongdosan@naver.com` 은 공개 채널이라 예외) (b) API 키·토큰·시크릿 (c) DB 비밀번호·인증 정보 (d) 작가 모드 키 (`VITE_AUTHOR_KEY` — `.env.local` + GitHub Secret 만, hardcoded X) (e) OAuth secrets·결제 정보. 검증 = `scripts/check-secrets.mjs` (build 게이트 — 시크릿 패턴 정규식 검출). 위반 시 build fail.
 
 ## 도구 우선순위
 
