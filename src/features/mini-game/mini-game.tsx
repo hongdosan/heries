@@ -49,9 +49,9 @@ const ITEM_HP_HEAL = 1
 
 // 스킬 — 검막 (Active, Shift / 상단 우측 버튼)
 const SKILL_CD_FRAMES = 60 * 8        // 8초 쿨다운
-const SKILL_DURATION_FRAMES = 36      // 0.6초 발동 (무적 + push)
+const SKILL_DURATION_FRAMES = 60      // 1초 발동 (무적 + push)
 const SKILL_PUSH_RADIUS = 100         // 100px 반경
-const SKILL_PUSH_STRENGTH = 14        // 적 밀어내기 강도
+const SKILL_PUSH_STRENGTH = 34        // 적 밀어내기 강도
 
 // ─── 타입 ──────────────────────────────────────────────────────
 interface Vec {
@@ -1069,7 +1069,7 @@ export function MiniGame({autoFocus = false}: MiniGameProps) {
                 <ul className="mg-help">
                   <li>이동 — <b>방향키</b> · 좌측 드래그 (모바일)</li>
                   <li>발사 — <b>Space</b> · 우측 탭 (이동 방향)</li>
-                  <li>스킬 검막 — <b>Shift</b> · 우상단 ⚔️ (무적 + 적 밀어내기)</li>
+                  <li>스킬 검막 — <b>Shift</b> · ⚔️ (무적 + 적 밀어내기)</li>
                   <li>재시작 — <b>Enter</b></li>
                 </ul>
                 {bestScore > 0 && (
