@@ -4,21 +4,21 @@
 /* ─── Launcher (floating 우측 트리거 버튼) ─────────────── */
 .mini-game-launcher {
   position: fixed;
-  right: clamp(12px, 3vw, 28px);
-  bottom: clamp(12px, 4vw, 32px);
+  right: clamp(var(--s-3), 3vw, var(--s-6));
+  bottom: clamp(var(--s-3), 4vw, var(--s-6));
   z-index: 80;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 18px 10px 14px;
-  border-radius: 999px;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-4) var(--s-2) var(--s-3);
+  border-radius: var(--r-pill);
   background: var(--accent);
-  color: #ffffff;
+  color: #fff;
   font-size: var(--fs-sm);
   font-weight: 700;
   letter-spacing: 0.02em;
   border: 0;
-  box-shadow: 0 6px 18px rgba(48, 80, 160, 0.32), 0 2px 6px rgba(20, 20, 26, 0.18);
+  box-shadow: var(--shadow);
   transition: transform var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
   cursor: pointer;
 }
@@ -26,11 +26,10 @@
 .mini-game-launcher:hover {
   background: var(--accent-hover);
   transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(48, 80, 160, 0.4), 0 3px 8px rgba(20, 20, 26, 0.22);
 }
 
 .mini-game-launcher-emoji {
-  font-size: 16px;
+  font-size: var(--fs-base);
   line-height: 1;
 }
 
@@ -40,11 +39,11 @@
   }
 
   .mini-game-launcher {
-    padding: 12px 14px;
+    padding: var(--s-3) var(--s-3);
   }
 
   .mini-game-launcher-emoji {
-    font-size: 18px;
+    font-size: var(--fs-md);
   }
 }
 
@@ -57,13 +56,20 @@
  * 터치 UX: dialog 자체 + body 에 touch-action: none → Y축 드래그가
  * page scroll / dialog scroll 로 새지 않고 게임 가상 패드에 도달.
  */
+/* dialog 외각 SSOT — 동일 단위를 dialog/card/body/frame calc 가 공유.
+   --mg-dialog-gap = dialog 와 viewport 사이 여백 (전체 dvh 에서 차감).
+   --mg-dialog-head = 헤더 height (mini-game-frame 의 max-height 계산용).
+   값 변경 시 한 자리에서 일관 갱신. */
 .mini-game-dialog {
+  --mg-dialog-gap: var(--s-5);     /* viewport 와 dialog 사이 여백 (24px 기준) */
+  --mg-dialog-head: var(--s-8);    /* 헤더 height 추정 (64px 기준, 실제 padding+font 약 48-56px) */
+  --mg-dialog-frame-max: clamp(360px, 60vw, 480px); /* 게임 frame max width */
   border: 0;
   padding: 0;
   background: transparent;
   margin: auto;
   width: clamp(280px, 92vw, 540px);
-  max-height: calc(100dvh - 24px);
+  max-height: calc(100dvh - var(--mg-dialog-gap));
   height: auto;
   color: var(--fg);
   touch-action: none;
@@ -80,18 +86,18 @@
   background: var(--surface);
   border-radius: var(--r-lg);
   overflow: hidden;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow);
   border: 1px solid var(--rule);
   display: flex;
   flex-direction: column;
-  max-height: calc(100dvh - 24px);
+  max-height: calc(100dvh - var(--mg-dialog-gap));
 }
 
 .mini-game-dialog-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: var(--s-3) var(--s-4);
   border-bottom: 1px solid var(--rule);
   background: var(--bg-soft);
 }
@@ -104,13 +110,13 @@
 }
 
 .mini-game-dialog-close {
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
+  width: clamp(36px, 5vw, 44px);
+  height: clamp(36px, 5vw, 44px);
+  border-radius: var(--r-pill);
   border: 0;
   background: transparent;
   color: var(--fg-3);
-  font-size: 18px;
+  font-size: var(--fs-md);
   cursor: pointer;
   transition: background var(--t-fast), color var(--t-fast);
   touch-action: manipulation;
@@ -122,16 +128,16 @@
   color: var(--fg);
 }
 @media (max-width: 640px), (pointer: coarse) {
-  /* 모바일 = 닫기 버튼 손가락 정확 터치 (44 권장 → 48 로 여유). */
+  /* 모바일 = 닫기 버튼 손가락 정확 터치 (a11y 44px 권장 이상). */
   .mini-game-dialog-close {
-    width: 48px;
-    height: 48px;
-    font-size: 22px;
+    width: clamp(44px, 12vw, 52px);
+    height: clamp(44px, 12vw, 52px);
+    font-size: var(--fs-lg);
   }
 }
 
 .mini-game-dialog-body {
-  padding: 12px;
+  padding: var(--s-3);
   background: var(--bg-sunken);
   display: flex;
   justify-content: center;
@@ -145,14 +151,17 @@
 
 /* mini-game-frame 은 9:16 고정. width 우선 fit 후, height 가 부족하면 height 우선. */
 .mini-game-dialog-body .mini-game-frame {
-  width: min(100%, calc((100dvh - 24px - 56px - 24px) * 9 / 16));
-  max-width: 480px;
+  width: min(100%, calc((100dvh - var(--mg-dialog-gap) - var(--mg-dialog-head) - var(--s-5)) * 9 / 16));
+  max-width: var(--mg-dialog-frame-max);
   height: auto;
 }
 
 @media (max-width: 640px) {
   /* 모바일 = 전체화면 고정. 헤더만 sticky, 게임 영역 = viewport 전체에 fit. */
   .mini-game-dialog {
+    --mg-dialog-gap: 0px;
+    --mg-dialog-head: var(--s-7);  /* 모바일 헤더 더 컴팩트 (약 48px) */
+    --mg-dialog-frame-max: 100%;
     width: 100vw;
     max-width: 100vw;
     height: 100dvh;
@@ -169,19 +178,18 @@
   }
 
   .mini-game-dialog-head {
-    padding: 10px 12px;
+    padding: var(--s-2) var(--s-3);
   }
 
   .mini-game-dialog-body {
-    padding: 6px;
+    padding: var(--s-1);
   }
 
   .mini-game-dialog-body .mini-game-frame {
-    /* 헤더(약 48px) + body padding (12px) 빼고 height 우선 fit (9:16). */
-    width: min(100%, calc((100dvh - 48px - 12px) * 9 / 16));
+    /* SSOT 변수로 calc — viewport 전체 fit (9:16). */
+    width: min(100%, calc((100dvh - var(--mg-dialog-head) - var(--s-3)) * 9 / 16));
     max-width: 100%;
-    /* iOS Safari address bar 변동 대응 — height 도 명시 */
-    max-height: calc(100dvh - 48px - 12px);
+    max-height: calc(100dvh - var(--mg-dialog-head) - var(--s-3));
   }
 }
 

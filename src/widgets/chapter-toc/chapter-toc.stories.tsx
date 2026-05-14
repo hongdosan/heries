@@ -9,7 +9,7 @@ const meta: Meta<typeof ChapterToc> = {
   decorators: [
     (Story) => (
       <MemoryRouter>
-        <div style={{ maxWidth: 720, padding: 16 }}>
+        <div style={{ maxWidth: 'var(--w-reader, 720px)', padding: 'var(--s-4)' }}>
           <Story />
         </div>
       </MemoryRouter>

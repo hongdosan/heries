@@ -37,7 +37,7 @@ export const AutoStart: Story = {
 export const Narrow: Story = {
   decorators: [
     (Story) => (
-      <div style={{ width: 280, padding: 8 }}>
+      <div style={{ width: 280, padding: 'var(--s-2)' }}>
         <Story />
       </div>
     ),

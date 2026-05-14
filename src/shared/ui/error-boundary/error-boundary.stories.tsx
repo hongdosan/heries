@@ -34,7 +34,7 @@ const Throw = ({ message }: { message: string }): never => {
 export const Normal: Story = {
   args: {
     children: (
-      <main style={{ padding: '2rem' }}>
+      <main style={{ padding: 'var(--s-6)' }}>
         <p>모든 것이 정상입니다.</p>
       </main>
     ),

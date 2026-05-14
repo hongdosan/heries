@@ -9,7 +9,7 @@ const meta: Meta<typeof SeriesList> = {
   decorators: [
     (Story) => (
       <MemoryRouter>
-        <div style={{ maxWidth: 960, padding: 16 }}>
+        <div style={{ maxWidth: 'var(--w-page, 960px)', padding: 'var(--s-4)' }}>
           <Story />
         </div>
       </MemoryRouter>
