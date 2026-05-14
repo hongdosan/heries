@@ -28,6 +28,9 @@ dist/
 dist-author/
 .vite/
 
+# Storybook static build (dev tool — no impact on dist)
+storybook-static/
+
 # Environment
 .env
 .env.local

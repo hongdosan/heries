@@ -2,9 +2,18 @@
   "name": "heries",
   "version": "0.1.0",
   "private": true,
+  "description": "H-eries — 작가(홍도산) 의 오리지널 웹 시리즈 컬렉션. React 19 + Vite + TypeScript strict.",
   "type": "module",
   "license": "SEE LICENSE IN LICENSE",
+  "author": "hongdosan",
   "homepage": "https://hongdosan.github.io/heries/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hongdosan/heries.git"
+  },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite",
     "dev:author": "VITE_AUTHOR_MODE=true vite",
@@ -12,7 +21,9 @@
     "build:author": "node scripts/check-images.mjs && VITE_AUTHOR_MODE=true tsc -b && VITE_AUTHOR_MODE=true vite build --outDir dist-author && VITE_AUTHOR_MODE=true node scripts/copy-content.mjs dist-author && cp .nojekyll dist-author/.nojekyll",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "optimize:images": "node scripts/optimize-images.mjs"
+    "optimize:images": "node scripts/optimize-images.mjs",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "react": "^19.0.0",
@@ -20,9 +31,16 @@
     "react-router-dom": "^7.0.0"
   },
   "devDependencies": {
+    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/addon-interactions": "^8.6.14",
+    "@storybook/blocks": "^8.6.14",
+    "@storybook/react": "^8.6.18",
+    "@storybook/react-vite": "^8.6.18",
+    "@storybook/test": "^8.6.18",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "storybook": "^8.6.18",
     "typescript": "^5.7.0",
     "vite": "^6.0.0"
   }
