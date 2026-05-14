@@ -53,24 +53,31 @@
    * 챕터 페이지 본문 (max-width = var(--w-reader) = 680px) 의 우측 가장자리에
    * 가까이 붙도록 배치. 화면이 본문보다 넓을 때는 *본문 + gutter* 직후에
    * 떠 있고, 화면이 좁아지면 viewport 우측에 붙는다.
+   *
+   * --scroll-nav-btn-size = scroll-nav-btn 의 width/height (clamp).
+   * right 오프셋 계산에서 동일 토큰을 사용해 일관 정렬.
    */
+  --scroll-nav-btn-size: clamp(36px, 4vw, 48px);
   position: fixed;
   bottom: var(--s-5);
-  right: max(var(--s-5), calc((100vw - var(--w-reader)) / 2 - 48px - var(--s-2)));
+  right: max(
+    var(--s-5),
+    calc((100vw - var(--w-reader)) / 2 - var(--scroll-nav-btn-size) - var(--s-2))
+  );
   display: flex;
   flex-direction: column;
   gap: var(--s-2);
   z-index: 30;
 }
 .scroll-nav-btn {
-  width: 40px;
-  height: 40px;
+  width: var(--scroll-nav-btn-size);
+  height: var(--scroll-nav-btn-size);
   border-radius: 50%;
   background: color-mix(in srgb, var(--surface) 92%, transparent);
   color: var(--fg-2);
   border: 1px solid var(--rule);
   box-shadow: var(--shadow);
-  font-size: 18px;
+  font-size: var(--fs-lg);
   line-height: 1;
   display: inline-flex;
   align-items: center;

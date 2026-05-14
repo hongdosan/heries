@@ -25,12 +25,13 @@
 .character-body {
   display: grid;
   gap: var(--s-7);
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: clamp(200px, 22vw, 280px) 1fr;
   align-items: start;
 }
 .character-meta-aside {
+  /* header row min-height (clamp 52~64px) + 본문 간격 — 헤더 sticky 와 정렬 */
   position: sticky;
-  top: calc(56px + var(--s-5));
+  top: calc(clamp(52px, 6vh, 64px) + var(--s-5));
   min-width: 0;
 }
 .meta-card {

@@ -17,7 +17,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--s-4);
-  min-height: 56px;
+  min-height: clamp(52px, 6vh, 64px);
 }
 .site-header .brand {
   display: flex;
@@ -115,7 +115,7 @@
 @media (max-width: 640px) {
   .site-header > .site-header-row {
     gap: var(--s-3);
-    min-height: 52px;
+    min-height: clamp(48px, 6vh, 56px);
   }
   .site-header .brand .meta { display: none; }
   .site-header-actions { gap: var(--s-2); }
