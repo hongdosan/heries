@@ -13,14 +13,15 @@
    - **`heries_arc` 필드** — 본 작품 소환 시점 (예: `① 능력 각성 직후` / `⑤ 시스템 폭주 후` / 보류 시 `tba`) 을 frontmatter 에 기록. 본 필드와 *H-eries 분기 절* 은 모두 reader 빌드에서 마스킹 (원칙 #9).
    - **운영 디테일 미노출** — 위 두 항목은 SSOT 운영 규약으로, `_series.md` 등 reader 노출 문서의 본문에서는 *구현 디테일 (필드명·placeholder·절 구조)* 을 노출하지 않는다 (서사 사실만 기술).
    - **외부 IP 차용 ZERO 정책** — 신규 캐릭터·세계관 도입 시: (a) *기존 작품의 캐릭터·고유명사·고유 능력·고유 진영* 과 명백히 구별되는 자작 모티프·자작 명명 사용 (b) *닌자·무협 (정파·사파·혈교·천마신교 등)·헌터·회귀자·환생자·판타지* 등 *장르 원형·일반 명사* 는 사용 가능하나, *특정 작품의 식별 가능한 고유 표현* 은 회피 (c) 의심스러우면 사용자 확인. NOTICE.md 의 모든 정책은 운영 SSOT.
-3. **최소 의존 — React 19 + React Router + Vite 만** (2026-05-11 정책 v2). 본 의존 외 외부 라이브러리·UI 키트·상태 관리 라이브러리 도입 시 사용자 확인 필수. *의존 추가의 정신* = "코드만 있으면 어디서든 실행 가능" — 특정 빌드 시스템·SaaS·플랫폼에 묶이는 의존 금지.
+3. **최소 의존 — 런타임은 React 19 + React Router + Vite 만** (2026-05-14 정책 v3). 본 의존 외 *런타임* 외부 라이브러리·UI 키트·상태 관리 라이브러리 도입 시 사용자 확인 필수. *의존 추가의 정신* = "코드만 있으면 어디서든 실행 가능" — 특정 빌드 시스템·SaaS·플랫폼에 묶이는 *런타임* 의존 금지. **dev 도구는 별도** — Storybook 등 *dist 산출물에 0 영향* 인 devDependencies 는 허용 (단, package.json `dependencies` vs `devDependencies` 구분 엄수).
 4. **FSD 아키텍처** — 프론트엔드 코드는 `src/` 6 레이어 (`app/pages/widgets/features/entities/shared`). 상위 레이어 → 하위 레이어만 import (격리). 슬라이스 외부에서는 `index.ts` (Public API) 만 import. 가이드: [`../src/README.md`](../src/README.md)
 5. **TypeScript strict + JSX** — `tsconfig.json` 의 `strict: true` 유지. `.tsx` 소스만 git 커밋, 빌드 산출물 (`dist/`) 은 `.gitignore`. 빌드 = `npm run build` (Vite). 개발 = `npm run dev`.
 6. **단일 작가 가정** — 다인 협업·코드 리뷰 분기 미적용.
 7. **GitHub 공개 저장소** — 비공개 토큰·시크릿·개인 식별 정보(이메일·주소 등) 산출물 포함 금지.
 8. **누적 산출물 최적화 강제** — append-only 구조는 임계 초과 시 압축 의무. 변경 이력 hot **20행** / 핸드오프 = 단일 파일 `CURRENT.md` 덮어쓰기 (정책 v3). 점검 시점 = *세션 시작 직후* + *세션 종료 직전*. 절차: §누적 산출물.
 9. **스포일러 분리 (작가 모드 vs 독자 모드)** — 독자 (default 빌드) 가 보는 것은 *시리즈 목록 + 등장인물 (원작 정보) + 발행된 챕터* 만. 마스킹 대상 = (a) `_series.md` 의 `## 시놉시스` 절 (b) 캐릭터 카드의 `## H-eries 분기 ~` 이하 모든 절 (c) frontmatter `heries_arc` (d) `worldbuilding/timeline/glossary/`. 작가 모드 = `VITE_AUTHOR_MODE=true` 환경 변수 (`npm run dev:author` / `npm run build:author`). 라이브 GitHub Pages 는 항상 reader 빌드만 배포.
-10. **작가 원칙 SSOT** — 챕터 작성 시 [`../content/series/clash-of-multiverses/worldbuilding/writing-principles.md`](../content/series/clash-of-multiverses/worldbuilding/writing-principles.md) 를 우선 참조. 핵심 = (a) 기승전결 4 단 구조 강제 (b) 묘사 자세히 — 시각·청각·촉각·공간 좌표·시간 박자 (c) 전투씬 *특히* 자세히 — 한 합 분해·호흡 단위·공간 좌표·부상·결과 (d) 모든 등장 인물 정의 의무 — 단독 카드 또는 [`4-minor/_mob-pool.md`](../content/series/clash-of-multiverses/characters/4-minor/_mob-pool.md) 1~2 줄 누적 (e) 한 챕터 한 사건 깊이 (시놉시스 압축 reject).
+10. **작가 원칙 SSOT** — *(예약, 무대 컨셉 결정 후 작성)*. 새 무대 컨셉이 결정되면 `content/series/{slug}/worldbuilding/writing-principles.md` 에 SSOT 작성 후 본 원칙에 챕터 작성 가이드 항목 추가.
+11. **공통 컴포넌트 (`shared/ui/`) 스토리북 강제** (2026-05-14 신설) — `src/shared/ui/{name}/` 신규 컴포넌트 추가 시 동일 슬라이스에 `{name}.stories.tsx` **반드시** 함께 작성. 누락 = 정책 위반. 스토리는 의미 있는 variant 최소 2 개 + 정상 케이스 1 개 (= 최소 3 스토리). `widgets/`, `features/` 슬라이스는 권장 (강제 X). `pages/` 는 라우팅 의존이라 미적용.
 
 ## 도구 우선순위
 
