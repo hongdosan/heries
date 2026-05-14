@@ -47,7 +47,7 @@ npm run typecheck        # 타입 체크만
 `shared/lib/spoiler.ts` 가 정책 SSOT. `IS_AUTHOR_MODE` (`shared/lib/env.ts`, `VITE_AUTHOR_MODE` 환경변수) 가 false (default) 면:
 
 - `_series.md` 의 `## 시놉시스` 절 마스킹
-- 캐릭터 카드의 `## H-eries 분기 ~` 이하 모든 절 마스킹 (단 `## 검증 출처` 노출)
+- 캐릭터 카드의 `## H-eries 분기 ~` 이하 모든 절 마스킹
 - 캐릭터 frontmatter 의 `heries_arc` 필드 제거
 - 챕터 본문은 마스킹 안 함 (이미 발행됨)
 
@@ -62,7 +62,9 @@ npm run typecheck        # 타입 체크만
 | `ChapterPage` | reader 폭(680px) + EP 모노 태그 + 본문 + **prev/next 카드** | 큰 행간 (1.95) + `word-break: keep-all` 한글 친화. |
 | `CharacterPage` | hero + **분할 레이아웃** (좌 sticky 메타카드 240px / 우 위키 본문) | 모바일은 단일 컬럼 적층. |
 
-**디자인 토큰**: `style.css` 상단의 `:root` 에 surface/text/accent/spacing/type/radius/shadow/motion 정의. 다크 모드는 `@media (prefers-color-scheme: dark)` 로 토큰 swap. 단일 폰트 (Pretendard) + 잉크블루 액센트 + 모노톤.
+**디자인 토큰**: `shared/styles/tokens.css` 의 `:root` 에 surface/text/accent/spacing/type/radius/shadow/motion 정의. 다크 모드는 `@media (prefers-color-scheme: dark)` 로 토큰 swap. 단일 폰트 (Pretendard) + 잉크블루 액센트 + 모노톤.
+
+**CSS 분산**: 슬라이스별로 `*.css` 를 함께 두고 `index.ts` 에서 import. 전역 CSS (tokens / base / typography / layout / utilities / author-mode / responsive) 는 `shared/styles/` 에 두고 `app/main.tsx` 에서만 import.
 
 ## 슬라이스 구성 (예시: `widgets/header/`)
 
@@ -90,7 +92,7 @@ src/
 │   └── index.ts                                    # Public API
 └── shared/
     ├── lib/                                        # types·frontmatter·markdown·manifest·env·spoiler·use-async
-    └── styles/style.css                            # 디자인 토큰 + 컴포넌트 + 다크 모드
+    └── styles/                                     # 전역 CSS — tokens·base·typography·layout·utilities·author-mode·responsive
 ```
 
 ## 작성 시 체크리스트
@@ -101,7 +103,7 @@ src/
 4. 동일 레이어 간 import 발견 시 → `shared/` 또는 `entities/` 로 추출
 5. 외부 라이브러리 import 발견 시 → 사용자 확인 (CLAUDE.md §3 — 최소 의존)
 6. 신규 컨텐츠 절·필드가 스포 영역이면 → `shared/lib/spoiler.ts` 동시 갱신
-7. 새 페이지/위젯의 스타일은 `style.css` 의 디자인 토큰을 사용 (raw 색상값 X)
+7. 새 페이지/위젯의 스타일은 슬라이스 내 `*.css` 에 작성하고 `index.ts` 에서 import, `tokens.css` 디자인 토큰 사용 (raw 색상값 X)
 
 ## 관련 문서
 
