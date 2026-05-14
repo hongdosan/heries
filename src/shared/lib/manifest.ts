@@ -57,11 +57,15 @@ function normalizeCharacters(raw: unknown): CharacterIndex[] {
     const idRaw = o['id']
     const folderRaw = o['folder']
     const nameRaw = o['name']
+    const summaryRaw = o['summary']
     const id = typeof idRaw === 'string' ? idRaw : ''
     const folder = typeof folderRaw === 'string' ? folderRaw : ''
     if (!id || !VALID_FOLDERS.has(folder as CharacterFolder)) continue
     const name = typeof nameRaw === 'string' && nameRaw ? nameRaw : id
-    out.push({ id, folder: folder as CharacterFolder, name })
+    const summary = typeof summaryRaw === 'string' && summaryRaw ? summaryRaw : undefined
+    const entry: CharacterIndex = { id, folder: folder as CharacterFolder, name }
+    if (summary) entry.summary = summary
+    out.push(entry)
   }
   return out
 }

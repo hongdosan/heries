@@ -61,6 +61,28 @@
   word-break: break-word;
 }
 
+.character-locked {
+  margin: var(--s-6) 0;
+  padding: var(--s-6);
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  text-align: center;
+}
+.character-locked h1 { margin: 0 0 var(--s-3); }
+.character-locked p { margin: 0 0 var(--s-3); color: var(--fg-2); }
+.character-locked-meta {
+  font-size: var(--fs-sm);
+  color: var(--fg-3);
+  margin: 0 0 var(--s-5) !important;
+}
+.character-locked-actions {
+  display: inline-flex;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 @media (max-width: 800px) {
   .character-body { grid-template-columns: 1fr; }
   .character-meta-aside { position: static; }

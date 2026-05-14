@@ -20,6 +20,7 @@ export interface CharacterIndex {
   id: string
   folder: CharacterFolder
   name: string
+  summary?: string
 }
 
 export interface ChapterIndex {

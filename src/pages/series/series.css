@@ -163,10 +163,8 @@
   white-space: nowrap;
 }
 
-/* Character grid (within tab) */
-.character-group {
-  margin: 0 0 var(--s-6);
-}
+/* Character grid (within tab). 정책: 주인공 카드만 Link, 나머지는 정적 카드. */
+.character-group { margin: 0 0 var(--s-6); }
 .character-group h3 {
   font-size: var(--fs-sm);
   font-weight: 500;
@@ -175,15 +173,15 @@
   letter-spacing: 0.08em;
   margin: 0 0 var(--s-3);
 }
-.character-list {
+.character-card-grid {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: var(--s-3);
 }
-.character-list li {
+.character-card {
   background: var(--surface);
   border: 1px solid var(--rule);
   border-radius: var(--r-md);
@@ -191,20 +189,34 @@
   transition: transform var(--t-fast), border-color var(--t-fast),
               box-shadow var(--t-fast);
 }
-.character-list li:hover {
+.character-card:has(.character-card-link):hover {
   transform: translateY(-2px);
   border-color: var(--accent-ring);
   box-shadow: var(--shadow);
 }
-.character-list li a {
-  display: block;
+.character-card-link,
+.character-card-static {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
   padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md);
+  color: var(--fg);
+  text-decoration: none;
+}
+.character-card-link:hover .character-card-name { color: var(--accent); }
+.character-card-static { color: var(--fg-2); }
+.character-card-name {
   font-size: var(--fs-md);
   font-weight: 500;
   color: var(--fg);
-  border-radius: var(--r-md);
 }
-.character-list li:hover a { color: var(--accent); }
+.character-card-static .character-card-name { color: var(--fg-2); }
+.character-card-summary {
+  font-size: var(--fs-xs);
+  color: var(--fg-3);
+  line-height: 1.5;
+}
 
 @media (max-width: 640px) {
   .series-hero.has-cover {

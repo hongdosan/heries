@@ -3,6 +3,7 @@ import { loadCharacter } from '../../entities/character'
 import { fetchSeriesManifest } from '../../shared/lib/manifest.js'
 import { renderInline } from '../../shared/lib/markdown.js'
 import { useAsync } from '../../shared/lib/use-async.js'
+import { useAuthorMode } from '../../shared/lib/use-author-mode.js'
 import { useDocumentTitle } from '../../shared/lib/use-document-title.js'
 
 const FOLDER_LABEL: Record<string, string> = {
@@ -14,6 +15,7 @@ const FOLDER_LABEL: Record<string, string> = {
 
 export function CharacterPage() {
   const { slug = '', id = '' } = useParams<{ slug: string; id: string }>()
+  const isAuthor = useAuthorMode()
 
   const state = useAsync(async () => {
     const manifest = await fetchSeriesManifest(slug)
@@ -30,6 +32,30 @@ export function CharacterPage() {
   if (state.status === 'error') return <main className="page-character"><p className="empty">오류: {state.error.message}</p></main>
 
   const { manifest, data } = state.data
+
+  // 정책 (character-doctrine): 주인공 외 캐릭터 상세는 작가 모드 한정.
+  // 비-작가가 직접 URL 진입 시 잠금 안내 + 시리즈 복귀 링크.
+  if (!isAuthor && data.index.folder !== '1-protagonist') {
+    return (
+      <main className="page-character">
+        <nav className="breadcrumb">
+          <Link to="/">H-eries</Link><span className="sep">/</span>
+          <Link to={`/series/${slug}`}>{manifest.title}</Link><span className="sep">/</span>
+          <span>잠김</span>
+        </nav>
+        <div className="character-locked">
+          <h1>잠긴 카드</h1>
+          <p>본 캐릭터의 상세 정보는 <Link to="/unlock">작가 모드</Link>에서 열람할 수 있습니다.</p>
+          <p className="character-locked-meta">{manifest.title} · {FOLDER_LABEL[data.index.folder] || data.index.folder}</p>
+          <div className="character-locked-actions">
+            <Link to={`/series/${slug}?tab=characters`} className="unlock-btn unlock-btn-primary">등장인물 목록으로</Link>
+            <Link to="/unlock" className="unlock-btn">작가 모드 잠금 해제</Link>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
   const fm = data.frontmatter
   const aliases = Array.isArray(fm.aliases) ? fm.aliases : []
   const hasMeta = fm.origin || fm.affiliation || fm.first_appearance || aliases.length > 0
