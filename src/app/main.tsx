@@ -18,6 +18,7 @@ import { ChapterPage } from '../pages/chapter'
 import { CharacterPage } from '../pages/character'
 import { NotFoundPage } from '../pages/not-found'
 import { applyTheme, getTheme } from '../shared/lib/theme.js'
+import { useScrollbarAutoHide } from '../shared/lib/use-scrollbar-autohide.js'
 import { ErrorBoundary } from '../shared/ui/error-boundary'
 
 // Apply saved theme override before first paint to avoid flicker.
@@ -41,6 +42,7 @@ function RouteTransition({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  useScrollbarAutoHide()
   return (
     <BrowserRouter basename={BASENAME}>
       <a href="#main" className="skip-link">본문으로 건너뛰기</a>

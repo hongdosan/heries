@@ -21,6 +21,54 @@ html, body {
   min-height: 100vh;
 }
 
+/* ─── 스크롤바 autohide ─────────────────────────────────
+ * 기본은 투명 (트랙·thumb 모두). 사용자가 스크롤하는 동안만
+ * body.is-scrolling 으로 fade-in. 스크롤 정지 1.2s 후 fade-out.
+ * scrollbar-gutter: stable → 폭 안정 (보임/숨김 시 layout shift 없음).
+ *
+ * 구현 SSOT: src/shared/lib/use-scrollbar-autohide.ts (main.tsx 에서 1회 호출).
+ * 정책: prefers-reduced-motion = 항상 표시 (transition 무력화).
+ * ───────────────────────────────────────────────────── */
+html {
+  scrollbar-gutter: stable;
+  /* Firefox — 색 transition 안 됨, toggle 만. */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 400ms ease;
+}
+body.is-scrolling {
+  /* WebKit thumb 색은 ::-webkit-scrollbar-thumb 측 transition 으로 처리. */
+}
+html:has(body.is-scrolling),
+body.is-scrolling {
+  scrollbar-color: var(--fg-4) transparent;
+}
+/* WebKit / Blink — Chrome / Safari / Edge */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 400ms ease;
+}
+body.is-scrolling::-webkit-scrollbar-thumb {
+  background-color: var(--fg-4);
+}
+body.is-scrolling::-webkit-scrollbar-thumb:hover {
+  background-color: var(--fg-3);
+}
+@media (prefers-reduced-motion: reduce) {
+  html { transition: none; scrollbar-color: var(--fg-4) transparent; }
+  ::-webkit-scrollbar-thumb { background-color: var(--fg-4); transition: none; }
+}
+
 body { display: flex; flex-direction: column; }
 #app { display: flex; flex-direction: column; flex: 1; }
 
