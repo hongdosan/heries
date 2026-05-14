@@ -84,6 +84,7 @@ heries/
 ├── package.json, tsconfig.json, vite.config.ts, index.html
 ├── content/                         # 마크다운 SSOT
 │   ├── _shared/                            # 공통 자산
+│   │   └── images/                                # 이미지 (heries-mark / placeholder / mini-game sprite)
 │   ├── series.json                         # 시리즈 인덱스
 │   └── series/{slug}/
 │       ├── manifest.json

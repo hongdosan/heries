@@ -2,8 +2,8 @@
 // Optimize thumbnail/cover images in-place.
 // Uses sharp-cli via npx (no permanent dependency added to package.json).
 //
-// Targets: content/_shared/*.{webp,jpg,jpeg,png}
-//          content/series/*/thumbnails/*.{webp,jpg,jpeg,png}
+// Targets: content/_shared/images/**/*.{webp,jpg,jpeg,png}
+//          content/series/*/thumbnails/**/*.{webp,jpg,jpeg,png}
 //
 // Output: same path, WebP, quality 80, resized to max 1600px width.
 

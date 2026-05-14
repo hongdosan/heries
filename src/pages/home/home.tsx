@@ -6,7 +6,7 @@ import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
 import {SeriesList} from '../../widgets/series-list'
 import {MiniGameLauncher} from '../../features/mini-game'
 
-const HERO_IMAGE = assetUrl('content/_shared/thumbnail-placeholder.webp')
+const HERO_IMAGE = assetUrl('content/_shared/images/thumbnail-placeholder.webp')
 const HERO_ALT = 'H-eries — 작가(홍도산) 의 오리지널 웹 시리즈 컬렉션'
 
 export function HomePage() {
