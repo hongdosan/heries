@@ -4,7 +4,7 @@
   "status": "tba",
   "thumbnail": "thumbnails/cover.webp",
   "characters": [
-    { "id": "woo-jin-hyeok", "folder": "1-protagonist", "name": "우진혁", "summary": "죽은 자를 자신의 권속으로 만드는 자." }
+    { "id": "woo-jin-hyeok", "folder": "1-protagonist", "name": "우진혁", "summary": "동생을 위해 운동을 포기하고 입대한 군인." }
   ],
   "chapters": []
 }
