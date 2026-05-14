@@ -17,7 +17,7 @@ export interface MiniGameDefinition {
   readonly component: ComponentType<{ readonly autoFocus?: boolean }>
 }
 
-// 동적 import 회피 = 카탈로그 자체가 SSOT. 새 게임 추가 시 import 1줄 +
+// 동적 import 방지 = 카탈로그 자체가 SSOT. 새 게임 추가 시 import 1줄 +
 // 배열 1 entry. launcher 는 본 배열만 알고 게임 내부는 모름 (FSD 정합).
 import { SwordsmanSurvival } from './games/swordsman-survival'
 

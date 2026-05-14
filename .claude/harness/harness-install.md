@@ -126,13 +126,12 @@ Claude Code 세션에서 다음 자연어 프롬프트 입력:
 ```
 하네스 구성해줘.
 
-도메인: 비상업적 크로스팬픽 웹 시리즈 'H-eries' 의 등장인물·세계관·연표·용어집을 markdown SSOT 로 관리·검증하는 에이전트.
+도메인: 작가 hongdosan 의 오리지널 웹 시리즈 'H-eries' 의 등장인물·세계관·연표·용어집을 markdown SSOT 로 관리·검증하는 에이전트.
 첫 작품: series/clash-of-multiverses/ (차원의 격돌).
-등장인물 .md 스키마: frontmatter (name, origin, affiliation, role, first_appearance, aliases) + 서술 본문.
-원작 차용 캐릭터는 origin 필드 필수 — 누락 시 reject.
-오리지널 캐릭터는 origin: original 명시.
+등장인물 .md 스키마: frontmatter (name, origin: original, role, first_appearance, reader_snapshot, heries_arc, aliases, summary) + 서술 본문.
+모든 캐릭터는 origin: original (100% 자작).
 정적 사이트는 라이브러리 의존성 0 — markdown / HTML 만 사용. GitHub Pages raw static (`.nojekyll`).
-모든 .md 산출물 첫 줄에 비상업적 팬픽 고지 부착:
+모든 .md 산출물 첫 줄에 저작권 고지 부착:
   <!-- © 2026 홍도산. All rights reserved. Original creator work. -->
 이름 규약: 파일 agent-lorekeeper.md, frontmatter name: H-eries-lorekeeper.
 산출물 위치: .claude/agents/.
@@ -167,10 +166,10 @@ cat .claude/CLAUDE.md   # 하네스 트리거 항목 추가 여부
 
 | # | 항목 | 통과 조건 |
 |---|------|----------|
-| 1 | 비상업적 팬픽 고지 | frontmatter 다음 줄에 `<!-- © 2026 홍도산. All rights reserved. Original creator work. -->` |
+| 1 | 저작권 고지 | frontmatter 다음 줄에 `<!-- © 2026 홍도산. All rights reserved. Original creator work. -->` |
 | 2 | SSOT 위치 인용 | `content/series/{slug}/characters/` 등 명시 |
 | 3 | 라이브러리 의존성 도입 시도 | 시도 시 사용자 확인 요청, 자동 도입 금지 |
-| 4 | `origin` 필드 강제 | 등장인물 카드에 `origin` 누락 시 reject |
+| 4 | `origin: original` 강제 | 등장인물 카드에 `origin` 누락 시 reject |
 | 5 | 단일 작가 가정 | 다인 협업 분기 미포함 |
 | 6 | GitHub 공개 저장소 인지 | 비공개 토큰·시크릿 포함 금지 |
 | 7 | frontmatter `name` | `H-eries-lorekeeper` 패턴 |
@@ -197,9 +196,8 @@ cat .claude/CLAUDE.md   # 하네스 트리거 항목 추가 여부
 
 `content/series/clash-of-multiverses/_series.md` 작성:
 - 시리즈 제목·시놉시스
-- **차용 원작 목록** (작품명 · 원저작자 · 차용 범위)
 - 연재 상태 (계획/연재 중/완결/휴재)
-- 비상업적 팬픽 고지 1줄
+- 저작권 고지 1줄
 
 ### 6.4 다음 도입 후보
 
@@ -262,7 +260,7 @@ rm -rf ~/.claude/skills/harness
 **원인**: 사용자가 직접 작성 시 누락 가능.
 **해결**: `agent-lorekeeper` 가 reject 하도록 트리거 프롬프트에 명시 (§4.1). 사후 검출 시 수동 보정.
 
-### 8.6 비상업적 팬픽 고지 미부착
+### 8.6 저작권 고지 미부착
 **원인**: harness 산출물의 frontmatter 직후 라인 누락.
 **해결**: `.claude/CLAUDE.md` 에 *모든 .md 산출물 첫 줄에 고지 부착* 을 명시. 검출 도우미 1줄 스크립트:
 ```bash

@@ -29,7 +29,7 @@
 - [ ] **성능** — RAF / DOM 직접 갱신 / 불필요 re-render
 - [ ] **dead code** — 미사용 export / class / 변수
 - [ ] **적응형** — hardcoded px/hex → CSS var/clamp/dvh
-- [ ] **카피·스타일** — 외부 IP 표현 / stale 표현 / 톤 일관성
+- [ ] **카피·스타일** — SSOT 미등록 명명 / stale 표현 / 톤 일관성
 
 ## 리뷰 결과 요청 형식
 

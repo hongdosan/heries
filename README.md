@@ -17,7 +17,6 @@
 ```
 
 - **모든 저작권은 홍도산 에게 단독 귀속**. 복제·배포·전송·번역·각색·기계학습 모델 학습 데이터 사용 모두 사전 서면 허가 필수.
-- **외부 IP 차용 ZERO** — 본 저장소는 타 작가의 캐릭터·세계관·고유 표현을 일체 차용하지 않는다. 일반 명사 (장르 원형) 만 사용.
 - **코드·구조도 동일하게 All Rights Reserved** — *코드·구조* (TypeScript·CSS·AI 에이전트 정의·빌드 스크립트·운영 문서) 와 *서사 콘텐츠* (`content/`) 모두 홍도산 단독 귀속. 오픈소스 라이선스 아님. 상세: [`LICENSE`](./LICENSE).
 - 라이선스·권리 문의: `contact_hongdosan@naver.com` 또는 GitHub Issue.
 - 자세한 정책: [NOTICE](./NOTICE.md).
@@ -137,7 +136,7 @@ summary: 한 줄 요약
 ## H-eries 분기 — (작품명) 변형  ← reader 빌드에서 마스킹
 ```
 
-- 모든 캐릭터는 `origin: original` (외부 IP 차용 ZERO).
+- 모든 캐릭터는 `origin: original`.
 - *공개 절* (`핵심 정체성`/`능력`/`외형`/`인간관계`/`출신 배경`) = reader 노출.
 - *작가 분기 절* (`## H-eries 분기 ~`) = reader 마스킹.
 

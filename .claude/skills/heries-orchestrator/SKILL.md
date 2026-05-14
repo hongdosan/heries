@@ -24,8 +24,8 @@ H-eries 프로젝트 (`/Users/홍도산/onion-workspace/H-eries/`) 에서 다음
 
 | 사용자 요청 패턴 | 호출 에이전트 | 사용 도구 |
 |---|---|---|
-| "등장인물 추가/갱신", "캐릭터 카드", "origin 누락", "무공 정정" | `H-eries-lorekeeper` | Agent (subagent_type=general-purpose, model=opus) |
-| "세계관 추가", "연표 갱신", "용어집", "`_series.md`", "차용 원작 목록", "페이즈 구조" | `H-eries-worldsmith` | Agent |
+| "등장인물 추가/갱신", "캐릭터 카드", "카드 정정", "캐릭터 보강" | `H-eries-lorekeeper` | Agent (subagent_type=general-purpose, model=opus) |
+| "세계관 추가", "연표 갱신", "용어집", "`_series.md`", "지역·세력" | `H-eries-worldsmith` | Agent |
 | "챕터 작성", "ep-NN 작성", "본문 집필", "시놉시스 받아", "떡밥 매설" | `H-eries-author` → 자동으로 `H-eries-continuity-reviewer` | Agent (파이프라인) |
 | "정합성 감사", "연속성 검증", "챕터 검수", "SSOT 정합", "떡밥 추적" | `H-eries-continuity-reviewer` | Agent |
 | "컴포넌트 추가", "렌더러 수정", "UX 개선", "FSD 레이어", "빌드 스크립트", "타입 에러", "마스킹 로직" | `H-eries-frontend-engineer` | Agent |

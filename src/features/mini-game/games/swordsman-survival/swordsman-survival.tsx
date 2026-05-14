@@ -305,7 +305,7 @@ function applyItemEffect(
   return {scoreBonus: ITEM_SCORE_BONUS, announceText: `+${ITEM_SCORE_BONUS}`}
 }
 
-// 아이템 표시 opacity (마지막 깜빡임 단계 처리). render 안 nested ternary 회피.
+// 아이템 표시 opacity (마지막 깜빡임 단계 처리). render 안 nested ternary 방지.
 function computeItemOpacity(life: number): string {
   if (life >= ITEM_BLINK_THRESHOLD_FRAMES) return '1'
   return life % ITEM_BLINK_INTERVAL_FRAMES < ITEM_BLINK_INTERVAL_FRAMES / 2 ? '0.35' : '1'
@@ -556,7 +556,7 @@ export function MiniGame({autoFocus = false}: Readonly<MiniGameProps>) {
     kind: 'wave' | 'elite' | 'item'
   } | null>(null)
 
-  // refs (게임 루프 상태 — 리렌더 회피)
+  // refs (게임 루프 상태 — 리렌더 방지)
   const stageRef = useRef<HTMLDivElement | null>(null)
   const playerRef = useRef<Player>(makePlayer())
   const enemiesRef = useRef<Enemy[]>([])
@@ -576,11 +576,11 @@ export function MiniGame({autoFocus = false}: Readonly<MiniGameProps>) {
   // 렌더 동기화용 — rAF 안에서 setState 1회씩만 호출 (HUD 갱신)
   const hudDirtyRef = useRef<boolean>(false)
   const skillReadyRef = useRef<boolean>(true)
-  // best-score 비교용 ref — setState callback 안 side effect 회피.
+  // best-score 비교용 ref — setState callback 안 side effect 방지.
   // 초기값 = localStorage 읽기 1회 (state 와 동기화).
   const bestScoreRef = useRef<number>(readBestScore())
 
-  // DOM 노드 ref — 렌더는 rAF 마다 transform 만 갱신 (React 재렌더 회피)
+  // DOM 노드 ref — 렌더는 rAF 마다 transform 만 갱신 (React 재렌더 방지)
   const playerElRef = useRef<HTMLDivElement | null>(null)
   const skillRingRef = useRef<HTMLSpanElement | null>(null)
   const enemiesLayerRef = useRef<HTMLDivElement | null>(null)
@@ -652,7 +652,7 @@ export function MiniGame({autoFocus = false}: Readonly<MiniGameProps>) {
   }, [reset])
 
   // 키보드 입력은 stage div 에서 직접 처리 (onKeyDown / onKeyUp).
-  // 글로벌 window 핸들러 회피 — 페이지 다른 UI (폼·링크) 영향 0.
+  // 글로벌 window 핸들러 방지 — 페이지 다른 UI (폼·링크) 영향 0.
   // stage 가 focus 받은 상태에서만 키 입력 응답 = a11y 정합.
   // PC 입력 = 방향키 (이동) + Space (발사) + Shift (스킬) + Enter (재시작). WASD 미사용.
   const isGameKey = useCallback((k: string): boolean => {
@@ -925,7 +925,7 @@ export function MiniGame({autoFocus = false}: Readonly<MiniGameProps>) {
       setPhase('over')
       setScore(scoreRef.current)
       setHpView(0)
-      // setState callback 안 side effect 회피 (StrictMode 중복 호출 방지).
+      // setState callback 안 side effect 방지 (StrictMode 중복 호출 방지).
       const finalScore = scoreRef.current
       if (finalScore > bestScoreRef.current) {
         bestScoreRef.current = finalScore
@@ -937,7 +937,7 @@ export function MiniGame({autoFocus = false}: Readonly<MiniGameProps>) {
       setHpView(p.hp)
       hudDirtyRef.current = false
     }
-    // 스킬 ready 상태 변화만 HUD 갱신 (매 frame setState 회피)
+    // 스킬 ready 상태 변화만 HUD 갱신 (매 frame setState 방지)
     const nowReady = p.skillCd <= 0
     if (nowReady !== skillReadyRef.current) {
       skillReadyRef.current = nowReady
@@ -945,7 +945,7 @@ export function MiniGame({autoFocus = false}: Readonly<MiniGameProps>) {
     }
   }, [])
 
-  // ─── 렌더 (DOM 직접 갱신 — React 재렌더 회피) ─────────────
+  // ─── 렌더 (DOM 직접 갱신 — React 재렌더 방지) ─────────────
   const render = useCallback((): void => {
     // 플레이어
     const p = playerRef.current

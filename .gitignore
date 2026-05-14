@@ -43,3 +43,4 @@ storybook-static/
 #  original characters and worldbuilding.)
 content/_legacy_*/
 
+/secret-dir/

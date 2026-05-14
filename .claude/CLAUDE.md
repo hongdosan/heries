@@ -10,9 +10,7 @@ static (`.nojekyll`) 로 발행.
 
 1. **모든 `.md` 산출물에 저작권 고지 1줄 부착** — frontmatter 가 없으면 첫 줄, 있으면 frontmatter 직후 줄에 다음 HTML 주석 1줄:
    `<!-- © 2026 홍도산. All rights reserved. Original creator work. -->`
-2. **등장인물 카드 `origin` 필드는 모두 `original`** — 본 프로젝트는 *작가(홍도산) 의 100% 오리지널 창작*. 차용 캐릭터·세계관·고유 능력명·고유
-   진영명을 절대 도입하지 않는다. 외부 IP 의 캐릭터·세계관·고유명사 (예: 특정 작가의 작품에 등장하는 인물명·기술명·진영명) 를 본 프로젝트에
-   *기재·인용·차용·암시·오마주 형태로도* 도입하지 않는다.
+2. **등장인물 카드 `origin` 필드는 모두 `original`** — 본 프로젝트는 *작가(홍도산) 의 100% 오리지널 창작*. 모든 등장인물·세계관·고유명사·능력·진영은 작가 본인 자작.
     - **카드 구조 (SSOT)** — 카드는 *공개 절* (`## 핵심 정체성` · `## 능력` · `## 인간관계` 등 — reader 빌드 노출) 과 *작가 분기
       절* (`## H-eries 분기 — {작품명} 변형` 이하 — 본 작품 변형 + 스포일러) 을 **분리 작성한다**. 분기 절은 reader 빌드에서 마스킹 (원칙
       #9).
@@ -20,9 +18,7 @@ static (`.nojekyll`) 로 발행.
       기록. 본 필드와 *H-eries 분기 절* 은 모두 reader 빌드에서 마스킹 (원칙 #9).
     - **운영 디테일 미노출** — 위 두 항목은 SSOT 운영 규약으로, `_series.md` 등 reader 노출 문서의 본문에서는 *구현 디테일 (
       필드명·placeholder·절 구조)* 을 노출하지 않는다 (서사 사실만 기술).
-    - **외부 IP 차용 ZERO 정책** — 신규 캐릭터·세계관 도입 시: (a) *기존 작품의 캐릭터·고유명사·고유 능력·고유 진영* 과 명백히 구별되는 자작 모티프·자작
-      명명 사용 (b) *닌자·무협 (정파·사파·혈교·천마신교 등)·헌터·회귀자·환생자·판타지* 등 *장르 원형·일반 명사* 는 사용 가능하나, *특정 작품의 식별 가능한
-      고유 표현* 은 회피 (c) 의심스러우면 사용자 확인. NOTICE.md 의 모든 정책은 운영 SSOT.
+    - **자작 명명 SSOT** — 신규 캐릭터·세계관 도입 시: (a) *닌자·무협 (정파·사파·혈교·천마신교 등)·헌터·회귀자·환생자·판타지* 등 *장르 원형·일반 명사* 는 사용 가능 (b) 고유 호칭·기술명·진영명은 작가 자작 명명을 lorekeeper / worldsmith SSOT 에 등록 후 사용 (c) 본문은 SSOT 등록 명명만 사용. NOTICE.md 의 모든 정책은 운영 SSOT.
 3. **최소 의존 — 런타임은 React 19 + React Router + Vite 만** (2026-05-14 정책 v3). 본 의존 외 *런타임* 외부 라이브러리·UI
    키트·상태 관리 라이브러리 도입 시 사용자 확인 필수. *의존 추가의 정신* = "코드만 있으면 어디서든 실행 가능" — 특정 빌드 시스템·SaaS·플랫폼에 묶이는 *런타임*
    의존 금지. **dev 도구는 별도** — Storybook 등 *dist 산출물에 0 영향* 인 devDependencies 는 허용 (단, package.json
@@ -85,7 +81,7 @@ H-eries 작업은 **`H-eries-orchestrator` 스킬** ([
 | 트리거 키워드                                                           | 호출 에이전트                                | 정의                                                                                   |
 |-------------------------------------------------------------------|----------------------------------------|--------------------------------------------------------------------------------------|
 | "등장인물 추가/갱신", "캐릭터 카드", "origin 누락", "무공 정정", "사부·문파"             | `H-eries-lorekeeper`                   | [`./agents/H-eries-lorekeeper.md`](./agents/H-eries-lorekeeper.md)                   |
-| "세계관 추가", "연표 갱신", "용어집", "`_series.md`", "차용 원작 목록", "페이즈 구조"    | `H-eries-worldsmith`                   | [`./agents/H-eries-worldsmith.md`](./agents/H-eries-worldsmith.md)                   |
+| "세계관 추가", "연표 갱신", "용어집", "`_series.md`", "페이즈 구조"    | `H-eries-worldsmith`                   | [`./agents/H-eries-worldsmith.md`](./agents/H-eries-worldsmith.md)                   |
 | "챕터 작성", "ep-NN 작성", "본문 집필", "시놉시스 받아", "떡밥 매설"                  | `H-eries-author` (→ 자동 reviewer 파이프라인) | [`./agents/H-eries-author.md`](./agents/H-eries-author.md)                           |
 | "정합성 감사", "연속성 검증", "챕터 검수", "SSOT 정합", "떡밥 추적"                   | `H-eries-continuity-reviewer`          | [`./agents/H-eries-continuity-reviewer.md`](./agents/H-eries-continuity-reviewer.md) |
 | "컴포넌트 추가/수정", "렌더러", "UX 개선", "FSD", "빌드 스크립트", "타입 에러", "마스킹 로직" | `H-eries-frontend-engineer`            | [`./agents/H-eries-frontend-engineer.md`](./agents/H-eries-frontend-engineer.md)     |
@@ -118,7 +114,7 @@ harness 진입점 순.
 
 | 대상                                                                | Hot 한도     | 초과 시 처리                                                                                                                                                                                                                                                                                   |
 |-------------------------------------------------------------------|------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`./harness/harness-state.md`](./harness/harness-state.md) §변경 이력 | 최근 **20행** | 21행 도달 시 **hot 에 최근 3행만 남도록 가장 오래된 행을 한꺼번에** [`./harness/harness-state-archive.md`](./harness/harness-state-archive.md) 로 이동 (= 매번 약 18행 일괄 이동, 카드 1장당 archive 발동 사이클 회피). archive 형식 = **1줄 bullet** (`- YYYY-MM-DD: 핵심 내용`) — 셀 단위 손실 압축. 원본 복원은 git history 로 해당 행이 hot 에 있던 commit 참조 |
+| [`./harness/harness-state.md`](./harness/harness-state.md) §변경 이력 | 최근 **20행** | 21행 도달 시 **hot 에 최근 3행만 남도록 가장 오래된 행을 한꺼번에** [`./harness/harness-state-archive.md`](./harness/harness-state-archive.md) 로 이동 (= 매번 약 18행 일괄 이동, 카드 1장당 archive 발동 사이클 방지). archive 형식 = **1줄 bullet** (`- YYYY-MM-DD: 핵심 내용`) — 셀 단위 손실 압축. 원본 복원은 git history 로 해당 행이 hot 에 있던 commit 참조 |
 | [`./handoff/CURRENT.md`](./handoff/CURRENT.md)                    | 단일 파일      | 세션 종료 직전 / 컨텍스트 60% 초과 시 **덮어쓰기**. 이전 본문 회수 = git history (`git log -p .claude/handoff/CURRENT.md`). 토큰 예산 2,000 이내. archive 디렉토리·날짜별 파일 생성 금지                                                                                                                                            |
 
 원칙:

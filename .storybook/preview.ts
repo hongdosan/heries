@@ -7,7 +7,7 @@ import '../src/shared/styles/layout.css'
 import '../src/shared/styles/utilities.css'
 import '../src/shared/styles/author-mode.css'
 import '../src/shared/styles/responsive.css'
-// 슬라이스별 css — stories.tsx 가 컴포넌트 직접 import 시 css 누락 회피.
+// 슬라이스별 css — stories.tsx 가 컴포넌트 직접 import 시 css 누락 방지.
 // 사이트는 각 슬라이스 index.ts 가 자기 css 를 import 하지만, stories 가
 // `./{slice}` (파일 직접) 패턴이면 index 우회 → preview 에서 보강.
 import '../src/widgets/header/header.css'

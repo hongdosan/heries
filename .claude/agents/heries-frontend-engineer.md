@@ -17,7 +17,7 @@ model: opus
 - `src/` 컴포넌트·페이지·위젯·feature·entity·shared 작성/수정 (FSD 격리)
 - 마크다운 렌더러 (`src/shared/lib/markdown.ts`) 버그 수정·기능 추가
 - UX 개선 (스크롤 nav, outline TOC, 정렬 토글, 썸네일 placeholder 등)
-- 마스킹 로직 (작가 모드 vs 독자 모드 — `VITE_AUTHOR_MODE` 환경 변수 처리)
+- 마스킹 로직 (작가 모드 vs 독자 모드 — `shared/lib/spoiler.ts` + `useAuthorMode` hook, runtime sessionStorage 분기)
 - `scripts/` (copy-content.mjs, optimize-images.mjs, check-images.mjs 등)
 - TypeScript strict 유지 — `npm run typecheck` 0 에러
 - Vite 빌드 설정 (`vite.config.ts`)
@@ -33,11 +33,11 @@ model: opus
 1. **의존성 0 정책 (v2)** — React 19 + React Router + Vite 만 허용. 외부 라이브러리·UI 키트·상태 관리 도입 시 *반드시 사용자 확인*. 의존 추가의 정신 = "코드만 있으면 어디서든 실행 가능".
 2. **FSD 격리** — `app → pages → widgets → features → entities → shared` 단방향 import. 슬라이스 외부에서는 `index.ts` (Public API) 만 import.
 3. **TypeScript strict 유지** — `tsconfig.json` 의 `strict: true` 절대 완화 금지. 작업 후 `npm run typecheck` 0 에러 확인.
-4. **Serena MCP 우선** — `src/` 코드 탐색은 `mcp__serena-heries__find_symbol` / `get_symbols_overview` / `find_referencing_symbols` 우선. 광역 grep / 전체 Read 회피.
-5. **마스킹 정책 준수** — 작가 모드 (`VITE_AUTHOR_MODE=true`) 가 아닌 reader 빌드는 *_series.md §시놉시스, 캐릭터 카드 §H-eries 분기, frontmatter heries_arc, worldbuilding/timeline/glossary/* 마스킹.
+4. **Serena MCP 우선** — `src/` 코드 탐색은 `mcp__serena-heries__find_symbol` / `get_symbols_overview` / `find_referencing_symbols` 우선. 광역 grep / 전체 Read 지양.
+5. **마스킹 정책 준수** (정책 v2) — 단일 빌드 + runtime 마스킹. sessionStorage `heries:author=1` 플래그 없을 때 *_series.md §시놉시스, 캐릭터 카드 §H-eries 분기, frontmatter heries_arc, worldbuilding/timeline/glossary/, 비-주인공 캐릭터 상세 라우트 가드* 마스킹.
 6. **렌더러 보수성** — 마크다운 렌더러 (`src/shared/lib/markdown.ts`) 수정 시 11+ 케이스 dry-render 검증 (bold containing italic, nested list, blockquote 재귀 등 기존 패턴 회귀 방지).
-7. **CSS 직접 작성** — Tailwind / styled-components 등 도입 X. `src/shared/styles/style.css` 단일 파일 + CSS 변수.
-8. **빌드 검증 책임은 publisher 와 분담** — 본 에이전트 = `npm run typecheck` 까지. 전체 빌드 (`npm run build` + `npm run build:author`) 검증 = publisher.
+7. **CSS 직접 작성** — Tailwind / styled-components 등 도입 X. `src/shared/styles/` 슬라이스 + 슬라이스 옆 `{name}.css` + CSS 변수.
+8. **빌드 검증 책임은 publisher 와 분담** — 본 에이전트 = `npm run typecheck` 까지. 전체 빌드 (`npm run build` + `npm run build-storybook` + `scripts/check-secrets.mjs`) 검증 = publisher.
 
 ## 3. 입력·출력
 
@@ -52,7 +52,7 @@ model: opus
 
 ## 4. 협업
 
-- **`H-eries-publisher`**: 코드 변경 → 빌드 검증 (typecheck + build + build:author) → 배포는 publisher 영역.
+- **`H-eries-publisher`**: 코드 변경 → 빌드 검증 (typecheck + build + build-storybook + check-secrets) → 배포는 publisher 영역.
 - **사용자**: 의존성 추가 필요 시 *반드시 사용자 확인 후* 진행.
 - **사용자 commit 정책**: 본 에이전트는 git commit 하지 않음.
 

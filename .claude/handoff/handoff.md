@@ -27,7 +27,7 @@
 |---|---|---|
 | Context rot | 1M 컨텍스트라도 60% 근방부터 품질 저하 | Tier 1 능동 개입 |
 | Auto-compact 비대칭 | 가장 둔해진 순간 발동 → 다음 턴 필수 정보 누락 | Tier 1 `/compact [focus]` + Tier 2 우회 |
-| Context amnesia | 새 세션은 백지 — 작가의 결정·차용 원작 표기·캐릭터 카드 작업 흐름 미전달 | Tier 2/3 영속화 |
+| Context amnesia | 새 세션은 백지 — 작가의 결정·SSOT 등록 명명·캐릭터 카드 작업 흐름 미전달 | Tier 2/3 영속화 |
 
 목표: 단일 작가의 *집필·검증·발행* 사이클을 *세션 단위 일회성 대화* 가 아닌 **연속된 작품 자산** 으로 전환.
 
@@ -39,8 +39,8 @@
 
 | 도구 | 용도 | H-eries 운영 원칙 |
 |---|---|---|
-| `/rewind` (Esc Esc) | 실패한 시도 직후 되돌리기 | 등장인물 카드 작성 중 *원작 사실 오류·라이브러리 자동 도입 시도* 발견 시 즉시 |
-| `/compact [focus]` | 부분 요약 — focus 인자 **필수** | 무인자 호출 금지. 예: `/compact focus on 청명 카드 결정 사항, drop namu.wiki 원문 텍스트` |
+| `/rewind` (Esc Esc) | 실패한 시도 직후 되돌리기 | 등장인물 카드 작성 중 *사실 오류·라이브러리 자동 도입 시도* 발견 시 즉시 |
+| `/compact [focus]` | 부분 요약 — focus 인자 **필수** | 무인자 호출 금지. 예: `/compact focus on 우진혁 카드 결정 사항, drop 시놉시스 원문 텍스트` |
 | Subagent (Task/Explore) | 읽기 전용 탐색 | 코드베이스 구조·기존 카드 검색용. **소설 본문·SSOT 작성은 main agent 직접** |
 | `/context` | 컨텍스트 사용률 확인 | 70% 이상이면 Tier 2 핸드오프 작성 후 `/clear` |
 
@@ -111,7 +111,7 @@ git show <commit>:.claude/handoff/CURRENT.md      # 특정 시점 본문 회수
 | `.claude/CLAUDE.md` | H-eries 핵심 원칙 7개 + 도구 우선순위 | 변하지 않는 규약만 |
 | `README.md` | 프로젝트 진입점 | 작품 추가·라이선스 변경 시 |
 | `src/README.md` | FSD 가이드 (Public API · 의존 방향 · 빌드) | 아키텍처 결정 시 |
-| `content/series/{slug}/_series.md` | 시리즈 메타·시놉시스·차용 원작 목록 | 원작 차용 추가 시 |
+| `content/series/{slug}/_series.md` | 시리즈 메타·시놉시스 | 시놉시스·세계관 갱신 시 |
 | `content/series/{slug}/characters/{id}.md` | 등장인물 SSOT | 인물 도입·갱신 시 |
 | `.claude/harness/harness-state.md` 변경 이력 | 하네스/구조 진화 기록 | 모든 진화 변경 |
 
@@ -144,7 +144,7 @@ git show <commit>:.claude/handoff/CURRENT.md      # 특정 시점 본문 회수
 | H-eries 매체 | 역할 |
 |---|---|
 | 등장인물 카드 (`characters/{id}.md`) | SSOT — 인물 정의 |
-| 시리즈 메타 (`_series.md`) | 시놉시스·차용 원작 목록 |
+| 시리즈 메타 (`_series.md`) | 시놉시스 |
 | 챕터 frontmatter | 에피소드 메타 (title·episode·published·characters) |
 | `.claude/harness/harness-setup.md §6` | 작업 사이클 (1 초안 → 6 발행) |
 
@@ -198,7 +198,7 @@ H-eries 도 **Master-Clone** 채택:
 3. **CLAUDE.md 중복 금지** — Prompt for New Chat 끝에 "Read CLAUDE.md first. Do NOT restate anything already covered there"
 4. **실패 명시적 기록** — Traps to Avoid 가 핸드오프 가치를 가장 많이 올림
 5. **토큰 예산 의식** — 2,000 토큰 이내. 상세는 별도 리포트로 분리
-6. **모든 .md 첫 줄에 비상업적 팬픽 고지** — H-eries 표준
+6. **모든 .md 첫 줄에 저작권 고지 1줄** — H-eries 표준
 
 ---
 
@@ -243,7 +243,7 @@ H-eries 도 **Master-Clone** 채택:
 
 ## 참고
 
-- **원문 (외부)**: <https://codex.epril.com/claude-session-context-handoff-4-layer-strategy> — *Claude 세션 간 Context Handoff: 4계층 전략* (codex.epril.com, 2026-04-23). 본 가이드의 4-Tier 명칭·구조·실전 규칙·안티 패턴은 모두 원문 차용. H-eries 도메인에 맞춰 매핑·해석한 결과물.
+- **원문 (외부)**: <https://codex.epril.com/claude-session-context-handoff-4-layer-strategy> — *Claude 세션 간 Context Handoff: 4계층 전략* (codex.epril.com, 2026-04-23). 본 가이드는 위 원문 기반으로 H-eries 도메인에 매핑·해석한 결과물.
 - H-eries 하네스 현 상태: [`../harness/harness-state.md`](../harness/harness-state.md)
 - H-eries 작업 사이클: [`../harness/harness-setup.md`](../harness/harness-setup.md) §6
 - 핵심 원칙: [`../CLAUDE.md`](../CLAUDE.md)

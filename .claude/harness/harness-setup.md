@@ -21,7 +21,7 @@
 [`revfactory/harness`](https://github.com/revfactory/harness) 는 **Claude Code 용 메타 스킬**. 도메인 한 줄을 입력받아 전문 에이전트 팀과 그들이 사용할 스킬을 자동 생성한다.
 
 - **저장소**: https://github.com/revfactory/harness
-- **라이선스**: Apache 2.0 — 본 저장소 *비상업적 팬픽 고지* 와 충돌 없음. harness 자체는 도구이며 산출물 라이선스 강제 안 함.
+- **라이선스**: Apache 2.0 — 본 저장소 *All Rights Reserved* 와 충돌 없음. harness 자체는 도구이며 산출물 라이선스 강제 안 함.
 - **참고 논문**: Hwang, M. (2026). *Harness: Structured Pre-Configuration for Enhancing LLM Code Agent Output Quality*
 
 ### 1.1 핵심 철학
@@ -53,11 +53,11 @@
 | 영역 | 담당 | 근거 |
 |------|------|------|
 | 소설 본문 (스토리·문체·구성) | **사용자 직접 작성 (작가)** | 창작은 사람의 영역 |
-| 등장인물·세계관 SSOT 골격 | 사용자 초안 → `agent-lorekeeper` 보강·검증 | 인물 정합성·중복·차용 표기 누락 검출 |
+| 등장인물·세계관 SSOT 골격 | 사용자 초안 → `agent-lorekeeper` 보강·검증 | 인물 정합성·중복·SSOT 미등록 명명 검출 |
 | 신규 챕터의 SSOT 정합성 검사 | `agent-continuity-reviewer` (자동 트리거) | 캐릭터·연표·세계관 모순 검출 |
 | 챕터 집필 보조 (구조·문체) | `agent-author` (요청 시) | 작가 보조 — 결정권은 작가 |
 | 정적 사이트 빌드·GitHub 배포 | `agent-publisher` (요청 시) | 반복 작업 자동화 (라이브러리 의존성 0 유지) |
-| 비상업적 팬픽 고지 표기 | 모든 산출물 자동 적용 (CLAUDE.md 강제) | 저작권 리스크 차단 |
+| 저작권 고지 표기 | 모든 산출물 자동 적용 (CLAUDE.md 강제) | 저작권 명확성 |
 
 > **분담의 의미**: *창작* 은 사람의 영역, *정합성·검증·반복 작업* 은 하네스의 영역.
 
@@ -76,10 +76,10 @@
 
 ### Phase 0 — 사전 준비
 
-1. **라이선스 검토** — Apache 2.0 (harness) ↔ 비상업적 팬픽 고지 (H-eries) 충돌 없음. harness 산출물에는 H-eries 표기 표준 적용.
+1. **라이선스 검토** — Apache 2.0 (harness) ↔ All Rights Reserved (H-eries) 충돌 없음. harness 산출물에는 H-eries 표기 표준 적용.
 2. **환경 변수 활성화** — `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` 셸 환경 또는 `.zshrc`.
 3. **분담 원칙 합의** — §2 매트릭스를 본 문서 SSOT 처리.
-4. **GitHub 저장소 준비** — 공개 저장소. README 첫머리에 비상업적 팬픽 고지 + 차용 원작 출처 안내 표기.
+4. **GitHub 저장소 준비** — 공개 저장소. README 첫머리에 저작권 고지 표기.
 
 ### Phase 1 — 플러그인 설치
 
@@ -101,10 +101,10 @@
 
 | # | 검증 항목 | 통과 조건 |
 |---|---|---|
-| 1 | 비상업적 팬픽 고지 부착 | frontmatter 다음 줄에 `<!-- © 2026 홍도산. All rights reserved. Original creator work. -->` |
+| 1 | 저작권 고지 부착 | frontmatter 다음 줄에 `<!-- © 2026 홍도산. All rights reserved. Original creator work. -->` |
 | 2 | SSOT 위치 인용 | `content/series/{slug}/characters/` 등 명시적 참조 |
 | 3 | 라이브러리 의존성 도입 시도 | 시도 시 사용자 확인 요청 (자동 도입 금지). `package.json` / `requirements.txt` / 빌드 스크립트 추가 거부 |
-| 4 | 원작 출처(`origin`) 필드 강제 | 등장인물 카드 frontmatter 에 `origin` 필드 필수 — 누락 시 reject |
+| 4 | `origin: original` 필드 강제 | 등장인물 카드 frontmatter 에 `origin: original` 필수 — 누락 시 reject |
 | 5 | 단일 작가 가정 | 다인 협업 분기 (브랜치 전략·리뷰 워크플로우 등) 미포함 |
 | 6 | GitHub 공개 저장소 인지 | 비공개 토큰·시크릿·개인 식별 정보 산출물에 포함 금지 |
 | 7 | frontmatter `name` | `H-eries-{role}` 패턴 (예: `H-eries-lorekeeper`) |
@@ -158,7 +158,7 @@
 | frontmatter `name` | `H-eries-{role}` | `H-eries-lorekeeper` |
 | 스킬 디렉토리 | kebab-case 도메인 | `character-bible/` |
 | 시리즈 슬러그 | kebab-case (영문 권장) | `clash-of-multiverses` |
-| 등장인물 ID | kebab-case (오리지널) / 원작-식별자 (차용) | `protagonist-name`, `naruto-uzumaki` |
+| 등장인물 ID | kebab-case 자작 명명 | `woo-jin-hyeok`, `protagonist-name` |
 | 챕터 파일 | `ep-{NN}-{slug}.md` | `ep-01-prologue.md`, `ep-12-final-clash.md` |
 | 중간 산출물 | `{NN}-{agent}-{artifact}.{ext}` | `01-lorekeeper-cards.md` |
 
@@ -175,7 +175,7 @@
 3. **실행 테스트**: with-skill vs without-skill 비교
 4. **트리거 검증**: should-trigger 8–10개 + should-NOT 8–10개
 5. **드라이런**: phase 순서 논리성 · dead link 부재
-6. **시나리오**: 정상 1개 + 에러 1개 이상 (예: `origin` 필드 누락 시 reject)
+6. **시나리오**: 정상 1개 + 에러 1개 이상 (예: `origin: original` 필드 누락 시 reject)
 
 ### 5.2 진화 트리거
 
@@ -202,7 +202,7 @@
 |---|---|---|---|
 | 1 | 챕터 초안 작성 | 사용자 (작가) | `chapters/ep-NN-{slug}.md` 초안 |
 | 2 | 신규 등장인물·세계관 발생 시 SSOT 갱신 | `agent-lorekeeper` | `characters/{id}.md` · `worldbuilding/*.md` · `glossary/*.md` 추가/갱신 |
-| 3 | 챕터-SSOT 정합성 감사 | `agent-continuity-reviewer` | 모순·누락·차용 표기 누락 보고서 |
+| 3 | 챕터-SSOT 정합성 감사 | `agent-continuity-reviewer` | 모순·누락·명명 SSOT 미등록 보고서 |
 | 4 | 문체·구조 점검 (선택) | `agent-author` | 가독성·구성 코멘트 |
 | 5 | 커밋 — 메시지에 *변경 챕터·캐릭터·SSOT* 명시 | 사용자 | git commit |
 | 6 | 발행 (GitHub push → GitHub Pages 재빌드) | `agent-publisher` | 공개 사이트 갱신 |

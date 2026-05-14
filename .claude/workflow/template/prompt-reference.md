@@ -11,7 +11,7 @@
 - **이름**: H-eries = `홍도산` + `(s)eries`
 - **성격**: 단일 작가 (`hongdosan`) 의 **오리지널 웹 시리즈 컬렉션** (정적 사이트)
 - **저작권**: © 2026 홍도산. All rights reserved.
-- **외부 IP 차용 ZERO** — 모든 캐릭터·세계관·고유 표현은 작가 본인 창작. `origin: original` 필드 강제. 차용 캐릭터·고유명사·고유 능력·진영명·고유 표현 일체 도입 금지.
+- **100% 오리지널 창작** — 모든 캐릭터·세계관·고유 표현은 작가 본인 창작. `origin: original` 필드 강제. 모든 고유 호칭·기술명·진영명은 작가 자작 SSOT 등록 후 사용.
 - **배포**: GitHub Pages (`hongdosan.github.io/heries/`), BrowserRouter + `.nojekyll`
 - **단일 작가 가정**: 다인 협업·코드 리뷰 분기 미적용
 
@@ -57,14 +57,14 @@ src/
 ## 4. CLAUDE.md 핵심 원칙 11 항 (강제)
 
 1. 모든 `.md` 첫 줄 (또는 frontmatter 직후) HTML 주석 1줄 저작권 고지 부착
-2. 모든 캐릭터 카드 `origin: original` + 외부 IP ZERO + 카드 절 구조 (공개 절 / 작가 분기 절 분리, reader 빌드 마스킹)
+2. 모든 캐릭터 카드 `origin: original` + 카드 절 구조 (독자 절 / 작가 절 분리, reader 빌드 마스킹)
 3. **런타임 의존 0** (React/React Router/Vite 외) + **dev 도구 허용** (Storybook 등 devDeps)
 4. FSD 6 레이어 단방향 import (격리)
 5. TypeScript strict + JSX (strict 7 옵션 포함)
 6. 단일 작가 가정 (다인 협업 X)
 7. GitHub 공개 저장소 (비공개 토큰·시크릿·개인 정보 산출물 X)
 8. 누적 산출물 최적화 강제 (harness-state §변경 이력 hot 20 / 핸드오프 CURRENT.md 덮어쓰기, 세션 시작/종료 직전 점검)
-9. 스포일러 분리 (작가 모드 `VITE_AUTHOR_MODE` vs 독자 모드. 마스킹 = `## 시놉시스` / `## H-eries 분기 ~` / `heries_arc` / worldbuilding/timeline/glossary)
+9. 스포일러 분리 (정책 v2 — 단일 빌드 + runtime `/unlock`. 마스킹 = `## 시놉시스` / `## H-eries 분기 ~` / `heries_arc` / worldbuilding/timeline/glossary + 비-주인공 캐릭터 상세 라우트 가드)
 10. 작가 원칙 SSOT (현재 tba — 무대 컨셉 결정 후 작성)
 11. `shared/ui/` 신규 컴포넌트 = `.stories.tsx` 강제 (최소 3 스토리, widgets/features 권장)
 
@@ -73,10 +73,10 @@ src/
 | 게이트 | 명령 | 통과 기준 |
 |---|---|---|
 | TypeScript | `npm run typecheck` | 0 에러 |
-| 빌드 | `npm run build` | 0 에러 + 마스킹 누수 0 |
+| 빌드 | `npm run build` | 0 에러 + 시크릿 누수 0 |
 | 스토리북 | `npm run build-storybook` | 0 에러 (storybook 영향 변경 시) |
 | 이미지 budget | (build 의 check-images 단계) | ≤500 KB / 이미지 |
-| 마스킹 누수 | (build 의 check-masking 단계) | 0 건 |
+| 시크릿 누수 | (build 의 check-secrets 단계) | 0 건 |
 | 의존 audit | `npm audit` | 0 취약점 (정기 점검) |
 
 CI = `.github/workflows/deploy.yml` 도 동일 게이트 + `dist storybook 누수 검증` 추가.
