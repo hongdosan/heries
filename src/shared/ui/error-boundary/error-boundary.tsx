@@ -25,13 +25,13 @@ interface ErrorBoundaryState {
 }
 
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  state: ErrorBoundaryState = { error: null, info: null }
+  override state: ErrorBoundaryState = { error: null, info: null }
 
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     return { error }
   }
 
-  componentDidCatch(error: Error, info: ErrorInfo): void {
+  override componentDidCatch(error: Error, info: ErrorInfo): void {
     // production 에서도 console 에 남겨 사용자의 브라우저 콘솔 / 디버그 시
     // 추적 가능. 외부 보고 채널은 없음 (의존성 0 정책).
     // eslint-disable-next-line no-console
@@ -49,7 +49,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     window.location.assign(import.meta.env.BASE_URL)
   }
 
-  render(): ReactNode {
+  override render(): ReactNode {
     const { error, info } = this.state
     if (!error) return this.props.children
 

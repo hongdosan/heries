@@ -1,17 +1,10 @@
 import { IS_AUTHOR_MODE } from './env.js'
 import patterns from './spoiler-patterns.json'
 
-/**
- * Strip spoiler sections from a markdown body.
- * - For `_series.md`: drops the `## 시놉시스` section.
- * - For character cards: drops everything from `## H-eries 분기 ~` onward,
- *   except the trailing `## 검증 출처` section (kept as it's source attribution, not spoiler).
- *
- * Author mode (`VITE_AUTHOR_MODE=true`) bypasses masking entirely.
- *
- * SSOT for spoiler patterns: spoiler-patterns.json (shared with build-time
- * scripts/copy-content.mjs to keep build / runtime in lockstep).
- */
+// Strip spoiler sections from a markdown body.
+// - `_series.md`: drops `## 시놉시스` section (until next `## ` or EOF).
+// - Character cards: drops `## H-eries 분기 ~` onward (until next `## ` or EOF).
+// Author mode (`VITE_AUTHOR_MODE=true`) bypasses masking. SSOT: spoiler-patterns.json.
 export function maskSpoilersFromMarkdown(
   raw: string,
   kind: 'series' | 'character' | 'chapter',
@@ -27,17 +20,11 @@ export function maskSpoilersFromMarkdown(
     if (line.startsWith('## ')) {
       const isSeriesSpoiler = kind === 'series' && patterns.seriesSpoilerHeaders.some((h) => line.startsWith(h))
       const isHeriesBranch = kind === 'character' && line.startsWith(patterns.heriesBranchHeader)
-      const isVerification = line.startsWith(patterns.verificationHeader)
-
       if (isSeriesSpoiler || isHeriesBranch) {
         skipping = true
         continue
       }
-      if (isVerification) {
-        skipping = false
-      } else {
-        if (skipping) continue
-      }
+      if (skipping) skipping = false
     }
     if (!skipping) out.push(line)
   }

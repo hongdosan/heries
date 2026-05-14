@@ -12,9 +12,7 @@ export interface SeriesIndexFile {
 
 export type CharacterFolder =
   | '1-protagonist'
-  | '1-main-character'
   | '2-major-supporting'
-  | '3-supporting'
   | '3-antagonist'
   | '4-minor'
 
@@ -67,11 +65,8 @@ export interface CharacterFrontmatter {
   origin?: string
   affiliation?: string
   role?: string
-  /** Story arc / appearance span — series-long / phase-long / arc / single-episode / cameo-recurring. */
-  arc_span?: string
   first_appearance?: string
   aliases?: string[]
   heries_arc?: string
-  /** One-bite summary (1~3 lines, ≤200 chars) for cross-fanfic readers. Reader-safe (원작 정보 only). */
   summary?: string
 }

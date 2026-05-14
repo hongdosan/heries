@@ -37,5 +37,5 @@ export function setTheme(theme: Theme): void {
 
 export function nextTheme(current: Theme): Theme {
   const i = THEMES.indexOf(current)
-  return THEMES[(i + 1) % THEMES.length]
+  return THEMES[(i + 1) % THEMES.length] ?? 'auto'
 }

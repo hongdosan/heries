@@ -32,10 +32,8 @@ function maskBody(raw, kind) {
     if (line.startsWith('## ')) {
       const isSeriesSpoiler = kind === 'series' && patterns.seriesSpoilerHeaders.some((h) => line.startsWith(h))
       const isHeries = kind === 'character' && line.startsWith(patterns.heriesBranchHeader)
-      const isVerification = line.startsWith(patterns.verificationHeader)
       if (isSeriesSpoiler || isHeries) { skip = true; continue }
-      if (isVerification) { skip = false }
-      else if (skip) continue
+      if (skip) { skip = false }
     }
     if (!skip) out.push(line)
   }
@@ -75,14 +73,11 @@ async function* walk(dir, base = dir) {
       yield* walk(full, base)
     } else {
       const relSlash = '/' + rel.replace(/\\/g, '/')
-      // Skip author-only notes inside thumbnails (e.g. PROMPTS.md).
+      // Skip author-only notes inside thumbnails (e.g. PROMPT.md).
       if (!IS_AUTHOR && /\/thumbnails\/.+\.md$/.test(relSlash)) continue
-      // Skip author-only meta files inside characters/ — pool files (`_*.md`)
-      // and the README guide. Card files (slug.md) are reader-exposed.
+      // Skip author-only pool files inside characters/ — `_*.md` (e.g. _mob-pool.md).
+      // Card files (slug.md) are reader-exposed.
       if (!IS_AUTHOR && /\/characters\/.*\/_[^/]+\.md$/.test(relSlash)) continue
-      if (!IS_AUTHOR && /\/characters\/README\.md$/.test(relSlash)) continue
-      // Skip antagonist cards in reader build — they reveal Phase 2/3 spoilers.
-      if (!IS_AUTHOR && /\/characters\/3-antagonist\//.test(relSlash)) continue
       yield { full, rel }
     }
   }
@@ -130,4 +125,4 @@ try {
 }
 
 const mode = IS_AUTHOR ? 'AUTHOR' : 'reader'
-console.log(`copy-content [${mode}]: ${copied} verbatim, ${masked} masked`)
+console.log(`✓ copy-content [${mode}]: ${copied} verbatim, ${masked} masked`)

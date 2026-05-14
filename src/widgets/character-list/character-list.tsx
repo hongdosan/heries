@@ -3,9 +3,7 @@ import type { CharacterFolder, CharacterIndex } from '../../shared/lib/types.js'
 
 const GROUP_ORDER: ReadonlyArray<{ folder: CharacterFolder; label: string }> = [
   { folder: '1-protagonist', label: '주인공' },
-  { folder: '1-main-character', label: '주인공' },
   { folder: '2-major-supporting', label: '주연' },
-  { folder: '3-supporting', label: '조연' },
   { folder: '3-antagonist', label: '빌런·멘토' },
   { folder: '4-minor', label: '단역·카메오' },
 ]

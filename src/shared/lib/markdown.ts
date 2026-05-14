@@ -14,12 +14,16 @@ export function renderMarkdown(src: string): string {
 
     const heading = line.match(/^(#{1,6})\s+(.*)$/)
     if (heading) {
-      const level = heading[1].length
-      const text = heading[2].trim()
+      const level = (heading[1] ?? '').length
+      const text = (heading[2] ?? '').trim()
       const id = slugify(text)
       const isAuthorOnly = text === '시놉시스' || text.startsWith('H-eries 분기')
       const cls = isAuthorOnly ? ' class="author-only-heading"' : ''
-      out.push(`<h${level}${cls} id="${id}">${renderInline(text)}</h${level}>`)
+      // h2/h3 만 anchor link (h1 = 페이지 제목, h4+ = 세부 항목)
+      const anchor = id && (level === 2 || level === 3)
+        ? `<a href="#${id}" class="heading-anchor" aria-hidden="true" tabindex="-1">#</a>`
+        : ''
+      out.push(`<h${level}${cls} id="${id}">${renderInline(text)}${anchor}</h${level}>`)
       i++
       continue
     }
@@ -28,8 +32,8 @@ export function renderMarkdown(src: string): string {
       const fence = line.slice(3).trim()
       const buf: string[] = []
       i++
-      while (i < lines.length && !lines[i].startsWith('```')) {
-        buf.push(lines[i])
+      while (i < lines.length && !(lines[i] ?? '').startsWith('```')) {
+        buf.push(lines[i] ?? '')
         i++
       }
       i++
@@ -40,8 +44,8 @@ export function renderMarkdown(src: string): string {
 
     if (line.startsWith('> ') || line === '>') {
       const buf: string[] = []
-      while (i < lines.length && (lines[i].startsWith('> ') || lines[i] === '>')) {
-        buf.push(lines[i].replace(/^>\s?/, ''))
+      while (i < lines.length && ((lines[i] ?? '').startsWith('> ') || lines[i] === '>')) {
+        buf.push((lines[i] ?? '').replace(/^>\s?/, ''))
         i++
       }
       out.push(`<blockquote>${renderMarkdown(buf.join('\n'))}</blockquote>`)
@@ -50,9 +54,10 @@ export function renderMarkdown(src: string): string {
 
     if (/^\s*[-*]\s+/.test(line)) {
       const items: { indent: number; text: string }[] = []
-      while (i < lines.length && /^\s*[-*]\s+/.test(lines[i])) {
-        const m = lines[i].match(/^(\s*)[-*]\s+(.*)$/)!
-        items.push({ indent: m[1].length, text: m[2] })
+      while (i < lines.length && /^\s*[-*]\s+/.test(lines[i] ?? '')) {
+        const m = (lines[i] ?? '').match(/^(\s*)[-*]\s+(.*)$/)
+        if (!m) { i++; continue }
+        items.push({ indent: (m[1] ?? '').length, text: m[2] ?? '' })
         i++
       }
       out.push(renderNestedList(items))
@@ -61,8 +66,8 @@ export function renderMarkdown(src: string): string {
 
     if (/^\s*\d+\.\s+/.test(line)) {
       const buf: string[] = []
-      while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i])) {
-        buf.push(lines[i].replace(/^\s*\d+\.\s+/, ''))
+      while (i < lines.length && /^\s*\d+\.\s+/.test(lines[i] ?? '')) {
+        buf.push((lines[i] ?? '').replace(/^\s*\d+\.\s+/, ''))
         i++
       }
       out.push('<ol>' + buf.map((b) => `<li>${renderInline(b)}</li>`).join('') + '</ol>')
@@ -73,8 +78,8 @@ export function renderMarkdown(src: string): string {
       const header = splitRow(line)
       i += 2
       const rows: string[][] = []
-      while (i < lines.length && lines[i].startsWith('|')) {
-        rows.push(splitRow(lines[i]))
+      while (i < lines.length && (lines[i] ?? '').startsWith('|')) {
+        rows.push(splitRow(lines[i] ?? ''))
         i++
       }
       const thead = '<thead><tr>' + header.map((h) => `<th>${renderInline(h)}</th>`).join('') + '</tr></thead>'
@@ -92,8 +97,8 @@ export function renderMarkdown(src: string): string {
     }
 
     const buf: string[] = []
-    while (i < lines.length && lines[i].trim() && !isBlockStart(lines[i])) {
-      buf.push(lines[i])
+    while (i < lines.length && (lines[i] ?? '').trim() && !isBlockStart(lines[i] ?? '')) {
+      buf.push(lines[i] ?? '')
       i++
     }
     out.push(`<p>${renderInline(buf.join(' '))}</p>`)
@@ -118,11 +123,11 @@ function renderNestedList(items: { indent: number; text: string }[]): string {
   let html = ''
   const stack: number[] = []
   for (const it of items) {
-    while (stack.length && stack[stack.length - 1] > it.indent) {
+    while (stack.length && (stack[stack.length - 1] ?? 0) > it.indent) {
       html += '</li></ul>'
       stack.pop()
     }
-    if (!stack.length || stack[stack.length - 1] < it.indent) {
+    if (!stack.length || (stack[stack.length - 1] ?? 0) < it.indent) {
       html += '<ul>'
       stack.push(it.indent)
     } else {
@@ -144,30 +149,24 @@ function splitRow(line: string): string[] {
 
 const URL_RE = String.raw`(?:[^\s()]|\([^\s()]*\))+`
 
+// Allow http/https/mailto + relative paths + protocol-relative + fragments + assetUrl outputs.
+// Block javascript:/data:/vbscript: and anything that looks like a script execution vector.
+function safeUrl(raw: string): string {
+  const t = String(raw).trim()
+  if (!t) return '#'
+  // eslint-disable-next-line no-control-regex
+  const stripped = t.replace(/[ -]/g, '')
+  if (/^\s*(javascript|data|vbscript|file):/i.test(stripped)) return '#'
+  return stripped.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
 export function renderInline(src: string): string {
   let s = escapeHtml(src)
-  s = s.replace(/`([^`]+)`/g, (_, c) => `<code>${c}</code>`)
-  s = s.replace(new RegExp(`!\\[([^\\]]*)]\\((${URL_RE})\\)`, 'g'), (_, alt, url) => `<img src="${url}" alt="${alt}">`)
-  s = s.replace(new RegExp(`\\[([^\\]]+)]\\((${URL_RE})\\)`, 'g'), (_, txt, url) => `<a href="${url}">${txt}</a>`)
-  const stash: string[] = []
-  const push = (html: string) => { stash.push(html); return ` STASH${stash.length - 1} ` }
-  s = s.replace(/\{\{char:([a-z0-9-]+)\|([^{}\n]+)\}\}/g, (_, id, name) => {
-    const cid = String(id).trim()
-    const n = String(name).trim()
-    if (!cid || !n) return `{{char:${id}|${name}}}`
-    return push(`<span class="character-mention" data-character-id="${cid}" tabindex="0">${n}</span>`)
-  })
-  s = s.replace(/\{([^{}|\n]+)\|([^{}\n]+)}/g, (_, term, desc) => {
-    const t = String(term).trim()
-    const d = String(desc).trim().replace(/"/g, '&quot;')
-    if (!t || !d) return `{${term}|${desc}}`
-    return push(`<abbr title="${d}" class="H-eries-term">${t}</abbr>`)
-  })
+  s = s.replace(/`([^`]+)`/g, (_, c: string) => `<code>${c}</code>`)
+  s = s.replace(new RegExp(`!\\[([^\\]]*)]\\((${URL_RE})\\)`, 'g'), (_, alt: string, url: string) => `<img src="${safeUrl(url)}" alt="${escapeAttr(String(alt))}">`)
+  s = s.replace(new RegExp(`\\[([^\\]]+)]\\((${URL_RE})\\)`, 'g'), (_, txt: string, url: string) => `<a href="${safeUrl(url)}">${txt}</a>`)
   s = s.replace(/\*\*([^\n]+?)\*\*(?!\*)/g, '<strong>$1</strong>')
   s = s.replace(/(?<!\*)\*(?!\s)([^*\n]+?)(?<!\s)\*(?!\*)/g, '<em>$1</em>')
-  if (stash.length) {
-    s = s.replace(/ STASH(\d+) /g, (_, n) => stash[Number(n)] ?? '')
-  }
   return s
 }
 
@@ -179,7 +178,11 @@ function escapeHtml(s: string): string {
 }
 
 function escapeAttr(s: string): string {
-  return s.replace(/"/g, '&quot;')
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
 }
 
 function slugify(s: string): string {
@@ -196,7 +199,7 @@ export function extractOutline(html: string, level: 2 | 3 = 2): { id: string; te
   const items: { id: string; text: string }[] = []
   let m: RegExpExecArray | null
   while ((m = re.exec(html)) !== null) {
-    items.push({ id: m[1], text: m[2] })
+    items.push({ id: m[1] ?? '', text: m[2] ?? '' })
   }
   return items
 }
