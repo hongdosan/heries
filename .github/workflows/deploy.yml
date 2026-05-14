@@ -18,8 +18,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # Safety: ensure reader build only. Author build must NEVER be deployed.
-      VITE_AUTHOR_MODE: ""
+      # 정책 #9 v2 (2026-05-14): 단일 라이브 빌드. 작가 모드 진입 키는
+      # GitHub Secret `VITE_AUTHOR_KEY` 로 주입. 미설정 시 작가 모드는
+      # 영구 잠금 상태 (`verifyAuthorKey` 가 항상 false 반환).
+      VITE_AUTHOR_KEY: ${{ secrets.VITE_AUTHOR_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,7 +38,7 @@ jobs:
       - name: Type check
         run: npm run typecheck
 
-      - name: Build (reader mode)
+      - name: Build
         run: npm run build
 
       - name: Build Storybook (sanity check, not deployed)

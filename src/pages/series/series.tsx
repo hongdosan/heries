@@ -1,6 +1,7 @@
 import {Link, useParams, useSearchParams} from 'react-router-dom'
 import {loadSeries} from '../../entities/series'
-import {assetUrl, IS_AUTHOR_MODE} from '../../shared/lib/env.js'
+import {assetUrl} from '../../shared/lib/env.js'
+import {useAuthorMode} from '../../shared/lib/use-author-mode.js'
 import {useAsync} from '../../shared/lib/use-async.js'
 import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
@@ -15,6 +16,7 @@ export function SeriesPage() {
   const state = useAsync(() => loadSeries(slug), [slug])
   const cover = useImgFallback()
   const [searchParams, setSearchParams] = useSearchParams()
+  const isAuthor = useAuthorMode()
   useDocumentTitle(state.status === 'success' ? state.data.manifest.title : '')
 
   const rawTab = searchParams.get('tab') as Tab | null
@@ -74,7 +76,7 @@ export function SeriesPage() {
                 onClick={() => setTab('characters')}>
           등장인물<span className="tab-count">{characterCount}</span>
         </button>
-        {IS_AUTHOR_MODE && (
+        {isAuthor && (
           <button role="tab" aria-selected={tab === 'author'} className="tab-btn"
                   onClick={() => setTab('author')}>
             작가 전용<span className="author-only-badge">AUTHOR</span>
@@ -91,7 +93,7 @@ export function SeriesPage() {
       {tab === 'characters' && (
         <CharacterList slug={slug} characters={manifest.characters}/>
       )}
-      {tab === 'author' && IS_AUTHOR_MODE && (
+      {tab === 'author' && isAuthor && (
         <section className="author-tab">
           <p className="author-tab-desc">
             본 탭은 <span className="author-only-badge">AUTHOR</span> 모드 빌드에서만 노출되는

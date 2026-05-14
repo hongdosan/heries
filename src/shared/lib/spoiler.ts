@@ -1,15 +1,15 @@
-import { IS_AUTHOR_MODE } from './env.js'
+import { isAuthorMode } from './env.js'
 import patterns from './spoiler-patterns.json'
 
 // Strip spoiler sections from a markdown body.
 // - `_series.md`: drops `## 시놉시스` section (until next `## ` or EOF).
 // - Character cards: drops `## H-eries 분기 ~` onward (until next `## ` or EOF).
-// Author mode (`VITE_AUTHOR_MODE=true`) bypasses masking. SSOT: spoiler-patterns.json.
+// Author mode (sessionStorage `heries:author=1`) bypasses masking. SSOT: spoiler-patterns.json.
 export function maskSpoilersFromMarkdown(
   raw: string,
   kind: 'series' | 'character' | 'chapter',
 ): string {
-  if (IS_AUTHOR_MODE) return raw
+  if (isAuthorMode()) return raw
   if (kind === 'chapter') return raw
 
   const lines = raw.split('\n')
@@ -36,7 +36,7 @@ export function maskSpoilersFromMarkdown(
  * Strip spoiler frontmatter fields (e.g. `heries_arc` on character cards).
  */
 export function maskSpoilersFromFrontmatter<F extends object>(fm: F, kind: 'series' | 'character' | 'chapter'): F {
-  if (IS_AUTHOR_MODE) return fm
+  if (isAuthorMode()) return fm
   if (kind !== 'character') return fm
   const rest: Record<string, unknown> = { ...(fm as Record<string, unknown>) }
   for (const key of patterns.spoilerFrontmatterKeys) {

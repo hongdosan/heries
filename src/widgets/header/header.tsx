@@ -1,6 +1,6 @@
 import {useState} from 'react'
 import {Link} from 'react-router-dom'
-import {IS_AUTHOR_MODE} from '../../shared/lib/env.js'
+import {useAuthorMode} from '../../shared/lib/use-author-mode.js'
 import {getTheme, nextTheme, setTheme, type Theme} from '../../shared/lib/theme.js'
 
 const CONTACT_USER = 'contact_hongdosan'
@@ -21,6 +21,7 @@ const THEME_LABEL: Record<Theme, string> = {
 export function Header() {
   const mailto = `mailto:${CONTACT_USER}@${CONTACT_DOMAIN}`
   const [theme, setThemeState] = useState<Theme>(() => getTheme())
+  const isAuthor = useAuthorMode()
   const cycleTheme = () => {
     const next = nextTheme(theme)
     setTheme(next)
@@ -33,7 +34,7 @@ export function Header() {
         <div className="brand">
           <div className="brand-row">
             <Link to="/" className="brand-link">H-eries</Link>
-            {IS_AUTHOR_MODE && <span className="author-badge" title="작가 모드">AUTHOR</span>}
+            {isAuthor && <span className="author-badge" title="작가 모드">AUTHOR</span>}
           </div>
           <p className="meta">오리지널 웹 시리즈 컬렉션</p>
         </div>
