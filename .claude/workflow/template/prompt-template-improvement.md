@@ -3,7 +3,7 @@
 # 코드 개선 프롬프트 (improvement)
 
 - **역할**: H-eries 의 기존 코드/콘텐츠의 동작 변경·리팩토링·튜닝을 명확히 적어 코드 개선 요청하는 프롬프트 템플릿.
-- **트랙**: improvement ([`ai-workflow.md`](../ai-workflow.md) §4-개선)
+- **트랙**: improvement ([`workflow.md`](../workflow.md) §4-개선)
 
 > **필수 정독**: [`prompt-reference.md`](./prompt-reference.md) — H-eries 단일 기준점.
 
@@ -69,5 +69,5 @@
 ## 참고
 
 - 필수 정독 참고서: [`prompt-reference.md`](./prompt-reference.md)
-- 개발 흐름: [`../ai-workflow.md`](../ai-workflow.md)
+- 개발 흐름: [`../workflow.md`](../workflow.md)
 - 핵심 원칙: [`../../CLAUDE.md`](../../CLAUDE.md)

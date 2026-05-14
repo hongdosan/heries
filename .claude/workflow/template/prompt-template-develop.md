@@ -3,7 +3,7 @@
 # 신규 기능 개발 프롬프트 (develop)
 
 - **역할**: H-eries 에 새 슬라이스·새 페이지·새 콘텐츠·새 기능 도입을 위해 작업 의도·범위·검증을 명확히 적어 코드 개발 요청하는 프롬프트 템플릿.
-- **트랙**: develop ([`ai-workflow.md`](../ai-workflow.md) §4-신규)
+- **트랙**: develop ([`workflow.md`](../workflow.md) §4-신규)
 
 > **필수 정독**: [`prompt-reference.md`](./prompt-reference.md) — H-eries 단일 기준점.
 
@@ -17,7 +17,8 @@
 
 ## 개발 방향
 
-> *어떻게* 만드는가. FSD 레이어 (app/pages/widgets/features/entities/shared) 의 어디에 두는지, 사용할 기존 토큰·헬퍼·entities 목록.
+> *어떻게* 만드는가. FSD 레이어 (app/pages/widgets/features/entities/shared) 의 어디에 두는지, 사용할 기존 토큰·헬퍼·entities
+> 목록.
 
 -
 
@@ -61,5 +62,5 @@
 ## 참고
 
 - 필수 정독 참고서: [`prompt-reference.md`](./prompt-reference.md)
-- 개발 흐름: [`../ai-workflow.md`](../ai-workflow.md)
+- 개발 흐름: [`../workflow.md`](../workflow.md)
 - 핵심 원칙: [`../../CLAUDE.md`](../../CLAUDE.md)

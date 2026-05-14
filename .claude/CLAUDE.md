@@ -45,13 +45,7 @@ static (`.nojekyll`) 로 발행.
 11. **공통 컴포넌트 (`shared/ui/`) 스토리북 강제** (2026-05-14 신설) — `src/shared/ui/{name}/` 신규 컴포넌트 추가 시 동일
     슬라이스에 `{name}.stories.tsx` **반드시** 함께 작성. 누락 = 정책 위반. 스토리는 의미 있는 variant 최소 2 개 + 정상 케이스 1 개 (=
     최소 3 스토리). `widgets/`, `features/` 슬라이스는 권장 (강제 X). `pages/` 는 라우팅 의존이라 미적용.
-12. **AI 개발 흐름 강제** (2026-05-14 신설) — auto-mode (자율 진행) 또는 3 파일 이상 변경 / 신규 슬라이스 도입 / 콘텐츠 SSOT 갱신 시 [
-    `./ai-workflow/ai-workflow.md`](workflow/workflow.md) 의 6 단계 흐름 (Context → Prompt QA →
-    Roadmap → Tech Review → Adaptive Execution → Commit/Close) 강제. 트랙별 프롬프트 템플릿: [
-    `develop`](workflow/template/prompt-template-develop.md) / [
-    `improvement`](workflow/template/prompt-template-improvement.md) / [
-    `review`](workflow/template/prompt-template-review.md). 단일 기준점: [
-    `prompt-reference.md`](workflow/template/prompt-reference.md).
+12. **AI 개발 흐름 강제** (2026-05-14 신설) — auto-mode (자율 진행) 또는 3 파일 이상 변경 / 신규 슬라이스 도입 / 콘텐츠 SSOT 갱신 시 [`./workflow/workflow.md`](./workflow/workflow.md) 의 6 단계 흐름 (Context → Prompt QA → Roadmap → Tech Review → Adaptive Execution → Commit/Close) 강제. 트랙별 프롬프트 템플릿: [`develop`](./workflow/template/prompt-template-develop.md) / [`improvement`](./workflow/template/prompt-template-improvement.md) / [`review`](./workflow/template/prompt-template-review.md). 단일 기준점: [`prompt-reference.md`](./workflow/template/prompt-reference.md).
 
 ## 도구 우선순위
 
