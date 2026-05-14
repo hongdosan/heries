@@ -368,8 +368,11 @@
 }
 
 /* 공격 시 검광 슬래시 — mg-slash.webp 스프라이트 (JSX 에서 inline backgroundImage).
-   발사 방향에 회전 + scale + fade. 무협 검기 텍스처 + 자연 glow. */
+   발사 방향에 회전 + scale + fade. 무협 검기 텍스처 + 자연 glow.
+   --mg-flash-angle = JSX 가 inline style 로 전달하는 facing 라디안.
+   sprite 는 가로 우측 향함이 기본. transform-origin = 왼쪽 (시작점 = 플레이어). */
 .mg-flash {
+  --mg-flash-angle: 0rad;
   position: absolute;
   width: 72px;
   height: 24px;
@@ -382,12 +385,13 @@
   animation: mg-flash-streak 180ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
   z-index: 6;
   filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.5));
+  transform-origin: 0% 50%;
 }
 
 @keyframes mg-flash-streak {
-  0% { opacity: 0; transform: scaleX(0.4); }
-  35% { opacity: 1; transform: scaleX(1); }
-  100% { opacity: 0; transform: scaleX(1.25); }
+  0% { opacity: 0; transform: rotate(var(--mg-flash-angle)) scaleX(0.4); }
+  35% { opacity: 1; transform: rotate(var(--mg-flash-angle)) scaleX(1); }
+  100% { opacity: 0; transform: rotate(var(--mg-flash-angle)) scaleX(1.25); }
 }
 
 /* 적 처치 시 impact 폭발 — sprite 1 frame (200ms fade) */

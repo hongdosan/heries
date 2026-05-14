@@ -1122,7 +1122,9 @@ export function MiniGame({autoFocus = false}: Readonly<MiniGameProps>) {
             </div>
           )}
 
-          {/* 공격 시 검광 슬래시 (sprite mg-slash.webp) */}
+          {/* 공격 시 검광 슬래시 (sprite mg-slash.webp).
+              플레이어 facing 방향으로 회전 = CSS var --mg-flash-angle 로 전달
+              (CSS animation 의 transform 안에서 rotate + scaleX 함께 적용). */}
           {flash && (
             <div
               key={flash.id}
@@ -1130,8 +1132,8 @@ export function MiniGame({autoFocus = false}: Readonly<MiniGameProps>) {
               style={{
                 left: flash.x,
                 top: flash.y,
-                transform: `rotate(${flash.angle}rad)`,
                 backgroundImage: `url(${SLASH_SPRITE})`,
+                ['--mg-flash-angle' as string]: `${flash.angle}rad`,
               }}
               aria-hidden="true"
             />
