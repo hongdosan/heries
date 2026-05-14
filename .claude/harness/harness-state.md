@@ -30,7 +30,7 @@
 |---|---|
 | 서비스 | `H-eries` — 단일 작가의 오리지널 다중/평행 세계 정적 웹 시리즈 |
 | 작품 #1 | `series/clash-of-multiverses/` (tba) |
-| 콘텐츠 성격 | **100% 오리지널 창작** — 외부 IP 차용 ZERO |
+| 콘텐츠 성격 | **100% 오리지널 창작** — 작가 hongdosan 자작 |
 | 작성자 | 단일 (`hongdosan`) — 외부 협업자 가정 없음 |
 | 독자 | 읽기 전용 |
 | 빌더 | React 19 + React Router + Vite (런타임 의존 3 종) + Storybook (dev 전용) |
@@ -90,7 +90,7 @@ content/
 ---
 slug: woo-jin-hyeok
 name: 우진혁
-origin: original   # 모든 본 프로젝트 캐릭터는 original (외부 IP 차용 ZERO)
+origin: original   # 모든 본 프로젝트 캐릭터는 original (작가 자작)
 role: protagonist | antagonist | supporting | cameo
 first_appearance: tba
 heries_arc: tba    # 본 작품 소환 시점·상태. reader 빌드에서 마스킹
@@ -109,8 +109,8 @@ summary: 한 줄 요약
 | 챕터 → 캐릭터 참조 무결성 검증 | LLM 순응 (`heries-continuity-reviewer` §검증 체크리스트) |
 | 저작권 고지 부착 강제 | **구현** — CLAUDE.md §원칙 #1 + 모든 에이전트 §작업 원칙 |
 | 이미지 budget 강제 (≤500KB) | **구현** — `scripts/check-images.mjs` 빌드 게이트 |
-| 작가 빌드 라이브 노출 차단 | **구현** — `.github/workflows/deploy.yml` 의 `VITE_AUTHOR_MODE: ""` env 강제 |
-| 마스킹 누수 게이트 | **구현** — `scripts/check-masking.mjs` 빌드 후처리 |
+| 작가 모드 잠금 | **구현** — runtime `/unlock` 페이지 + `VITE_AUTHOR_KEY` 검증 + sessionStorage 플래그 (정책 v2) |
+| 시크릿 누수 게이트 | **구현** — `scripts/check-secrets.mjs` 빌드 후처리 (CLAUDE.md #13) |
 | `shared/ui/` 스토리북 강제 | LLM 순응 (CLAUDE.md §원칙 #11) |
 | Pre-commit hook | 없음 (사용자 메모리 = 사용자 직접 commit 정책) |
 
@@ -122,6 +122,7 @@ summary: 한 줄 요약
 
 | 날짜 | 변경 내용 | 대상 | 사유 |
 |---|---|---|---|
+| 2026-05-15 (자율 라운드 우진혁 + 톤 정리) | **우진혁 카드 700+ 줄 자율 디테일 완성 + 프로젝트 전반 운영 문서 톤 정리 (자작 강조 형태)** — (a) 운영 문서 톤 정리 16 파일: `src/widgets/footer`, `NOTICE.md`, `content/notice.md`, `content/about.md`, `README.md`, `.claude/CLAUDE.md` 원칙 #2, `.claude/agents/heries-{lorekeeper,worldsmith,author,continuity-reviewer,publisher,frontend-engineer}.md`, `.claude/skills/heries-orchestrator/SKILL.md`, `.claude/harness/{harness,harness-setup,harness-install,harness-state}.md`, `.claude/handoff/handoff.md`, `.claude/workflow/template/{prompt-reference,prompt-template-review}.md` — 모두 *100% 오리지널·자작 명명 SSOT* 톤으로 정리. publisher / frontend-engineer 의 stale 정책 v1 표현 → 정책 v2 (단일 빌드 / runtime 마스킹 / check-secrets) 정합. (b) `_series.md` = 본문 헤더 1 단락 + 시놉시스 절 (작가 마스킹) 작성. (c) 우진혁 카드 (`content/series/clash-of-multiverses/characters/1-protagonist/woo-jin-hyeok.md`) 자율 28 라운드 누적 디테일 = 작가 백엔드 32+ 절 (작가 절 인덱스·연대기·신체외형·성격가치관·습관·가족출신·운동시절·군·신체단련합성·각성트리거·능력단계별발현·영혼시각·단계 1·2·3·후반·권속성장·임계 1·2·각성고정깨짐·성장곡선·측정등급·주변호칭사전·다른 인물 시선·우진혁시선·전투패턴·대화화법·능력감춤·일상패턴·일상디테일·결정패턴·본인시간·후반자아침투·약점·철학·목표·인간관계노드·인과백엔드·트라우마결심풍경·선악스펙트럼·말못한마음·권속명단템플릿·후반갈등분기 A~G·끝시나리오 ①~④·단계별 챕터 시나리오·시점운용가이드·시그니처사전·명대사후보·대표한컷·마수풍경·카드안의카드한줄요약·다른작품연결·자작매커니즘 11 축). 검증: typecheck 0 / build 0 / build-storybook 0 / check-secrets 0 누수 / dist css 43.30 KB / js 286.30 KB. | 카드 = 우진혁 .md 1 파일 + `_series.md` + 운영 문서 16 파일 일괄. | 다음 사이클 후보 = 첫 챕터 시놉시스 받기 / 우선아 단독 카드 승격 결정 / 새 캐릭터 카드 신설. 변경 이력 hot **12행 / 한도 20**. |
 | 2026-05-14 (정책 v2 unlock C1~C5) | **작가 모드 정책 v2 — 단일 빌드 + runtime /unlock + character-doctrine SSOT + 시크릿 게이트** — C1: CLAUDE.md 원칙 #9 v2 (단일 빌드 + sessionStorage `heries:author=1` + `?unlock=KEY`) + #13 신설 (개인 정보·시크릿·`VITE_AUTHOR_KEY` hardcode 금지) + `content/series/clash-of-multiverses/worldbuilding/character-doctrine.md` SSOT 신설 (7 원칙 + 7 운영 매커니즘). C2: `src/shared/lib/env.ts` 함수화 (`isAuthorMode/setAuthorMode/verifyAuthorKey`, `IS_AUTHOR_MODE` const 폐기) + `src/shared/lib/use-author-mode.ts` 신규 hook (custom event + storage event 구독) + `spoiler.ts`·`widgets/header`·`pages/series` hook 마이그레이션 + `scripts/copy-content.mjs` 마스킹 제거 (단순 복사) + `scripts/check-secrets.mjs` 신규 (구 check-masking.mjs 대체, 시크릿 패턴 정규식 검출) + `package.json` `dev:author/build:author` 폐기·`build` check-secrets 호출 + `vite.config.ts` author 분기 제거 (단일 dist) + `.github/workflows/deploy.yml` `VITE_AUTHOR_KEY` GitHub Secret 주입. C3: `src/pages/unlock/` 신규 슬라이스 (폼 + `?unlock=KEY` 자동 검증 + 잠그기) + `/unlock` 라우트 + AUTHOR 배지를 Link 로 변환. C4: `CharacterIndex.summary` 옵션 필드 + manifest 정규화 + 우진혁 manifest summary 채움 + `widgets/character-list` 카드 그리드 재작성 (주인공만 Link, 나머지 정적 카드 + 작가 모드 시 전부 Link) + `pages/character` 라우트 가드 (비-작가 비-주인공 진입 시 잠금 화면 + 잠금 해제 링크) + 스토리북 summary 샘플. C5: `README.md` / `src/README.md` / `.claude/handoff/CURRENT.md` 동기화. 검증: typecheck 0 / build 0 / build-storybook 0 / check-secrets 0 누수 / dist css 43.30 KB / js 286.36 KB. | `.claude/CLAUDE.md` (#9 v2, #13 신설), `content/series/clash-of-multiverses/{worldbuilding/character-doctrine.md (신규), manifest.json}`, `src/{shared/lib/{env.ts, spoiler.ts, use-author-mode.ts (신규)}, pages/{unlock/ (신규), series/series.tsx, series/series.css, character/character.tsx, character/character.css}, widgets/{header/header.tsx, header/header.css, character-list/character-list.tsx, character-list/character-list.stories.tsx}, shared/styles/author-mode.css, shared/lib/{manifest.ts, types.ts}, app/main.tsx}`, `scripts/{copy-content.mjs, check-secrets.mjs (신규, check-masking.mjs 폐기)}`, `package.json` (scripts), `vite.config.ts` (단일 dist), `.github/workflows/deploy.yml` (Secret 주입), `README.md`, `src/README.md`, `.claude/handoff/CURRENT.md`, `.claude/harness/harness-state.md` (본 행) | 본 사이클 = 정책 v2 단방향 마이그레이션. 우진혁 등장인물 디테일 논의는 별도 트랙으로 분리. 다음 사이클 후보: (a) GitHub Secret `VITE_AUTHOR_KEY` 등록 + 로컬 `.env.local` 작성 (b) 우진혁 카드 본문 보강 + 카드 페어링 (c) 첫 챕터 시놉시스 받기. 변경 이력 hot **11행 / 한도 20**. |
 | 2026-05-14 (라운드 28~30) | **첫 paint fallback + 로그 톤 일관** — (1) `index.html` inline `<style>` 추가 (CSS module 로드 전 다크/라이트 fallback, prefers-color-scheme + data-theme="dark" 양쪽 케이스) (2) `scripts/copy-content.mjs` 빌드 로그에 `✓` prefix 추가 (check-images / check-masking 과 일관) (3) 페이지 transition 첫 진입 fade-in = 의도된 자연 동작 (변경 X). 검증: typecheck 0 / build 0 / 마스킹 누수 0. | `index.html` (inline style), `scripts/copy-content.mjs` (prefix), `.claude/harness/harness-state.md` (본 행) | 본 사이클 = 가벼운 UX/로그 폴리시. 변경 이력 hot **10행 / 한도 20**. |
 | 2026-05-14 (라운드 25~27) | **heading anchor + outline 임계 + author-only marker CSS** — (1) markdown.ts h2/h3 에 `<a class="heading-anchor">#</a>` 자동 부착 + typography.css hover 룰 (챕터 본문 `.article-prose` 안에서는 숨김, 모바일 항상 흐림 노출) (2) chapter outline 표시 임계 1 → 2 절 (1 절 이하 가치 작음) (3) author-mode.css 에 `.author-only-label` / `.author-only-value` 룰 보강 (character.tsx 에서 marker 만 있고 효과 0 이었던 잔여 정합). 검증: typecheck 0 / build 0 / 마스킹 누수 0. | `src/shared/lib/markdown.ts` (anchor), `src/shared/styles/typography.css` (.heading-anchor), `src/pages/chapter/chapter.tsx` (outline 임계), `src/shared/styles/author-mode.css` (label/value), `.claude/harness/harness-state.md` (본 행) | 본 사이클 = UX 가독성 + 운영 marker 정합. 변경 이력 hot **9행 / 한도 20**. |
