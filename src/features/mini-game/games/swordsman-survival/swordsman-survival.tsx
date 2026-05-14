@@ -1,6 +1,6 @@
 import type {KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent} from 'react'
 import {useCallback, useEffect, useLayoutEffect, useRef, useState,} from 'react'
-import {assetUrl} from '../../shared/lib/env.js'
+import {assetUrl} from '../../../../shared/lib/env.js'
 
 // ─────────────────────────────────────────────────────────────────
 // 검기생존록 — 무협 아이작풍 탄막 슈터 (H-eries 메인 페이지 미니 게임)

@@ -1,21 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { MiniGame } from './mini-game'
-import './mini-game.css'
+import { MiniGame } from './swordsman-survival'
 
-// 검기생존록 미니 게임 시연.
+// 검기생존록 — swordsman-survival 슬라이스 시연.
 // 시연 한계 = 실제 RAF 루프·키보드/포인터 입력은 storybook 환경에서도 동작하나
-// (1) 시각 효과(emoji·gradient) 는 환경 폰트·다크 모드에 영향
+// (1) 시각 효과(sprite·gradient) 는 환경 폰트·다크 모드에 영향
 // (2) 가상 패드는 터치 환경에서만 자연스러움 — 데스크탑 마우스로도 동작은 함
 // (3) Default 스토리는 idle 상태로 시작. AutoStart 스토리는 마운트 직후 시작.
 const meta: Meta<typeof MiniGame> = {
-  title: 'features/MiniGame',
+  title: 'features/mini-game/SwordsmanSurvival',
   component: MiniGame,
   parameters: {
     layout: 'centered',
   },
   decorators: [
     (Story) => (
-      <div style={{ width: 'min(480px, 100%)', padding: 16 }}>
+      <div style={{ width: 'min(480px, 100%)', padding: 'var(--s-4)' }}>
         <Story />
       </div>
     ),
@@ -50,7 +49,3 @@ export const DarkBackground: Story = {
     backgrounds: { default: 'dark' },
   },
 }
-
-// over 화면은 직접 시연 불가 (state 외부 주입 X). 대신 게임 진행 후 사망 도달 시
-// 자동 노출. 작가 검수 흐름: AutoStart → 방치 → 자동 over → overlay 확인.
-// 또는 키보드 입력으로 게임 시작 후 일부러 적과 충돌하여 over 도달.

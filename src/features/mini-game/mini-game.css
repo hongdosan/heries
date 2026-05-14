@@ -203,6 +203,63 @@
   }
 }
 
+/* ─── 게임 선택 화면 (catalog 2+ 일 때 dialog body 안 표시) ─── */
+.mini-game-select {
+  /* dialog body 의 flex/center 정합. 선택 카드 그리드. */
+  align-items: stretch;
+  padding: var(--s-5);
+}
+
+.mini-game-select-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 24vw, 200px), 1fr));
+  gap: var(--s-3);
+  width: 100%;
+}
+
+.mini-game-select-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  padding: var(--s-5) var(--s-4);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-md);
+  color: var(--fg);
+  cursor: pointer;
+  transition: border-color var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
+  font: inherit;
+  text-align: center;
+}
+
+.mini-game-select-card:hover {
+  border-color: var(--accent-ring);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.mini-game-select-emoji {
+  font-size: var(--fs-2xl);
+  line-height: 1;
+}
+
+.mini-game-select-title {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.mini-game-select-desc {
+  font-size: var(--fs-sm);
+  color: var(--fg-3);
+  line-height: 1.5;
+}
+
 .mini-game {
   --mg-bg: #0c0a09;
   --mg-bg-2: #1c1917;
