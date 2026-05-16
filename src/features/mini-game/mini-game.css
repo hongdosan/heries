@@ -209,7 +209,9 @@
 }
 
 @media (max-width: 640px) {
-  /* 모바일 = 전체화면 고정. 헤더만 sticky, 게임 영역 = viewport 전체에 fit. */
+  /* 모바일 = 전체화면 고정. 헤더만 sticky, 게임 영역 = viewport 전체에 fit.
+   * dvh = dynamic viewport height (브라우저 chrome 변동 자동 반영). 추가로 Fullscreen API
+   * (launcher.tsx 에서 게임 시작 시 dialog.requestFullscreen) 로 chrome 자체 숨김. */
   .mini-game-dialog {
     --mg-dialog-gap: 0px;
     --mg-dialog-head: var(--s-7);  /* 모바일 헤더 더 컴팩트 (약 48px) */
@@ -261,6 +263,27 @@
   .mini-game-launcher:hover {
     transform: none;
   }
+}
+
+/* Fullscreen API 진입 시 — dialog 가 화면 전체 차지. dvh 계산 불필요 (chrome 자체 숨김).
+ * iOS Safari 는 본 API 미지원이라 dvh fallback 으로 동작. */
+.mini-game-dialog:fullscreen {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  border-radius: 0;
+}
+
+.mini-game-dialog:fullscreen .mini-game-dialog-card {
+  height: 100vh;
+  max-height: 100vh;
+  border-radius: 0;
+  border: 0;
+}
+
+.mini-game-dialog:fullscreen .mini-game-dialog-body .mini-game-frame--landscape {
+  max-height: calc(100vh - var(--mg-dialog-head) - var(--s-3));
 }
 
 /* ─── 게임 선택 화면 (dialog open 시 항상 먼저 표시) ─── */

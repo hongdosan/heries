@@ -1039,6 +1039,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
 
   // ─── 렌더 ─────────────────────────────────────────────────
   const hpHearts = '●'.repeat(player.hp) + '○'.repeat(PLAYER_MAX_HP - player.hp)
+  const qiReady = ki >= QI_COST
   // 이형환위 시각 게이지 — ki 잔량 / DASH_COST 비율 (0..1). DASH_COOLDOWN_MS = 0 라
   // 쿨다운 기반 비율은 의미 없음 (0 / 0 = NaN). ki 진행률이 *사용 가능까지의 거리* 를 더 정확히 표현.
   const dashCdFraction = clamp(1 - Math.min(ki, DASH_COST) / DASH_COST, 0, 1)
@@ -1222,13 +1223,21 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
                 <button type="button" className="sm-pad-btn sm-pad-slash" aria-label="베기"
                         onPointerDown={onPadDown('slash')}>베기
                 </button>
-                <button type="button" className="sm-pad-btn sm-pad-qi" aria-label="장풍"
-                        onPointerDown={onPadDown('qi')}>장풍
+                <button
+                  type="button"
+                  className={'sm-pad-btn sm-pad-qi' + (qiReady ? '' : ' is-disabled')}
+                  aria-label="장풍"
+                  aria-disabled={!qiReady}
+                  disabled={!qiReady}
+                  onPointerDown={onPadDown('qi')}
+                >장풍
                 </button>
                 <button
                   type="button"
-                  className={'sm-pad-btn sm-pad-dash' + (dashReady ? '' : ' sm-pad-cd')}
+                  className={'sm-pad-btn sm-pad-dash' + (dashReady ? '' : ' sm-pad-cd is-disabled')}
                   aria-label="이형환위"
+                  aria-disabled={!dashReady}
+                  disabled={!dashReady}
                   onPointerDown={onPadDown('dash')}
                   style={{'--sm-cd': dashCdFraction} as CSSProperties}
                 >이형환위

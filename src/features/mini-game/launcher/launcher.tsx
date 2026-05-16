@@ -18,10 +18,24 @@ export function MiniGameLauncher() {
 
   const closeDialog = useCallback(() => {
     setOpen(false)
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
   }, [])
 
   const backToMenu = useCallback(() => {
     setSelectedId(null)
+    // 메뉴 복귀 시 fullscreen 해제 (게임만 풀스크린 의도).
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
+  }, [])
+
+  // 게임 카드 클릭 = 게임 시작. 모바일 브라우저 chrome (주소창·뒤로가기) 가
+  // 게임 화면을 가리는 문제 해결 위해 dialog 자체에 Fullscreen API 진입.
+  // iOS Safari 는 Fullscreen API 미지원 — try/catch 무동작 fallback (안드로이드 Chrome 정상).
+  const startGame = useCallback((id: string) => {
+    setSelectedId(id)
+    const dlg = dialogRef.current
+    if (dlg && !document.fullscreenElement && dlg.requestFullscreen) {
+      dlg.requestFullscreen({ navigationUI: 'hide' }).catch(() => {})
+    }
   }, [])
 
   // open state ↔ dialog showModal / close 동기화.
@@ -57,6 +71,7 @@ export function MiniGameLauncher() {
 
   const onDialogClose = useCallback(() => {
     setOpen(false)
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
   }, [])
 
   const onDialogClick = useCallback((e: ReactMouseEvent<HTMLDialogElement>) => {
@@ -122,7 +137,7 @@ export function MiniGameLauncher() {
                     <button
                       type="button"
                       className="mini-game-select-card"
-                      onClick={() => setSelectedId(g.id)}
+                      onClick={() => startGame(g.id)}
                     >
                       <span className="mini-game-select-emoji" aria-hidden="true">{g.emoji}</span>
                       <span className="mini-game-select-title">{g.title}</span>

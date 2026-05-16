@@ -15,7 +15,7 @@
   --sm-bg-2: #1f2937;
   --sm-bg-deep: #030712;
   --sm-bg-near-black: #09090b;
-  --sm-bg-tint: #0c0c12;          /* vignette gradient base (rgba(12,12,18,X)) */
+  --sm-bg-tint: #0c0c12; /* vignette gradient base (rgba(12,12,18,X)) */
 
   /* text */
   --sm-fg: #fff;
@@ -27,25 +27,25 @@
   --sm-accent: #67e8f9;
   --sm-accent-bright: #a5f3fc;
   --sm-accent-pale: #cffafe;
-  --sm-accent-deep: #22d3ee;       /* bg glow base */
+  --sm-accent-deep: #22d3ee; /* bg glow base */
 
   /* red — danger (피격·적·HP) */
   --sm-danger: #fda4af;
   --sm-danger-bright: #fecaca;
   --sm-danger-deep: #450a0a;
-  --sm-danger-base: #ef4444;       /* peril pulse base */
+  --sm-danger-base: #ef4444; /* peril pulse base */
 
   /* violet — elite·광살·천검기 */
   --sm-elite: #f5d0fe;
   --sm-elite-bright: #f0abfc;
-  --sm-elite-mid: #c084fc;         /* ki-bar gradient end */
+  --sm-elite-mid: #c084fc; /* ki-bar gradient end */
   --sm-elite-deep: #d946ef;
   --sm-elite-dark: #4a044e;
 
   /* amber — 장풍 hit */
   --sm-amber: #fcd34d;
   --sm-amber-pale: #fef3c7;
-  --sm-amber-soft: #fde68a;        /* pad-dash */
+  --sm-amber-soft: #fde68a; /* pad-dash */
 
   display: flex;
   align-items: center;
@@ -67,7 +67,9 @@
 /* 모바일 portrait = 가로 강제 안내. landscape 시 자동 사라짐. */
 @media (max-width: 900px) and (orientation: portrait) {
   .sm-frame::after {
-    content: '↻ 기기를 가로로 돌려 주세요';
+    content: '↻ 기기를 가로로 돌려 주세요. (PC 권장)';
+    white-space: pre-line;
+    line-height: 1.5;
     position: absolute;
     inset: 0;
     display: flex;
@@ -401,25 +403,16 @@
 /* 이형환위 무적 — ring 폐기. sprite 자체에 cyan aura 적용 → sprite 본체 위치 mismatch 0.
  * (이전 ring 형태는 sprite 본체 편향과 어긋나는 시각 버그) */
 .sm-stickman-invuln .sm-sprite {
-  filter:
-    drop-shadow(0 0 8px color-mix(in srgb, var(--sm-accent) 90%, transparent))
-    drop-shadow(0 0 18px color-mix(in srgb, var(--sm-accent-bright) 60%, transparent))
-    brightness(1.1);
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--sm-accent) 90%, transparent)) drop-shadow(0 0 18px color-mix(in srgb, var(--sm-accent-bright) 60%, transparent)) brightness(1.1);
   animation: sm-invuln-glow 0.7s ease-in-out infinite alternate;
 }
 
 @keyframes sm-invuln-glow {
   0% {
-    filter:
-      drop-shadow(0 0 5px color-mix(in srgb, var(--sm-accent) 75%, transparent))
-      drop-shadow(0 0 12px color-mix(in srgb, var(--sm-accent-bright) 45%, transparent))
-      brightness(1.05);
+    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--sm-accent) 75%, transparent)) drop-shadow(0 0 12px color-mix(in srgb, var(--sm-accent-bright) 45%, transparent)) brightness(1.05);
   }
   100% {
-    filter:
-      drop-shadow(0 0 12px var(--sm-accent))
-      drop-shadow(0 0 24px color-mix(in srgb, var(--sm-accent-bright) 75%, transparent))
-      brightness(1.18);
+    filter: drop-shadow(0 0 12px var(--sm-accent)) drop-shadow(0 0 24px color-mix(in srgb, var(--sm-accent-bright) 75%, transparent)) brightness(1.18);
   }
 }
 
@@ -673,24 +666,40 @@
 }
 
 .sm-pad-btn {
-  width: 56px;
+  /* 라벨 길이에 따라 폭 자동 fit (4자 = 이형환위). 최소 폭 56 유지. */
+  min-width: 56px;
   height: 56px;
+  padding: 0 10px;
   border-radius: 18px;
   border: none;
   font-weight: 900;
   font-size: 14px;
   cursor: pointer;
   touch-action: none;
+  /* 라벨 줄바꿈 금지 + flex center 로 글자 가운데 정렬. */
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   background: color-mix(in srgb, var(--sm-fg) 15%, transparent);
   color: var(--sm-fg);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 12px color-mix(in srgb, #000 40%, transparent);
-  transition: transform 0.08s ease-out, background 0.18s ease-out;
+  transition: transform 0.08s ease-out, background 0.18s ease-out, opacity 0.18s ease-out;
 }
 
 .sm-pad-btn:active {
   transform: scale(0.92);
   background: color-mix(in srgb, var(--sm-fg) 28%, transparent);
+}
+
+.sm-pad-btn:disabled,
+.sm-pad-btn.is-disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+  pointer-events: none;
 }
 
 .sm-pad-slash {

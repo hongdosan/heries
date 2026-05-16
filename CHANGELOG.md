@@ -16,6 +16,22 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 ---
 
+## [v0.2.4] — 2026-05-17
+
+### Changed (광살검 패드 + 모바일 viewport)
+- **장풍 버튼 비활성화** — 내공 < 14 시 `disabled` + opacity 0.42 + grayscale + `cursor: not-allowed` (이전 = 누를 수 있으나 무동작)
+- **이형환위 버튼 비활성화** — 내공 < 31 시 동일 disabled 시각 (기존 `sm-pad-cd` 게이지 위에 disabled 보강)
+- **이형환위 라벨 줄바꿈 차단** — `.sm-pad-btn { white-space: nowrap }` 적용. 좁은 폭 모바일에서 4자 라벨 깨짐 해소
+- **모바일 viewport 정합** — `index.html` viewport meta = `maximum-scale=1.0, user-scalable=no, viewport-fit=cover` 강화 → 더블탭 확대 차단 (iOS Safari 포함)
+- **mini-game dialog 풀스크린 진입** — 게임 카드 클릭 시 `dialog.requestFullscreen()` 호출. 브라우저 chrome (주소창·뒤로가기) 자체 숨김 → 게임 영역 viewport 전체 fit. iOS Safari 는 미지원 → dvh fallback (chrome 영역 dvh 반영). 메뉴 복귀·dialog 닫기 시 `document.exitFullscreen()` 자동 해제
+- **PWA hint meta 추가** — `mobile-web-app-capable` / `apple-mobile-web-app-capable` / `apple-mobile-web-app-status-bar-style=black-translucent` (홈 화면 추가 시 chrome 자동 숨김)
+
+### Notes
+- main 직접 commit (사용자 명시 "main 브랜치 0.2.4 버전 진행")
+- v0.3.0 (Compiler/ESLint/Tailwind) 은 develop 에만 보존 — 별도 release 대기
+
+---
+
 ## [v0.2.3] — 2026-05-16
 
 ### Changed (광살검 모바일 UX)
