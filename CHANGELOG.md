@@ -16,6 +16,34 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 ---
 
+## [v0.3.0] — 2026-05-16
+
+### Added (dev tooling)
+- **React Compiler (babel-plugin-react-compiler)** 도입 — `compilationMode: 'all'` 모드. 자동 메모이제이션 → 수동 `React.memo / useCallback / useMemo` 부담 ↓
+- **ESLint 9** flat config (`eslint.config.js`) 신규 + `lint` / `lint:fix` script
+  - `@typescript-eslint/parser` + `eslint-plugin-react` + `eslint-plugin-react-hooks@5`
+  - 결과 = 0 error / 1 warning (의도된 missing dep)
+  - `eslint-plugin-react-compiler` (rc) 의 zod-validation-error 호환성 버그로 제외 (안정 버전 출시 시 재도입). babel plugin 은 정상 작동
+- **Tailwind v4** (`tailwindcss` + `@tailwindcss/vite`) 도입 — coexist 패턴
+  - `src/shared/styles/tailwind.css` 에 기존 디자인 토큰 (`tokens.css` 의 :root var) 을 `@theme` 으로 통합 (`bg-accent`, `text-fg-2`, `p-4` 등 utility 노출)
+  - 기존 슬라이스 CSS 모두 유지 — 신규 컴포넌트는 Tailwind 우선, 기존 컴포넌트는 점진 마이그레이션
+  - 전략 SSOT: `src/shared/styles/tailwind-migration.md` (5 Phase 로드맵)
+
+### Changed (devDep)
+- 신규 devDep 추가 — babel-plugin-react-compiler / eslint + plugins / tailwindcss + @tailwindcss/vite
+- 런타임 의존 = 변경 0 (React 19 + React Router 7 그대로). 정책 #3 정합
+
+### Performance / Bundle
+- dist js: 303.63 KB raw / **107.53 KB gzip** (+10.2 KB — React Compiler runtime)
+- dist css: 56.37 → 66.63 KB raw / 11.33 → **13.64 KB gzip** (+2.3 KB — Tailwind preflight reset)
+- 빌드 시간: 0.5s → **1.96s** (compiler 분석 + Tailwind purge)
+
+### Notes
+- 사용자-facing 변경 0 (시각·동작 동일)
+- 작가 측 개발 편의 ↑ (자동 메모이제이션 / lint / 향후 atomic class)
+
+---
+
 ## [v0.2.2] — 2026-05-16
 
 ### Changed (운영 — 분리 범위 확장)

@@ -1,0 +1,57 @@
+/* Tailwind v4 entry — CSS-first config (별도 tailwind.config.js 폐기).
+ *
+ * @theme 블록 = Tailwind 가 인식할 디자인 토큰. 기존 tokens.css / mini-game.css /
+ * stickman-murim.css 의 var 들을 시맨틱 utility 로 노출 (예: bg-accent / text-fg).
+ *
+ * 기존 CSS (tokens.css / 슬라이스별 .css) 는 coexist 유지 — 본 파일은 *Tailwind 사용
+ * 컴포넌트* 가 var 를 utility class 로도 쓸 수 있게 노출하는 역할.
+ *
+ * 마이그레이션 = 점진. 새 컴포넌트는 Tailwind class 권장, 기존 컴포넌트는 그대로.
+ * 전략 SSOT: src/shared/styles/tailwind-migration.md
+ */
+
+@import 'tailwindcss';
+
+@theme {
+  /* surface — 기존 tokens.css 의 :root var 와 일치 */
+  --color-bg: #ffffff;
+  --color-bg-soft: #f7f7f5;
+  --color-bg-sunken: #efefec;
+  --color-surface: #ffffff;
+
+  /* text */
+  --color-fg: #16161a;
+  --color-fg-2: #3a3a40;
+  --color-fg-3: #6e6e76;
+  --color-fg-4: #9e9ea6;
+
+  /* accent — ink blue */
+  --color-accent: #3050a0;
+  --color-accent-hover: #1f3878;
+
+  /* rules */
+  --color-rule: #e6e6e2;
+  --color-rule-strong: #cfcfcb;
+
+  /* warn / code */
+  --color-warn-bg: #fff7df;
+  --color-warn-rule: #c89417;
+  --color-warn-fg: #745812;
+  --color-code-bg: #f0efea;
+
+  /* spacing — 기존 --s-* 와 일치 */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 24px;
+  --spacing-6: 32px;
+  --spacing-7: 48px;
+  --spacing-8: 64px;
+  --spacing-9: 96px;
+
+  /* font */
+  --font-sans: "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo",
+               -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
