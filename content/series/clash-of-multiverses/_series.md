@@ -3,7 +3,7 @@ title: 차원의 격돌
 slug: clash-of-multiverses
 status: 연재 중
 started: 2026-05-15
-updated: 2026-05-15
+updated: 2026-05-16
 ---
 
 <!-- © 2026 홍도산. All rights reserved. Original creator work. -->
