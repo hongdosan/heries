@@ -394,6 +394,10 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
   })
 
   const stageRef = useRef<HTMLDivElement | null>(null)
+  // 모바일 가상 패드 (좌측 영역 swipe) — 검기생존록 패턴 정합. 광살검은 1D (가로).
+  const padActiveRef = useRef<{id: number; ox: number} | null>(null)
+  const padBaseRef = useRef<HTMLDivElement | null>(null)
+  const padDotRef = useRef<HTMLDivElement | null>(null)
   const frameRef = useRef<number | null>(null)
   const keysRef = useRef<KeysHeld>({left: false, right: false})
   const lastSpawnRef = useRef<number>(0)
@@ -961,9 +965,76 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
     if (kind === 'dash') dash()
   }, [dash, qiAttack, slashAttack])
 
-  const onPadUp = useCallback((kind: ActionKey) => () => {
-    if (kind === 'left') keysRef.current.left = false
-    if (kind === 'right') keysRef.current.right = false
+  // onPadUp 폐기 — 좌측 [←][→] 버튼이 가상 패드 swipe 로 대체됨.
+  // 우측 액션 버튼 (베기/장풍/이형환위) 은 *탭* 만 — release 추적 불필요.
+
+  // ─── 모바일 가상 패드 (좌측 영역 swipe = 이동, 우측 영역 = 우측 버튼이 처리) ─
+  // 검기생존록 패턴 정합. 광살검은 1D (가로) — dx 부호 + threshold 로 left/right.
+  const PAD_DEAD_ZONE_PX = 14   // 시작점 ±14 안 = 정지
+  const PAD_MAX_R_PX = 56       // dot 시각 이동 한도
+
+  const stageRectToWorldX = useCallback((clientX: number): number | null => {
+    const stage = stageRef.current
+    if (!stage) return null
+    const rect = stage.getBoundingClientRect()
+    if (rect.width <= 0) return null
+    return ((clientX - rect.left) / rect.width) * WORLD_W
+  }, [])
+
+  const onStagePointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    if (stateRef.current.phase !== 'playing') return
+    const x = stageRectToWorldX(e.clientX)
+    if (x == null) return
+    if (x >= WORLD_W / 2) return  // 우측 = 버튼이 처리. 좌측 영역만 가상 패드.
+    padActiveRef.current = {id: e.pointerId, ox: x}
+    const stage = stageRef.current
+    const rect = stage?.getBoundingClientRect()
+    if (rect && padBaseRef.current && padDotRef.current) {
+      const localX = e.clientX - rect.left
+      const localY = e.clientY - rect.top
+      padBaseRef.current.style.left = `${localX}px`
+      padBaseRef.current.style.top = `${localY}px`
+      padBaseRef.current.style.opacity = '1'
+      padDotRef.current.style.left = `${localX}px`
+      padDotRef.current.style.top = `${localY}px`
+      padDotRef.current.style.opacity = '1'
+    }
+  }, [stageRectToWorldX])
+
+  const onStagePointerMove = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    const pad = padActiveRef.current
+    if (!pad || pad.id !== e.pointerId) return
+    const x = stageRectToWorldX(e.clientX)
+    if (x == null) return
+    const dx = x - pad.ox  // WORLD 좌표 dx
+    if (dx > PAD_DEAD_ZONE_PX) {
+      keysRef.current.right = true
+      keysRef.current.left = false
+    } else if (dx < -PAD_DEAD_ZONE_PX) {
+      keysRef.current.left = true
+      keysRef.current.right = false
+    } else {
+      keysRef.current.left = false
+      keysRef.current.right = false
+    }
+    // dot 위치 (시각만, 좌우 한도 PAD_MAX_R_PX)
+    if (padDotRef.current && padBaseRef.current) {
+      const rect = stageRef.current?.getBoundingClientRect()
+      if (rect) {
+        const clamped = Math.max(-PAD_MAX_R_PX, Math.min(PAD_MAX_R_PX, e.clientX - (rect.left + parseFloat(padBaseRef.current.style.left || '0'))))
+        padDotRef.current.style.left = `${parseFloat(padBaseRef.current.style.left || '0') + clamped}px`
+      }
+    }
+  }, [stageRectToWorldX])
+
+  const onStagePointerUp = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
+    const pad = padActiveRef.current
+    if (!pad || pad.id !== e.pointerId) return
+    padActiveRef.current = null
+    keysRef.current.left = false
+    keysRef.current.right = false
+    if (padBaseRef.current) padBaseRef.current.style.opacity = '0'
+    if (padDotRef.current) padDotRef.current.style.opacity = '0'
   }, [])
 
   // ─── 렌더 ─────────────────────────────────────────────────
@@ -983,6 +1054,11 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
         aria-label="광살검"
         onKeyDown={onKeyDown}
         onKeyUp={onKeyUp}
+        onPointerDown={onStagePointerDown}
+        onPointerMove={onStagePointerMove}
+        onPointerUp={onStagePointerUp}
+        onPointerCancel={onStagePointerUp}
+        onContextMenu={(e) => e.preventDefault()}
         style={{width: view.width, height: view.height}}
         autoFocus={autoFocus}
       >
@@ -1131,29 +1207,17 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
             </div>
           </footer>
 
-          {/* 모바일 패드 */}
+          {/* 모바일 가상 패드 (좌측 영역 swipe = 이동) — 검기생존록 정합 */}
+          {phase === 'playing' && !view.isDesktop && (
+            <>
+              <div ref={padBaseRef} className="sm-pad-base" aria-hidden="true" />
+              <div ref={padDotRef} className="sm-pad-dot" aria-hidden="true" />
+            </>
+          )}
+
+          {/* 모바일 액션 버튼 (우측) */}
           {phase === 'playing' && !view.isDesktop && (
             <div className="sm-pad">
-              <div className="sm-pad-group">
-                <button
-                  type="button"
-                  className="sm-pad-btn"
-                  aria-label="왼쪽"
-                  onPointerDown={onPadDown('left')}
-                  onPointerUp={onPadUp('left')}
-                  onPointerCancel={onPadUp('left')}
-                >←
-                </button>
-                <button
-                  type="button"
-                  className="sm-pad-btn"
-                  aria-label="오른쪽"
-                  onPointerDown={onPadDown('right')}
-                  onPointerUp={onPadUp('right')}
-                  onPointerCancel={onPadUp('right')}
-                >→
-                </button>
-              </div>
               <div className="sm-pad-group">
                 <button type="button" className="sm-pad-btn sm-pad-slash" aria-label="베기"
                         onPointerDown={onPadDown('slash')}>베기

@@ -1,6 +1,6 @@
 {
   "name": "heries",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "private": true,
   "description": "H-eries — 작가(홍도산) 의 오리지널 웹 시리즈 컬렉션. React 19 + Vite + TypeScript strict.",
   "type": "module",

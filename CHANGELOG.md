@@ -16,6 +16,21 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 ---
 
+## [v0.2.3] — 2026-05-16
+
+### Changed (광살검 모바일 UX)
+- **좌측 [←][→] 버튼 → 좌측 영역 swipe 가상 패드** (검기생존록 패턴 정합)
+  - 터치한 자리에 반투명 ring + dot (조이스틱) 표시, drag dx 부호로 좌/우 이동
+  - 우측 영역 = 베기·장풍·이형환위 버튼 (기존 유지)
+- **모바일 portrait 시 가로 회전 안내** — `↻ 기기를 가로로 돌려 주세요` 풀스크린 (z-index 200). landscape 회전 시 자동 해제
+- **터치 차단** — `user-select: none`, `touch-action: none`, `-webkit-touch-callout: none`, `-webkit-tap-highlight-color: transparent`, `overscroll-behavior: contain`, `onContextMenu` 차단. 더블탭 확대·텍스트 선택·long-press 메뉴·overscroll bounce 모두 차단
+
+### Notes
+- 사용자 시연 후 OK 확인 → main 직접 commit (release 사이클 단축)
+- v0.3.0 (Compiler/ESLint/Tailwind) 은 develop 에만 보존 — 별도 release 진입 대기
+
+---
+
 ## [v0.2.2] — 2026-05-16
 
 ### Changed (운영 — 분리 범위 확장)
