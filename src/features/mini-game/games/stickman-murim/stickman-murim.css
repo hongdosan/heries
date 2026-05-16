@@ -64,29 +64,6 @@
   position: relative;
 }
 
-/* 모바일 portrait = 가로 강제 안내. landscape 시 자동 사라짐. */
-@media (max-width: 900px) and (orientation: portrait) {
-  .sm-frame::after {
-    content: '↻ 기기를 가로로 돌려 주세요. (PC 권장)';
-    white-space: pre-line;
-    line-height: 1.5;
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: color-mix(in srgb, var(--sm-bg) 96%, transparent);
-    color: var(--sm-accent-bright);
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-align: center;
-    z-index: 200;
-    padding: 24px;
-    pointer-events: auto;
-  }
-}
-
 /* sm-stage 의 모든 자식 요소 = 터치 콜아웃·선택 차단 */
 .sm-stage,
 .sm-stage * {
@@ -620,13 +597,12 @@
   transition: width 0.15s linear;
 }
 
-/* 모바일 액션 버튼 (우측만) — 가로 모바일에서 가용 height 좁아 bottom 작게.
-   safe-area-inset 보강으로 iOS 노치 영역 침범 차단. */
+/* 모바일 액션 버튼 (우측만) */
 .sm-pad {
   position: absolute;
-  bottom: max(12px, env(safe-area-inset-bottom));
-  right: max(12px, env(safe-area-inset-right));
-  padding: 0;
+  bottom: 96px;
+  right: 0;
+  padding: 0 12px;
   display: flex;
   justify-content: flex-end;
   z-index: 70;
@@ -667,40 +643,24 @@
 }
 
 .sm-pad-btn {
-  /* 라벨 길이에 따라 폭 자동 fit (4자 = 이형환위). 최소 폭 56 유지. */
-  min-width: 56px;
+  width: 56px;
   height: 56px;
-  padding: 0 10px;
   border-radius: 18px;
   border: none;
   font-weight: 900;
   font-size: 14px;
   cursor: pointer;
   touch-action: none;
-  /* 라벨 줄바꿈 금지 + flex center 로 글자 가운데 정렬. */
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
   background: color-mix(in srgb, var(--sm-fg) 15%, transparent);
   color: var(--sm-fg);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 12px color-mix(in srgb, #000 40%, transparent);
-  transition: transform 0.08s ease-out, background 0.18s ease-out, opacity 0.18s ease-out;
+  transition: transform 0.08s ease-out, background 0.18s ease-out;
 }
 
 .sm-pad-btn:active {
   transform: scale(0.92);
   background: color-mix(in srgb, var(--sm-fg) 28%, transparent);
-}
-
-.sm-pad-btn:disabled,
-.sm-pad-btn.is-disabled {
-  opacity: 0.42;
-  cursor: not-allowed;
-  filter: grayscale(0.4);
-  pointer-events: none;
 }
 
 .sm-pad-slash {
@@ -732,52 +692,18 @@
   justify-content: center;
   background: color-mix(in srgb, #000 78%, transparent);
   backdrop-filter: blur(2px);
-  padding: 12px;
-  /* 카드가 viewport 보다 크면 스크롤 (가로 모바일 좁은 height 대응). */
-  overflow: auto;
+  padding: 20px;
 }
 
 .sm-overlay-card {
-  max-width: min(320px, 92%);
-  max-height: 100%;
-  overflow: auto;
+  max-width: 320px;
   border-radius: 24px;
   border: 1px solid color-mix(in srgb, var(--sm-accent-bright) 18%, transparent);
   background: color-mix(in srgb, var(--sm-fg) 8%, transparent);
-  padding: 20px;
+  padding: 24px;
   text-align: center;
   box-shadow: 0 22px 60px color-mix(in srgb, #000 70%, transparent);
   animation: sm-overlay-pop 0.2s ease-out;
-}
-
-/* 가로 모바일 — 카드 콘텐츠 컴팩트 (height 좁아 잘림 방지). */
-@media (max-height: 480px) {
-  .sm-overlay-card {
-    padding: 14px 18px;
-    border-radius: 16px;
-  }
-  .sm-overlay-emoji {
-    font-size: 32px;
-    margin-bottom: 4px;
-  }
-  .sm-overlay-title {
-    font-size: 22px;
-    margin: 0 0 4px;
-  }
-  .sm-overlay-desc {
-    font-size: 12px;
-    margin: 0 0 10px;
-    line-height: 1.4;
-  }
-  .sm-overlay-btn {
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 12px;
-  }
-  .sm-overlay-keys {
-    margin: 6px 0 0;
-    font-size: 10px;
-  }
 }
 
 @keyframes sm-overlay-pop {

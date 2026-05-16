@@ -16,35 +16,28 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 ---
 
-## [v0.2.5] — 2026-05-17
+## [v0.2.6] — 2026-05-17
 
-### Fixed (모바일 패드·오버레이 영역 잘림 — v0.2.4 hotfix)
-- **JSX 구조 변경** — `sm-pad` (액션 버튼) + `sm-overlay` (시작/재시작 카드) → `sm-frame` 자식 (이전 = `sm-world` 안 = `transform: scale(view.scale)` 영역에 갇혀 모바일에서 작아짐). `sm-pad-base/dot` 가상 패드는 `sm-stage` 자식 (`sm-world` 밖) 으로 (좌표 stage rect 기준 유지)
-- **iOS Safari `<dialog>` 위치 보정** — 모바일 `mini-game-dialog` 에 `position: fixed; inset: 0; margin: 0;` 명시 + `safe-area-inset` padding 4 방향 → 노치·홈 인디케이터 영역 침범 차단
-- **`sm-pad` 안전 영역 정합** — `bottom: max(12px, env(safe-area-inset-bottom))` / `right: max(12px, env(safe-area-inset-right))` (이전 `bottom: 96px` 가 모바일 좁은 가로 height 에서 화면 위로 침범)
-- **`sm-overlay` 카드 컴팩트 모드** — `max-height: 100%; overflow: auto` + `@media (max-height: 480px)` 시 emoji 56→32 / title 32→22 / btn padding 16→10 (가로 모바일 좁은 height 에서 카드 잘림 차단)
-- **`mini-game-frame--landscape` 모바일 height 단순화** — `calc(100dvh - head - s-3)` → `100%` (부모 card 가 이미 safe-area 차감)
+### Reverted
+- **v0.2.4 / v0.2.5 모바일 변경 일괄 revert** — iOS 모바일에서 화면 자체 잘림 + 검기생존록 9:16 비율 깨짐 야기. v0.2.3 (`b5eaf3c`) 상태로 코드 복원
+- v0.2.4 / v0.2.5 tag 는 history 보존 (이후 참고용)
 
-### Notes
-- 사용자 보고 3 결함 (모바일 버튼 안 보임 / 시작·재시작 창 잘림 / 화면 잘림) 일괄 해결
-- v0.2.4 직후 hotfix patch — main 직접 commit (사용자 명시)
+### Fixed (광살검 무조건 fit)
+- **`stickman-murim.tsx` fit() `STAGE_FIT_MIN_W/H` 폐기** — `Math.max(MIN, rect)` 가 viewport 가용 height (가로 모바일 ~322px) 보다 큰 `MIN_H = 420` 강제 → stage viewport 밖 삐져나옴. MIN 폐기로 "어떤 화면이든 fit" 보장. rect 0 시만 skip
+- **`frame--landscape` min-height 동적** — `420px` → `min(420px, calc(100dvh - 120px))` (viewport 짧으면 자동 축소, 큰 viewport 는 420 floor 유지)
+- **`sm-frame::after` 가로 회전 풀스크린 안내 폐기** — 게임 영역 가림 + 디자인 부적합. PC 권장 안내는 select intro 로 이동
+- **모바일 헤더 슬림** — `--mg-dialog-head` 48 → 36, padding s-2 s-3 → 2px s-2, close 44 → 28, title font fs-md → fs-sm (가용 게임 height 증가)
+- **`dialog-body` padding `s-2`** — 게임 frame 과 dialog 경계 분리 (이전 = 딱 붙음)
 
----
-
-## [v0.2.4] — 2026-05-17
-
-### Changed (광살검 패드 + 모바일 viewport)
-- **장풍 버튼 비활성화** — 내공 < 14 시 `disabled` + opacity 0.42 + grayscale + `cursor: not-allowed` (이전 = 누를 수 있으나 무동작)
-- **이형환위 버튼 비활성화** — 내공 < 31 시 동일 disabled 시각 (기존 `sm-pad-cd` 게이지 위에 disabled 보강)
-- **이형환위 라벨 줄바꿈 차단 + 가운데 정렬** — `.sm-pad-btn { white-space: nowrap; display: inline-flex; align-items/justify-content: center; min-width: 56px; padding: 0 10px }`. 라벨 길이에 따라 폭 자동 fit + 글자 가운데
-- **모바일 viewport 정합** — `index.html` viewport meta = `maximum-scale=1.0, user-scalable=no, viewport-fit=cover` 강화 → 더블탭 확대 차단 (iOS Safari 포함)
-- **mini-game dialog 풀스크린 진입** — 게임 카드 클릭 시 `dialog.requestFullscreen()` 호출. 브라우저 chrome (주소창·뒤로가기) 자체 숨김 → 게임 영역 viewport 전체 fit. iOS Safari 는 미지원 → dvh fallback (chrome 영역 dvh 반영). 메뉴 복귀·dialog 닫기 시 `document.exitFullscreen()` 자동 해제
-- **PWA hint meta 추가** — `mobile-web-app-capable` / `apple-mobile-web-app-capable` / `apple-mobile-web-app-status-bar-style=black-translucent` (홈 화면 추가 시 chrome 자동 숨김)
-- **가로 안내 문구 보강** — `↻ 기기를 가로로 돌려 주세요. (PC 권장)`
+### Changed
+- **PC 환경 권장 안내** — `mini-game-select-intro` 안에 `(PC 환경 권장)` 한 줄 추가 (모든 미니 게임 공통, 메뉴 화면 1회 안내)
+- **`mini-game-select` grid** — `minmax(200px, 1fr)` → `minmax(min(200px, 100%), 1fr)` (좁은 viewport 시 단일 컬럼 fallback, 우측 overflow 차단)
+- **`mini-game-select-card` 컴팩트** — padding s-5 s-4 → s-3, height 148 → min-height 128, emoji fs-2xl → fs-xl, title fs-md → fs-sm + nowrap ellipsis, desc 2줄 → 1줄 nowrap ellipsis (좁은 card 폭 글씨 잘림 차단)
 
 ### Notes
-- main 직접 commit (사용자 명시 "main 브랜치 0.2.4 버전 진행")
-- v0.3.0 (Compiler/ESLint/Tailwind) 은 develop 에만 보존 — 별도 release 대기
+- 검증: typecheck 0 / vite build 0 / check-secrets 0
+- 사용자 시연 후 v0.2.4 / v0.2.5 의 모바일 결함 호소 → 즉시 롤백 + fit 본질 해결 + UI 정합 동시 처리
+- 단일 push 로 사이트 안정 복구 + 광살검 무조건 fit + 미니 게임 메뉴 정합 적용
 
 ---
 

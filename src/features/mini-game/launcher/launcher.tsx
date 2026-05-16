@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
-import { MINI_GAMES, findGame } from '../catalog.js'
+import {type MouseEvent as ReactMouseEvent, useCallback, useEffect, useRef, useState} from 'react'
+import {findGame, MINI_GAMES} from '../catalog.js'
 
 // floating 트리거 + native <dialog>.
 // 흐름: 트리거 → 게임 선택 화면 → 카드 클릭 → 게임 마운트 → ← 메뉴 → 선택 화면 ...
@@ -18,24 +18,10 @@ export function MiniGameLauncher() {
 
   const closeDialog = useCallback(() => {
     setOpen(false)
-    if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
   }, [])
 
   const backToMenu = useCallback(() => {
     setSelectedId(null)
-    // 메뉴 복귀 시 fullscreen 해제 (게임만 풀스크린 의도).
-    if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
-  }, [])
-
-  // 게임 카드 클릭 = 게임 시작. 모바일 브라우저 chrome (주소창·뒤로가기) 가
-  // 게임 화면을 가리는 문제 해결 위해 dialog 자체에 Fullscreen API 진입.
-  // iOS Safari 는 Fullscreen API 미지원 — try/catch 무동작 fallback (안드로이드 Chrome 정상).
-  const startGame = useCallback((id: string) => {
-    setSelectedId(id)
-    const dlg = dialogRef.current
-    if (dlg && !document.fullscreenElement && dlg.requestFullscreen) {
-      dlg.requestFullscreen({ navigationUI: 'hide' }).catch(() => {})
-    }
   }, [])
 
   // open state ↔ dialog showModal / close 동기화.
@@ -43,7 +29,11 @@ export function MiniGameLauncher() {
     const dlg = dialogRef.current
     if (!dlg) return
     if (open && !dlg.open) {
-      try { dlg.showModal() } catch { dlg.setAttribute('open', '') }
+      try {
+        dlg.showModal()
+      } catch {
+        dlg.setAttribute('open', '')
+      }
     } else if (!open && dlg.open) {
       dlg.close()
     }
@@ -61,7 +51,7 @@ export function MiniGameLauncher() {
       if (e.target instanceof Node && dialogRef.current?.contains(e.target)) return
       e.preventDefault()
     }
-    globalThis.addEventListener('touchmove', blockTouch, { passive: false })
+    globalThis.addEventListener('touchmove', blockTouch, {passive: false})
     return () => {
       body.style.overflow = previousOverflow
       body.style.touchAction = previousTouchAction
@@ -71,7 +61,6 @@ export function MiniGameLauncher() {
 
   const onDialogClose = useCallback(() => {
     setOpen(false)
-    if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
   }, [])
 
   const onDialogClick = useCallback((e: ReactMouseEvent<HTMLDialogElement>) => {
@@ -120,7 +109,8 @@ export function MiniGameLauncher() {
               className="mini-game-dialog-close"
               aria-label="닫기"
               onClick={closeDialog}
-            >✕</button>
+            >✕
+            </button>
           </header>
 
           {/* 게임 선택 화면 — selected 없을 때 항상 표시 */}
@@ -128,8 +118,9 @@ export function MiniGameLauncher() {
             <div className="mini-game-dialog-body mini-game-select">
               <p className="mini-game-select-intro">
                 {MINI_GAMES.length === 1
-                  ? '게임을 골라 시작하세요.'
-                  : `${MINI_GAMES.length} 개의 게임 중 하나를 골라 시작하세요.`}
+                  ? '게임을 골라 시작하세요. '
+                  : `${MINI_GAMES.length} 개의 게임 중 하나를 골라 시작하세요. `}
+                (PC 환경 권장)
               </p>
               <ul className="mini-game-select-list">
                 {MINI_GAMES.map((g) => (
@@ -137,7 +128,7 @@ export function MiniGameLauncher() {
                     <button
                       type="button"
                       className="mini-game-select-card"
-                      onClick={() => startGame(g.id)}
+                      onClick={() => setSelectedId(g.id)}
                     >
                       <span className="mini-game-select-emoji" aria-hidden="true">{g.emoji}</span>
                       <span className="mini-game-select-title">{g.title}</span>
@@ -154,7 +145,7 @@ export function MiniGameLauncher() {
           {/* 선택된 게임 마운트 */}
           {open && selected && (
             <div className="mini-game-dialog-body">
-              <selected.component autoFocus={true} />
+              <selected.component autoFocus={true}/>
             </div>
           )}
         </div>
