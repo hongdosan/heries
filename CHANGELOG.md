@@ -16,6 +16,23 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 ---
 
+## [v0.2.2] — 2026-05-16
+
+### Changed (운영 — 분리 범위 확장)
+- **`.claude/harness/harness-state.md` 분리** — 작가 운영 *engineering* 측면 (변경 이력 누적 SSOT) → `.private-config/heries/claude/harness/harness-state.md` + 심링크
+- **`.env.local` 분리** — `VITE_AUTHOR_KEY` 등 작가 시크릿 → `.private-config/heries/frontend/env/.env.local` + 심링크. private repo 안에서 git 추적 가능 (이전 = gitignore 로 회피)
+
+### Updated
+- `scripts/init-private.sh` — 파일 심링크 (디렉토리 아닌) 도 처리 (`harness-state.md`, `.env.local`)
+- `.gitignore` — 신규 심링크 2 경로 추가
+- `.claude/harness/private-config.md` — 매핑 표 + 미분리 항목 갱신
+
+### Notes
+- `.claude/harness/` 의 나머지 (`harness.md`, `harness-setup.md`, `harness-install.md`, `git-strategy.md`, `private-config.md`) = 공개 유지 (정책·가이드 = OSS·외부 참고 가치)
+- 사용자-facing 변경 0 (배포·빌드 동작 동일)
+
+---
+
 ## [v0.2.1] — 2026-05-16
 
 ### Added (운영)

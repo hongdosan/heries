@@ -11,22 +11,27 @@
 | 메인 경로 (심링크) | → | 실제 위치 (`.private-config/heries/` 안) |
 |---|---|---|
 | `.claude/handoff/` | → | `.private-config/heries/claude/handoff/` |
+| `.claude/harness/harness-state.md` | → | `.private-config/heries/claude/harness/harness-state.md` |
 | `.claude/workflow/plan/` | → | `.private-config/heries/claude/workflow/plan/` |
 | `.claude/workflow/prompt/custom/` | → | `.private-config/heries/claude/workflow/prompt/custom/` |
+| `.env.local` | → | `.private-config/heries/frontend/env/.env.local` |
 
-`.gitignore` 가 위 3 심링크를 무시 — 본 repo (공개) 에 노출되지 않음.
+`.gitignore` 가 위 심링크들을 무시 — 본 repo (공개) 에 노출되지 않음.
 
 ## 2. 분리 자료 / 미분리 자료
 
 ### 분리 (`.private-config/heries/` 안)
-- **세션 핸드오프** (`CURRENT.md`) — 작업 상태·다음 단계 등 내부 메모
-- **작업 계획** (`workflow/plan/ep-NN/*`) — 챕터 작성 단계·시놉시스 협의·검토 사이클 디테일
-- **커스텀 프롬프트** (`workflow/prompt/custom/*`) — 작가 운영 노하우, 시리즈별 프롬프트 변형
+- **세션 핸드오프** (`claude/handoff/CURRENT.md`, `handoff.md`) — 작업 상태·다음 단계 등 내부 메모
+- **하네스 작업 이력** (`claude/harness/harness-state.md`) — 변경 이력 누적 SSOT (작가 운영 *engineering*)
+- **작업 계획** (`claude/workflow/plan/ep-NN/*`) — 챕터 작성 단계·시놉시스 협의·검토 사이클 디테일
+- **커스텀 프롬프트** (`claude/workflow/prompt/custom/*`) — 작가 운영 노하우, 시리즈별 프롬프트 변형
+- **시크릿 env** (`frontend/env/.env.local`) — `VITE_AUTHOR_KEY` 등 작가 키. git 추적 가능한 안전한 위치 (private repo)
 
 ### 미분리 (공개 repo 그대로)
 - `.claude/agents/heries-*.md` — 에이전트 정의 (운영 SSOT, 외부 참고 가치)
 - `.claude/skills/` — 스킬 정의
-- `.claude/CLAUDE.md`, `.claude/harness/` — 핵심 정책 + 본 문서 포함
+- `.claude/CLAUDE.md` — 핵심 정책 SSOT
+- `.claude/harness/{harness.md, harness-setup.md, harness-install.md, git-strategy.md, private-config.md}` — 정책·가이드 (OSS·외부 참고 가치)
 - `.claude/workflow/{workflow.md, template/}` — 일반 워크플로우 + 템플릿
 - 콘텐츠 (`content/series/.../{chapters,characters,worldbuilding,...}`) — 작품 본문. 작가 분기 절은 runtime 마스킹 (`/unlock` 게이트) 으로 별도 보호
 

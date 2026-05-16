@@ -49,5 +49,6 @@ content/_legacy_*/
 # 본 심링크는 scripts/init-private.sh 가 로컬에서 재생성.
 # 절차: .claude/harness/private-config.md
 .claude/handoff
+.claude/harness/harness-state.md
 .claude/workflow/plan
 .claude/workflow/prompt/custom

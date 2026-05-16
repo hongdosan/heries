@@ -24,8 +24,10 @@ echo "▸ .private-config/heries → .claude/ 심링크 생성"
 # 형식: "메인 심링크 위치|상대 target"
 LINKS=(
   ".claude/handoff|../.private-config/heries/claude/handoff"
+  ".claude/harness/harness-state.md|../../.private-config/heries/claude/harness/harness-state.md"
   ".claude/workflow/plan|../../.private-config/heries/claude/workflow/plan"
   ".claude/workflow/prompt/custom|../../../.private-config/heries/claude/workflow/prompt/custom"
+  ".env.local|.private-config/heries/frontend/env/.env.local"
 )
 
 for entry in "${LINKS[@]}"; do
@@ -35,8 +37,10 @@ for entry in "${LINKS[@]}"; do
   # 부모 디렉토리 확보
   mkdir -p "$(dirname "$LINK")"
 
-  # 기존 링크/디렉토리 제거 (디렉토리는 비어있을 때만 안전)
+  # 기존 링크/파일/디렉토리 제거 (디렉토리는 비어있을 때만 안전)
   if [ -L "$LINK" ]; then
+    rm "$LINK"
+  elif [ -f "$LINK" ]; then
     rm "$LINK"
   elif [ -d "$LINK" ]; then
     # 비어있는 디렉토리만 안전하게 제거. 비어있지 않으면 사용자 개입 필요.
