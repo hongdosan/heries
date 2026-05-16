@@ -620,12 +620,13 @@
   transition: width 0.15s linear;
 }
 
-/* 모바일 액션 버튼 (우측만) */
+/* 모바일 액션 버튼 (우측만) — 가로 모바일에서 가용 height 좁아 bottom 작게.
+   safe-area-inset 보강으로 iOS 노치 영역 침범 차단. */
 .sm-pad {
   position: absolute;
-  bottom: 96px;
-  right: 0;
-  padding: 0 12px;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  right: max(12px, env(safe-area-inset-right));
+  padding: 0;
   display: flex;
   justify-content: flex-end;
   z-index: 70;
@@ -731,18 +732,52 @@
   justify-content: center;
   background: color-mix(in srgb, #000 78%, transparent);
   backdrop-filter: blur(2px);
-  padding: 20px;
+  padding: 12px;
+  /* 카드가 viewport 보다 크면 스크롤 (가로 모바일 좁은 height 대응). */
+  overflow: auto;
 }
 
 .sm-overlay-card {
-  max-width: 320px;
+  max-width: min(320px, 92%);
+  max-height: 100%;
+  overflow: auto;
   border-radius: 24px;
   border: 1px solid color-mix(in srgb, var(--sm-accent-bright) 18%, transparent);
   background: color-mix(in srgb, var(--sm-fg) 8%, transparent);
-  padding: 24px;
+  padding: 20px;
   text-align: center;
   box-shadow: 0 22px 60px color-mix(in srgb, #000 70%, transparent);
   animation: sm-overlay-pop 0.2s ease-out;
+}
+
+/* 가로 모바일 — 카드 콘텐츠 컴팩트 (height 좁아 잘림 방지). */
+@media (max-height: 480px) {
+  .sm-overlay-card {
+    padding: 14px 18px;
+    border-radius: 16px;
+  }
+  .sm-overlay-emoji {
+    font-size: 32px;
+    margin-bottom: 4px;
+  }
+  .sm-overlay-title {
+    font-size: 22px;
+    margin: 0 0 4px;
+  }
+  .sm-overlay-desc {
+    font-size: 12px;
+    margin: 0 0 10px;
+    line-height: 1.4;
+  }
+  .sm-overlay-btn {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 12px;
+  }
+  .sm-overlay-keys {
+    margin: 6px 0 0;
+    font-size: 10px;
+  }
 }
 
 @keyframes sm-overlay-pop {

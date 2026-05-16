@@ -1208,65 +1208,65 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
             </div>
           </footer>
 
-          {/* 모바일 가상 패드 (좌측 영역 swipe = 이동) — 검기생존록 정합 */}
-          {phase === 'playing' && !view.isDesktop && (
-            <>
-              <div ref={padBaseRef} className="sm-pad-base" aria-hidden="true" />
-              <div ref={padDotRef} className="sm-pad-dot" aria-hidden="true" />
-            </>
-          )}
-
-          {/* 모바일 액션 버튼 (우측) */}
-          {phase === 'playing' && !view.isDesktop && (
-            <div className="sm-pad">
-              <div className="sm-pad-group">
-                <button type="button" className="sm-pad-btn sm-pad-slash" aria-label="베기"
-                        onPointerDown={onPadDown('slash')}>베기
-                </button>
-                <button
-                  type="button"
-                  className={'sm-pad-btn sm-pad-qi' + (qiReady ? '' : ' is-disabled')}
-                  aria-label="장풍"
-                  aria-disabled={!qiReady}
-                  disabled={!qiReady}
-                  onPointerDown={onPadDown('qi')}
-                >장풍
-                </button>
-                <button
-                  type="button"
-                  className={'sm-pad-btn sm-pad-dash' + (dashReady ? '' : ' sm-pad-cd is-disabled')}
-                  aria-label="이형환위"
-                  aria-disabled={!dashReady}
-                  disabled={!dashReady}
-                  onPointerDown={onPadDown('dash')}
-                  style={{'--sm-cd': dashCdFraction} as CSSProperties}
-                >이형환위
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* 시작 / 오버 오버레이 */}
-          {phase !== 'playing' && (
-            <div className="sm-overlay">
-              <div className="sm-overlay-card">
-                <div className="sm-overlay-emoji" aria-hidden="true">🥋</div>
-                <h1 className="sm-overlay-title">광살검</h1>
-                <p className="sm-overlay-desc">
-                  {phase === 'over'
-                    ? `협객이 쓰러졌다. 강호로 다시 나서라.`
-                    : '몰려오는 자객을 무찔러라.'}
-                </p>
-                <p className="sm-overlay-desc">{`점수: ${score}`}</p>
-                <button type="button" className="sm-overlay-btn" onClick={reset}>
-                  {phase === 'over' ? `다시 강호로` : '강호 입장'}
-                </button>
-                <p className="sm-overlay-keys"> 방향키 이동 · Space 베기 · Shift 이형환위 · Z 장풍</p>
-              </div>
-            </div>
-          )}
         </div>
+        {/* 모바일 가상 패드 (좌측 영역 swipe = 이동) — sm-world 밖 (scale 영향 X), sm-stage 자식 (좌표 stage rect 기준). */}
+        {phase === 'playing' && !view.isDesktop && (
+          <>
+            <div ref={padBaseRef} className="sm-pad-base" aria-hidden="true" />
+            <div ref={padDotRef} className="sm-pad-dot" aria-hidden="true" />
+          </>
+        )}
       </div>
+
+      {/* 모바일 액션 버튼 (우측) — sm-frame 자식 (viewport 전체 우하단 정합). */}
+      {phase === 'playing' && !view.isDesktop && (
+        <div className="sm-pad">
+          <div className="sm-pad-group">
+            <button type="button" className="sm-pad-btn sm-pad-slash" aria-label="베기"
+                    onPointerDown={onPadDown('slash')}>베기
+            </button>
+            <button
+              type="button"
+              className={'sm-pad-btn sm-pad-qi' + (qiReady ? '' : ' is-disabled')}
+              aria-label="장풍"
+              aria-disabled={!qiReady}
+              disabled={!qiReady}
+              onPointerDown={onPadDown('qi')}
+            >장풍
+            </button>
+            <button
+              type="button"
+              className={'sm-pad-btn sm-pad-dash' + (dashReady ? '' : ' sm-pad-cd is-disabled')}
+              aria-label="이형환위"
+              aria-disabled={!dashReady}
+              disabled={!dashReady}
+              onPointerDown={onPadDown('dash')}
+              style={{'--sm-cd': dashCdFraction} as CSSProperties}
+            >이형환위
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 시작 / 오버 오버레이 — sm-frame 자식 (viewport 전체 cover, scale 영향 X). */}
+      {phase !== 'playing' && (
+        <div className="sm-overlay">
+          <div className="sm-overlay-card">
+            <div className="sm-overlay-emoji" aria-hidden="true">🥋</div>
+            <h1 className="sm-overlay-title">광살검</h1>
+            <p className="sm-overlay-desc">
+              {phase === 'over'
+                ? `협객이 쓰러졌다. 강호로 다시 나서라.`
+                : '몰려오는 자객을 무찔러라.'}
+            </p>
+            <p className="sm-overlay-desc">{`점수: ${score}`}</p>
+            <button type="button" className="sm-overlay-btn" onClick={reset}>
+              {phase === 'over' ? `다시 강호로` : '강호 입장'}
+            </button>
+            <p className="sm-overlay-keys"> 방향키 이동 · Space 베기 · Shift 이형환위 · Z 장풍</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
