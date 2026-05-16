@@ -16,6 +16,27 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 ---
 
+## [v0.2.1] — 2026-05-16
+
+### Added (운영)
+- **프라이빗 서브모듈 `.private-config` 도입** — 천기망 (`martial-arts-config`) 의 `heries/` 폴더 정합
+  - `.claude/handoff/` → `.private-config/heries/claude/handoff/` 분리 + 심링크
+  - `.claude/workflow/plan/` → 동일 분리 + 심링크
+  - `.claude/workflow/prompt/custom/` → 동일 분리 + 심링크
+- `scripts/init-private.sh` 신규 — clone 후 심링크 자동 생성 (작가/외부 기여자 모두)
+- `.claude/harness/private-config.md` 신규 — 서브모듈 운영 SSOT (동작 원리·시나리오·트러블슈팅)
+
+### Changed
+- `README.md` 빠른 시작 = 서브모듈 권한 유무 따른 2 흐름 안내 + 브랜치 전략·프라이빗 자료 섹션 추가
+- `.gitignore` = 심링크 3 경로 추가 (`.claude/handoff`, `.claude/workflow/plan`, `.claude/workflow/prompt/custom`)
+- 사용자 메모리 `feedback_main_only_user_commits.md` (3 branch 전략 v2 + 서브모듈 정합)
+
+### Notes
+- 본 변경은 사용자-facing 0 — 작가 운영 흐름·UX 변경만. 사이트 빌드·배포 동작 동일
+- 미분리 (공개 repo 유지): `.claude/agents`, `.claude/skills`, `.claude/CLAUDE.md`, `.claude/harness/*`, `.claude/workflow/{workflow.md, template/}` — OSS·외부 참고 가치
+
+---
+
 ## [v0.2.0] — 2026-05-16
 
 ### Added (작품)
