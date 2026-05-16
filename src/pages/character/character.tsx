@@ -75,24 +75,25 @@ export function CharacterPage() {
         {fm.role && <p className="subtitle">{fm.role}</p>}
       </header>
 
-      {fm.summary && (
-        <aside
-          className="character-summary"
-          aria-label="한입 요약"
-          dangerouslySetInnerHTML={{ __html: renderInline(String(fm.summary)) }}
-        />
-      )}
-
       <div className="character-body">
-        {hasMeta ? (
+        {(hasMeta || fm.summary) ? (
           <aside className="character-meta-aside">
-            <dl className="meta-card">
-              {fm.origin && (<><dt>원작</dt><dd dangerouslySetInnerHTML={{ __html: renderInline(String(fm.origin)) }} /></>)}
-              {fm.affiliation && (<><dt>소속</dt><dd dangerouslySetInnerHTML={{ __html: renderInline(String(fm.affiliation)) }} /></>)}
-              {fm.first_appearance && (<><dt>첫 등장</dt><dd>{fm.first_appearance}</dd></>)}
-              {aliases.length > 0 && (<><dt>이명</dt><dd dangerouslySetInnerHTML={{ __html: aliases.map((a) => renderInline(String(a))).join(' · ') }} /></>)}
-              {heriesArc && (<><dt className="author-only-label">소환 시점 <span className="author-only-badge">AUTHOR</span></dt><dd className="author-only-value" dangerouslySetInnerHTML={{ __html: renderInline(heriesArc) }} /></>)}
-            </dl>
+            {fm.summary && (
+              <p
+                className="character-summary"
+                aria-label="한입 요약"
+                dangerouslySetInnerHTML={{ __html: renderInline(String(fm.summary)) }}
+              />
+            )}
+            {hasMeta && (
+              <dl className="meta-card">
+                {fm.origin && (<><dt>원작</dt><dd dangerouslySetInnerHTML={{ __html: renderInline(String(fm.origin)) }} /></>)}
+                {fm.affiliation && (<><dt>소속</dt><dd dangerouslySetInnerHTML={{ __html: renderInline(String(fm.affiliation)) }} /></>)}
+                {fm.first_appearance && (<><dt>첫 등장</dt><dd>{fm.first_appearance}</dd></>)}
+                {aliases.length > 0 && (<><dt>이명</dt><dd dangerouslySetInnerHTML={{ __html: aliases.map((a) => renderInline(String(a))).join(' · ') }} /></>)}
+                {heriesArc && (<><dt className="author-only-label">소환 시점 <span className="author-only-badge">AUTHOR</span></dt><dd className="author-only-value" dangerouslySetInnerHTML={{ __html: renderInline(heriesArc) }} /></>)}
+              </dl>
+            )}
           </aside>
         ) : <span />}
         <article
