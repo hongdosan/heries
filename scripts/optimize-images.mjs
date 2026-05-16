@@ -16,17 +16,17 @@ import process from 'node:process'
 const IMG_RE = /\.(webp|jpg|jpeg|png)$/i
 const SHARP_CLI = 'sharp-cli@latest'
 
-function findImageDirs(root) {
+function findImageDirs() {
   // Returns all directories that hold thumbnail/cover images. Recurses into
-  // content/_shared/** (mini-game/ 등 하위 sprite 폴더 포함) +
-  // content/series/*/thumbnails (chapter-images/ 등 포함).
+  // src/shared/images/** (mini-game/ 등 하위 sprite 폴더 포함, 코드 자산) +
+  // content/series/*/thumbnails (작가 자산 — chapter-images/ 등 포함).
   const out = []
   try {
-    const sharedDir = join(root, '_shared')
+    const sharedDir = 'src/shared/images'
     if (statSync(sharedDir).isDirectory()) walkDirs(sharedDir, out)
   } catch {}
   try {
-    const seriesDir = join(root, 'series')
+    const seriesDir = 'content/series'
     for (const slug of readdirSync(seriesDir)) {
       const thumbs = join(seriesDir, slug, 'thumbnails')
       try {
@@ -53,7 +53,7 @@ function humanKB(bytes) {
   return (bytes / 1024).toFixed(0) + ' KB'
 }
 
-const dirs = findImageDirs('content')
+const dirs = findImageDirs()
 if (dirs.length === 0) {
   console.log('no thumbnail directories found.')
   process.exit(0)

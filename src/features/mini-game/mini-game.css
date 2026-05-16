@@ -63,12 +63,14 @@
 .mini-game-dialog {
   --mg-dialog-gap: var(--s-5);     /* viewport 와 dialog 사이 여백 (24px 기준) */
   --mg-dialog-head: var(--s-8);    /* 헤더 height 추정 (64px 기준, 실제 padding+font 약 48-56px) */
-  --mg-dialog-frame-max: clamp(360px, 60vw, 480px); /* 게임 frame max width */
+  --mg-dialog-frame-max: clamp(360px, 60vw, 480px); /* 9:16 세로형 frame max width */
   border: 0;
   padding: 0;
   background: transparent;
   margin: auto;
-  width: clamp(280px, 92vw, 540px);
+  /* 가로형 게임 (광살검 = 820×460) 수용을 위해 max 키움.
+   * 세로형 게임은 frame 안에서 자체 max-width 480 으로 가운데 정렬. */
+  width: clamp(280px, 96vw, 960px);
   max-height: calc(100dvh - var(--mg-dialog-gap));
   height: auto;
   color: var(--fg);
@@ -190,11 +192,20 @@
   overscroll-behavior: contain;
 }
 
-/* mini-game-frame 은 9:16 고정. width 우선 fit 후, height 가 부족하면 height 우선. */
+/* mini-game-frame 은 9:16 고정 (세로형). width 우선 fit 후, height 가 부족하면 height 우선. */
 .mini-game-dialog-body .mini-game-frame {
   width: min(100%, calc((100dvh - var(--mg-dialog-gap) - var(--mg-dialog-head) - var(--s-5)) * 9 / 16));
   max-width: var(--mg-dialog-frame-max);
   height: auto;
+}
+
+/* 가로형 게임은 9:16 강제 미적용. dialog 가용 공간 100% 활용 후 게임 자체 fit. */
+.mini-game-dialog-body .mini-game-frame--landscape {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: calc(100dvh - var(--mg-dialog-gap) - var(--mg-dialog-head) - var(--s-5));
+  min-height: 320px;
 }
 
 @media (max-width: 640px) {
@@ -232,6 +243,14 @@
     max-width: 100%;
     max-height: calc(100dvh - var(--mg-dialog-head) - var(--s-3));
   }
+  /* 가로형 — viewport 전체 가로 활용 (portrait 모바일에서도 풀폭). */
+  .mini-game-dialog-body .mini-game-frame--landscape {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    max-height: calc(100dvh - var(--mg-dialog-head) - var(--s-3));
+    min-height: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -264,11 +283,14 @@
 .mini-game-select-list {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 24vw, 200px), 1fr));
+  /* 카드 가로폭 균등 — 각 카드는 cell 의 1fr 차지, min-width 0 으로 content
+   * 길이에 따른 trace 확장 차단. dialog 가 넓어지면 카드 폭도 동등하게 ↑. */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--s-3);
   width: 100%;
+  max-width: 640px;  /* 카드 ≥3 일 때도 한 줄 안 너무 옆으로 퍼지지 않도록 제한 */
 }
 
 .mini-game-select-card {
@@ -286,6 +308,11 @@
   transition: border-color var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
   font: inherit;
   text-align: center;
+  /* 카드 가로폭·세로폭 모두 균등 강제. height 고정 + content overflow ellipsis. */
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  height: 148px;
 }
 
 .mini-game-select-card:hover {
@@ -308,7 +335,14 @@
 .mini-game-select-desc {
   font-size: var(--fs-sm);
   color: var(--fg-3);
-  line-height: 1.5;
+  line-height: 1.4;
+  /* 설명 길이가 카드 높이에 영향 주지 않도록 2 줄 강제 + ellipsis. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .mini-game {
@@ -340,6 +374,14 @@
   overflow: hidden;
   position: relative;
   box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+/* 가로형 게임 (광살검) — 9:16 aspect-ratio·max-width 해제, 부모 100% 사용. */
+.mini-game-frame.mini-game-frame--landscape {
+  max-width: 100%;
+  aspect-ratio: auto;
+  height: 100%;
+  min-height: 0;
 }
 
 /* 게임 좌표계는 WORLD_W × WORLD_H (360x640) px 고정.

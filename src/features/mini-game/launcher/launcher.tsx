@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
 import { MINI_GAMES, findGame } from '../catalog.js'
 
 // floating 트리거 + native <dialog>.
@@ -59,7 +59,7 @@ export function MiniGameLauncher() {
     setOpen(false)
   }, [])
 
-  const onDialogClick = useCallback((e: React.MouseEvent<HTMLDialogElement>) => {
+  const onDialogClick = useCallback((e: ReactMouseEvent<HTMLDialogElement>) => {
     if (e.target === dialogRef.current) {
       setOpen(false)
     }
@@ -139,7 +139,7 @@ export function MiniGameLauncher() {
           {/* 선택된 게임 마운트 */}
           {open && selected && (
             <div className="mini-game-dialog-body">
-              <selected.component autoFocus={false} />
+              <selected.component autoFocus={true} />
             </div>
           )}
         </div>

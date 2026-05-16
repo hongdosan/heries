@@ -1,6 +1,8 @@
 import type {KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent} from 'react'
 import {useCallback, useEffect, useLayoutEffect, useRef, useState,} from 'react'
-import {assetUrl} from '../../../../shared/lib/env.js'
+import SLASH_SPRITE from '../../../../shared/images/mini-game/swordsman-survival/slash.webp?url'
+import IMPACT_ELITE_SPRITE from '../../../../shared/images/mini-game/swordsman-survival/impact-amber.webp?url'
+import IMPACT_NORMAL_SPRITE from '../../../../shared/images/mini-game/swordsman-survival/impact-crimson.webp?url'
 
 // ─────────────────────────────────────────────────────────────────
 // 검기생존록 — 무협 아이작풍 탄막 슈터 (H-eries 메인 페이지 미니 게임)
@@ -50,9 +52,7 @@ const ITEM_HP_HEAL = 1
 
 // 무협 액션 sprite — BASE_URL prefix 위해 assetUrl 헬퍼.
 // JSX 의 inline style 에서 backgroundImage 로 적용.
-const SLASH_SPRITE = assetUrl('content/_shared/images/mini-game/mg-slash.webp')
-const IMPACT_ELITE_SPRITE = assetUrl('content/_shared/images/mini-game/mg-impact-amber.webp')
-const IMPACT_NORMAL_SPRITE = assetUrl('content/_shared/images/mini-game/mg-impact-crimson.webp')
+// sprite 상수 = top of file vite ?url import 으로 대체됨.
 const IMPACT_FADE_MS = 280
 
 // 스킬 — 검막 (Active, Shift / 상단 우측 버튼)
@@ -243,8 +243,8 @@ function spawnEnemy(level: number): Enemy {
   const size = elite ? ELITE_SIZE : ENEMY_SIZE
   // 화면 가장자리에서 spawn
   const side = Math.floor(Math.random() * 4)
-  let x = 0
-  let y = 0
+  let x: number
+  let y: number
   if (side === 0) {
     x = rand(0, WORLD_W - size);
     y = -size

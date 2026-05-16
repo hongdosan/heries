@@ -2,8 +2,8 @@
 // Build gate: fail the build if any thumbnail/cover image exceeds the size budget.
 // Run BEFORE vite build to force the author to run `npm run optimize:images`.
 //
-// Targets: content/_shared/*.{webp,jpg,jpeg,png}
-//          content/series/*/thumbnails/*.{webp,jpg,jpeg,png}
+// Targets: src/shared/images/**/*.{webp,jpg,jpeg,png}     (코드 자산)
+//          content/series/*/thumbnails/**/*.{webp,jpg,jpeg,png} (작가 자산)
 
 import { readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
@@ -20,15 +20,15 @@ function walkImages(dir, acc) {
   }
 }
 
-function collect(root) {
-  // Recurses into content/_shared and content/series/*/thumbnails so subfolders
-  // (e.g. chapter-images/) are included.
+function collect() {
+  // Recurses into src/shared/images (code assets — sprite, mark, placeholder) +
+  // content/series/*/thumbnails (author assets — chapter cover, prompt-driven webp).
   const out = []
   try {
-    if (statSync(join(root, '_shared')).isDirectory()) walkImages(join(root, '_shared'), out)
+    if (statSync('src/shared/images').isDirectory()) walkImages('src/shared/images', out)
   } catch {}
   try {
-    const seriesDir = join(root, 'series')
+    const seriesDir = 'content/series'
     for (const slug of readdirSync(seriesDir)) {
       const thumbs = join(seriesDir, slug, 'thumbnails')
       try {
@@ -39,7 +39,7 @@ function collect(root) {
   return out
 }
 
-const files = collect('content')
+const files = collect()
 const oversized = files
   .map((p) => ({ p, size: statSync(p).size }))
   .filter((x) => x.size > MAX_BYTES)

@@ -1,0 +1,747 @@
+/* 광살검 — 가로 진행 검술 액션 전용 CSS (mini-game.css 와 분리).
+ * 모든 클래스 prefix = sm-* (검기생존록의 mg-* 와 분리).
+ * 좌표는 px (게임 SSOT 좌표계). 스테이지 자체에 CSS scale 적용.
+ *
+ * 디자인 토큰 = .sm-frame 스코프 --sm-*.
+ * 알파 변형은 color-mix(in srgb, var(--sm-X) N%, transparent) 사용 (모던 CSS).
+ * 검기생존록의 .mini-game --mg-* 와 동일 패턴 (자매 슬라이스 정합).
+ *
+ * TSX 의 COLOR_* 6 상수도 본 팔레트 값과 동일 hex (string literal 은 var 사용 불가).
+ * 변경 시 stickman-murim.tsx COLOR_* 도 함께 동기화. */
+
+.sm-frame {
+  /* surface */
+  --sm-bg: #07070b;
+  --sm-bg-2: #1f2937;
+  --sm-bg-deep: #030712;
+  --sm-bg-near-black: #09090b;
+  --sm-bg-tint: #0c0c12;          /* vignette gradient base (rgba(12,12,18,X)) */
+
+  /* text */
+  --sm-fg: #fff;
+  --sm-fg-2: #f4f4f5;
+  --sm-fg-3: #d4d4d8;
+  --sm-fg-4: #a1a1aa;
+
+  /* cyan — accent (이형환위·wave·ground·hit) */
+  --sm-accent: #67e8f9;
+  --sm-accent-bright: #a5f3fc;
+  --sm-accent-pale: #cffafe;
+  --sm-accent-deep: #22d3ee;       /* bg glow base */
+
+  /* red — danger (피격·적·HP) */
+  --sm-danger: #fda4af;
+  --sm-danger-bright: #fecaca;
+  --sm-danger-deep: #450a0a;
+  --sm-danger-base: #ef4444;       /* peril pulse base */
+
+  /* violet — elite·광살·천검기 */
+  --sm-elite: #f5d0fe;
+  --sm-elite-bright: #f0abfc;
+  --sm-elite-mid: #c084fc;         /* ki-bar gradient end */
+  --sm-elite-deep: #d946ef;
+  --sm-elite-dark: #4a044e;
+
+  /* amber — 장풍 hit */
+  --sm-amber: #fcd34d;
+  --sm-amber-pale: #fef3c7;
+  --sm-amber-soft: #fde68a;        /* pad-dash */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: var(--sm-bg);
+  color: var(--sm-fg);
+  user-select: none;
+  touch-action: none;
+}
+
+.sm-stage {
+  position: relative;
+  overflow: hidden;
+  background: var(--sm-bg);
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--sm-accent) 18%, transparent);
+  box-shadow: 0 22px 60px color-mix(in srgb, #000 70%, transparent),
+  0 0 0 1px color-mix(in srgb, var(--sm-fg) 4%, transparent) inset;
+  outline: none;
+}
+
+.sm-stage:focus-visible {
+  box-shadow: 0 22px 60px color-mix(in srgb, #000 70%, transparent),
+  0 0 0 2px var(--sm-accent) inset;
+}
+
+.sm-shake {
+  animation: sm-shake-kf 0.14s linear;
+}
+
+@keyframes sm-shake-kf {
+  0% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-6px, 4px);
+  }
+  40% {
+    transform: translate(5px, -4px);
+  }
+  60% {
+    transform: translate(-3px, 2px);
+  }
+  80% {
+    transform: translate(2px, -1px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.sm-world {
+  position: absolute;
+  inset: 0;
+  width: 820px;
+  height: 460px;
+  transform-origin: top left;
+}
+
+/* 배경 — 하단 cyan glow + 상단 crimson glow + vignette 누적 */
+.sm-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 72%, color-mix(in srgb, var(--sm-accent-deep) 16%, transparent), transparent 32%),
+  radial-gradient(circle at 50% 20%, color-mix(in srgb, var(--sm-danger-base) 18%, transparent), transparent 34%),
+  linear-gradient(to bottom, color-mix(in srgb, var(--sm-bg-tint) 60%, transparent), color-mix(in srgb, #000 96%, transparent));
+  pointer-events: none;
+}
+
+/* vignette — 화면 가장자리 어둠 */
+.sm-world::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, color-mix(in srgb, #000 65%, transparent) 100%);
+  z-index: 80;
+}
+
+/* 위험도별 색조 — level data attr 로 가산. peril pulse 는 level 5+ */
+.sm-world[data-level="3"]::after,
+.sm-world[data-level="4"]::after,
+.sm-world[data-level="5"]::after,
+.sm-world[data-level="6"]::after,
+.sm-world[data-level="7"]::after,
+.sm-world[data-level="8"]::after,
+.sm-world[data-level="9"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 85;
+  background: radial-gradient(ellipse at center, transparent 60%, color-mix(in srgb, var(--sm-danger-base) 18%, transparent) 100%);
+  animation: sm-peril-pulse 1.4s ease-in-out infinite;
+}
+
+.sm-world[data-level="5"]::after {
+  background: radial-gradient(ellipse at center, transparent 55%, color-mix(in srgb, var(--sm-danger-base) 24%, transparent) 100%);
+}
+
+.sm-world[data-level="6"]::after {
+  background: radial-gradient(ellipse at center, transparent 50%, color-mix(in srgb, var(--sm-danger-base) 30%, transparent) 100%);
+}
+
+.sm-world[data-level="7"]::after {
+  background: radial-gradient(ellipse at center, transparent 48%, color-mix(in srgb, var(--sm-danger-base) 36%, transparent) 100%);
+}
+
+.sm-world[data-level="8"]::after {
+  background: radial-gradient(ellipse at center, transparent 45%, color-mix(in srgb, var(--sm-danger-base) 42%, transparent) 100%);
+}
+
+.sm-world[data-level="9"]::after {
+  background: radial-gradient(ellipse at center, transparent 40%, color-mix(in srgb, var(--sm-elite-deep) 45%, transparent) 100%);
+  animation: sm-peril-pulse 0.85s ease-in-out infinite;
+}
+
+@keyframes sm-peril-pulse {
+  0%, 100% {
+    opacity: 0.65;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* 지면 — 시각적으로 명확히 구분 (사용자 *떠 보임* 정합). */
+.sm-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: repeating-linear-gradient(90deg,
+  transparent 0,
+  transparent 18px,
+  color-mix(in srgb, var(--sm-accent) 8%, transparent) 18px,
+  color-mix(in srgb, var(--sm-accent) 8%, transparent) 19px),
+  linear-gradient(to bottom, var(--sm-bg-2), var(--sm-bg-deep));
+  border-top: 2px solid color-mix(in srgb, var(--sm-accent) 55%, transparent);
+  box-shadow: inset 0 12px 24px -8px color-mix(in srgb, #000 70%, transparent);
+}
+
+.sm-ground-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(to right,
+  transparent 0%,
+  var(--sm-accent) 15%,
+  var(--sm-elite-deep) 50%,
+  var(--sm-accent) 85%,
+  transparent 100%);
+  z-index: 5;
+}
+
+/* 캐릭터 발밑 그림자 — 떠 보임 해소 */
+.sm-stickman::after,
+.sm-enemy::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -8px;
+  width: 90%;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, color-mix(in srgb, #000 55%, transparent) 0%, transparent 70%);
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* HUD — 상단 */
+.sm-hud-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 12px;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.sm-hud-card {
+  border: 1px solid color-mix(in srgb, var(--sm-fg) 10%, transparent);
+  background: color-mix(in srgb, #000 50%, transparent);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  padding: 8px 12px;
+}
+
+.sm-hud-top .sm-hud-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.sm-hud-eyebrow {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  color: color-mix(in srgb, var(--sm-accent-bright) 80%, transparent);
+}
+
+.sm-hud-name {
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--sm-fg-2);
+}
+
+.sm-hud-meta {
+  text-align: right;
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--sm-fg-3);
+}
+
+.sm-meta-score {
+  color: var(--sm-accent-bright);
+  font-weight: 900;
+}
+
+.sm-meta-level {
+  color: var(--sm-danger-bright);
+  font-weight: 900;
+}
+
+.sm-meta-hp {
+  letter-spacing: 0.2em;
+  color: var(--sm-danger);
+  font-size: 14px;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--sm-danger) 60%, transparent);
+}
+
+/* 키 힌트 */
+.sm-hint {
+  position: absolute;
+  top: 90px;
+  left: 12px;
+  z-index: 40;
+  font-size: 10px;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--sm-fg) 40%, transparent);
+  pointer-events: none;
+  letter-spacing: 0.04em;
+}
+
+/* 졸라맨 */
+.sm-stickman {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  transition: opacity 0.18s linear;
+}
+
+.sm-stickman-hurt {
+  animation: sm-hurt-blink 0.16s linear infinite;
+}
+
+@keyframes sm-hurt-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* sprite 공통 — *height 기준* 정렬 (width auto 로 sprite 비율 자동).
+ * sprite 별 가로/세로 비율이 달라도 본체 (사람) 가 차지하는 *세로* 크기는 일관.
+ * idle (정사각) / attack (가로 길이) 가 박스 안에서 동일 시각 크기로 보임.
+ * 발 위치 = 박스 하단 (bottom: 0). 가로 중심 = left 50% + translateX(-50%) (inline). */
+.sm-sprite {
+  position: absolute;
+  width: auto;
+  height: 80%;
+  left: 50%;
+  bottom: 0;
+  pointer-events: none;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  image-rendering: -webkit-optimize-contrast;
+  transform: translateX(-50%);
+  max-width: none;
+}
+
+.sm-stickman, .sm-enemy {
+  overflow: visible;
+}
+
+/* 장풍 sprite — 박스 100% 채움 (가로형 단발 이펙트). */
+.sm-wave .sm-sprite {
+  width: 100%;
+  height: 100%;
+  left: 0;
+  bottom: 0;
+  transform: none;
+  object-fit: contain;
+}
+
+/* 공격 sprite — height 기준 정렬이라 sprite 비율 영향 0. 시각 강조만 (brightness). */
+.sm-stickman-attacking .sm-sprite {
+  filter: brightness(1.15) contrast(1.05);
+  transition: filter 0.08s linear;
+}
+
+.sm-stickman-dashing .sm-sprite {
+  filter: blur(0.6px) brightness(1.2);
+  opacity: 0.92;
+}
+
+/* 이형환위 무적 — ring 폐기. sprite 자체에 cyan aura 적용 → sprite 본체 위치 mismatch 0.
+ * (이전 ring 형태는 sprite 본체 편향과 어긋나는 시각 버그) */
+.sm-stickman-invuln .sm-sprite {
+  filter:
+    drop-shadow(0 0 8px color-mix(in srgb, var(--sm-accent) 90%, transparent))
+    drop-shadow(0 0 18px color-mix(in srgb, var(--sm-accent-bright) 60%, transparent))
+    brightness(1.1);
+  animation: sm-invuln-glow 0.7s ease-in-out infinite alternate;
+}
+
+@keyframes sm-invuln-glow {
+  0% {
+    filter:
+      drop-shadow(0 0 5px color-mix(in srgb, var(--sm-accent) 75%, transparent))
+      drop-shadow(0 0 12px color-mix(in srgb, var(--sm-accent-bright) 45%, transparent))
+      brightness(1.05);
+  }
+  100% {
+    filter:
+      drop-shadow(0 0 12px var(--sm-accent))
+      drop-shadow(0 0 24px color-mix(in srgb, var(--sm-accent-bright) 75%, transparent))
+      brightness(1.18);
+  }
+}
+
+/* 임팩트 / 사망 이펙트 sprite */
+.sm-effect {
+  position: absolute;
+  z-index: 55;
+  pointer-events: none;
+  object-fit: contain;
+  will-change: opacity;
+}
+
+/* 광살 풀스크린 sprite — 광살 발동 시 ~450ms fade */
+.sm-gwangsal-fx {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 75;
+  animation: sm-gwangsal-fade 0.45s ease-out forwards;
+}
+
+@keyframes sm-gwangsal-fade {
+  0% {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* 적 — 자객 */
+.sm-enemy {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  transform-origin: center bottom;
+  transition: opacity 0.18s linear;
+}
+
+.sm-enemy-stun {
+  opacity: 0.55;
+  animation: sm-enemy-flash 0.12s linear;
+}
+
+@keyframes sm-enemy-flash {
+  0% {
+    filter: brightness(2) saturate(2);
+  }
+  100% {
+    filter: brightness(1) saturate(1);
+  }
+}
+
+/* 엘리트 적 — sprite filter 로 살짝 강조 (보라 glow). */
+.sm-enemy-elite .sm-sprite {
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--sm-elite-bright) 55%, transparent));
+}
+
+.sm-enemy-hp {
+  position: absolute;
+  top: -16px;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--sm-danger-deep);
+  overflow: hidden;
+}
+
+.sm-enemy-hp-fill {
+  height: 100%;
+  background: var(--sm-elite);
+  transition: width 0.15s linear;
+}
+
+/* 장풍 */
+.sm-wave {
+  position: absolute;
+  z-index: 40;
+  pointer-events: none;
+  /* background 없음 — sprite img 만 노출 (사용자 명시 = 추가 이펙트 X). */
+}
+
+/* 파티클 */
+.sm-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 65;
+  transform: translate(-50%, -50%);
+}
+
+/* 판정 텍스트 */
+.sm-judge {
+  position: absolute;
+  left: 50%;
+  top: 132px;
+  z-index: 60;
+  transform: translateX(-50%);
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  filter: drop-shadow(0 0 18px currentColor);
+  animation: sm-judge-kf 0.42s ease-out;
+  pointer-events: none;
+}
+
+@keyframes sm-judge-kf {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 12px) scale(0.82);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(-50%, -10px) scale(1.18);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -32px) scale(1);
+  }
+}
+
+.sm-judge-cyan {
+  color: var(--sm-accent-pale);
+}
+
+.sm-judge-red {
+  color: var(--sm-danger-bright);
+}
+
+.sm-judge-amber {
+  color: var(--sm-amber-pale);
+}
+
+.sm-judge-violet {
+  color: var(--sm-elite);
+}
+
+.sm-judge-stone {
+  color: var(--sm-fg-4);
+}
+
+/* 하단 HUD */
+.sm-hud-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.sm-hud-bottom-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--sm-fg-3);
+}
+
+.sm-hud-bottom-values {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  line-height: 1;
+}
+
+.sm-combo {
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--sm-accent-pale);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--sm-accent) 60%, transparent);
+}
+
+.sm-ki-percent {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--sm-elite);
+}
+
+.sm-ki-bar {
+  margin-top: 8px;
+  height: 6px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--sm-fg) 10%, transparent);
+  overflow: hidden;
+}
+
+.sm-ki-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(to right, var(--sm-elite), var(--sm-elite-mid));
+  box-shadow: 0 0 12px color-mix(in srgb, var(--sm-elite-deep) 90%, transparent);
+  transition: width 0.15s linear;
+}
+
+/* 모바일 패드 */
+.sm-pad {
+  position: absolute;
+  bottom: 96px;
+  left: 0;
+  right: 0;
+  padding: 0 12px;
+  display: flex;
+  justify-content: space-between;
+  z-index: 70;
+  pointer-events: none;
+}
+
+.sm-pad-group {
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.sm-pad-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  border: none;
+  font-weight: 900;
+  font-size: 14px;
+  cursor: pointer;
+  touch-action: none;
+  background: color-mix(in srgb, var(--sm-fg) 15%, transparent);
+  color: var(--sm-fg);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px color-mix(in srgb, #000 40%, transparent);
+  transition: transform 0.08s ease-out, background 0.18s ease-out;
+}
+
+.sm-pad-btn:active {
+  transform: scale(0.92);
+  background: color-mix(in srgb, var(--sm-fg) 28%, transparent);
+}
+
+.sm-pad-slash {
+  background: var(--sm-accent-bright);
+  color: var(--sm-bg-near-black);
+}
+
+.sm-pad-qi {
+  background: var(--sm-elite);
+  color: var(--sm-bg-near-black);
+}
+
+.sm-pad-dash {
+  background: var(--sm-amber-soft);
+  color: var(--sm-bg-near-black);
+}
+
+.sm-pad-cd {
+  opacity: 0.6;
+}
+
+/* 오버레이 (시작 / 종료) */
+.sm-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, #000 78%, transparent);
+  backdrop-filter: blur(2px);
+  padding: 20px;
+}
+
+.sm-overlay-card {
+  max-width: 320px;
+  border-radius: 24px;
+  border: 1px solid color-mix(in srgb, var(--sm-accent-bright) 18%, transparent);
+  background: color-mix(in srgb, var(--sm-fg) 8%, transparent);
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 22px 60px color-mix(in srgb, #000 70%, transparent);
+  animation: sm-overlay-pop 0.2s ease-out;
+}
+
+@keyframes sm-overlay-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.sm-overlay-emoji {
+  font-size: 56px;
+  margin-bottom: 8px;
+}
+
+.sm-overlay-title {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--sm-accent-pale);
+  letter-spacing: 0.05em;
+}
+
+.sm-overlay-desc {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--sm-fg-3);
+}
+
+.sm-overlay-btn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  border: none;
+  background: var(--sm-accent-bright);
+  color: var(--sm-bg-near-black);
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.18s ease-out, transform 0.08s ease-out;
+}
+
+.sm-overlay-btn:hover {
+  background: var(--sm-accent-pale);
+}
+
+.sm-overlay-btn:active {
+  transform: scale(0.97);
+}
+
+.sm-overlay-keys {
+  margin: 12px 0 0;
+  font-size: 11px;
+  color: var(--sm-fg-4);
+}
+
+/* prefers-reduced-motion — 모든 애니메이션 정지 */
+@media (prefers-reduced-motion: reduce) {
+  .sm-shake,
+  .sm-wave,
+  .sm-stickman-hurt,
+  .sm-stickman-invuln .sm-sprite,
+  .sm-overlay-card,
+  .sm-world::after,
+  .sm-judge,
+  .sm-gwangsal-fx {
+    animation: none !important;
+  }
+}

@@ -1,12 +1,10 @@
 import {Link} from 'react-router-dom'
-import {assetUrl} from '../../shared/lib/env.js'
 import {fetchSeriesIndex} from '../../shared/lib/manifest.js'
 import {useAsync} from '../../shared/lib/use-async.js'
 import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
 import {SeriesList} from '../../widgets/series-list'
 import {MiniGameLauncher} from '../../features/mini-game'
-
-const HERO_IMAGE = assetUrl('content/_shared/images/thumbnail-placeholder.webp')
+import HERO_IMAGE from '../../shared/images/thumbnail-placeholder.webp?url'
 const HERO_ALT = 'H-eries — 작가(홍도산) 의 오리지널 웹 시리즈 컬렉션'
 
 export function HomePage() {

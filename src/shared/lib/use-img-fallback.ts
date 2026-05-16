@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react'
-import { assetUrl } from './env.js'
+import placeholderUrl from '../images/thumbnail-placeholder.webp?url'
 
 /** Site-wide default thumbnail placeholder image. */
-export const PLACEHOLDER_THUMB = assetUrl('content/_shared/images/thumbnail-placeholder.webp')
+export const PLACEHOLDER_THUMB = placeholderUrl
 
 /**
  * Track <img> load failure so the caller can swap to a placeholder.

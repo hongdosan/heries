@@ -7,6 +7,7 @@ import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
 import {ChapterToc} from '../../widgets/chapter-toc'
 import {CharacterList} from '../../widgets/character-list'
+import {MiniGameLauncher} from '../../features/mini-game'
 
 type Tab = 'overview' | 'chapters' | 'characters' | 'author'
 const TABS: ReadonlyArray<Tab> = ['overview', 'chapters', 'characters', 'author']
@@ -108,6 +109,7 @@ export function SeriesPage() {
           </ul>
         </section>
       )}
+      <MiniGameLauncher/>
     </main>
   )
 }

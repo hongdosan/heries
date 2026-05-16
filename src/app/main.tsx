@@ -1,4 +1,4 @@
-import {StrictMode} from 'react'
+import {StrictMode, type ReactNode} from 'react'
 import {createRoot} from 'react-dom/client'
 import {BrowserRouter, Route, Routes, useLocation} from 'react-router-dom'
 import '../shared/styles/tokens.css'
@@ -33,7 +33,7 @@ const BASENAME = import.meta.env.BASE_URL.replace(/\/$/, '')
 
 // 라우트 변경 시 fade-in transition wrapper. useLocation.key 변경 → div remount
 // → CSS animation 재실행. prefers-reduced-motion 환경은 animation 무력화 (responsive.css).
-function RouteTransition({children}: Readonly<{ children: React.ReactNode }>) {
+function RouteTransition({children}: Readonly<{ children: ReactNode }>) {
   const location = useLocation()
   return (
     <div key={location.key} className="route-transition">
