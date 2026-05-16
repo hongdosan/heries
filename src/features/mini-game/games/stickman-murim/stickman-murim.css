@@ -643,24 +643,40 @@
 }
 
 .sm-pad-btn {
-  width: 56px;
+  /* 폭 = 라벨 길이 따라 자동 fit. 56 floor. */
+  min-width: 56px;
   height: 56px;
+  padding: 0 10px;
   border-radius: 18px;
   border: none;
   font-weight: 900;
   font-size: 14px;
   cursor: pointer;
   touch-action: none;
+  /* 라벨 줄바꿈 차단 + flex center → 글자 가운데 정렬 (이형환위 등 4자 라벨 정합). */
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   background: color-mix(in srgb, var(--sm-fg) 15%, transparent);
   color: var(--sm-fg);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 12px color-mix(in srgb, #000 40%, transparent);
-  transition: transform 0.08s ease-out, background 0.18s ease-out;
+  transition: transform 0.08s ease-out, background 0.18s ease-out, opacity 0.18s ease-out;
 }
 
 .sm-pad-btn:active {
   transform: scale(0.92);
   background: color-mix(in srgb, var(--sm-fg) 28%, transparent);
+}
+
+.sm-pad-btn:disabled,
+.sm-pad-btn.is-disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+  pointer-events: none;
 }
 
 .sm-pad-slash {

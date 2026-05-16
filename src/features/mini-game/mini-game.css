@@ -92,6 +92,9 @@
   border: 1px solid var(--rule);
   display: flex;
   flex-direction: column;
+  /* height 명시 — content fit 시 frame size 가 stage state 따라가 resize 시 무한 축소 루프 야기.
+     height 고정 = body flex 1 이 head 제외 영역 안정 차지 → frame 독립. */
+  height: calc(100dvh - var(--mg-dialog-gap));
   max-height: calc(100dvh - var(--mg-dialog-gap));
 }
 

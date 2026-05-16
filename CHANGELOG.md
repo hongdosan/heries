@@ -16,6 +16,24 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 ---
 
+## [v0.2.7] — 2026-05-17
+
+### Fixed (광살검 모바일 결함 보강 — v0.2.6 hotfix)
+- **모바일 가상 패드 위치 정합** — `sm-pad-base/dot` → `sm-stage` 자식 (`sm-world` 밖) 으로 이동. 이전 = `sm-world` 안 `transform: scale(view.scale)` 영역에 갇혀 JS 가 설정한 viewport px 좌표가 scale 적용 후 작아져 항상 좌상단 쪽 표시
+- **`mini-game-dialog-card` height 명시** — `max-height` 만 → `height + max-height` 둘 다 `calc(100dvh - gap)`. 이전 = content fit → body flex 1 의 부모 height 가 frame content 따라감 → frame content 가 sm-stage size 따라가서 resize 시 무한 축소 루프. 광살검에서 브라우저 너비 줄였다 늘릴 때 stage 가 무한히 얇아지는 결함
+
+### Changed (광살검 패드 버튼)
+- **장풍 버튼 disabled** — `qiReady = ki >= QI_COST` 신규 + 내공 부족 시 `disabled` 속성 + `is-disabled` 클래스
+- **이형환위 버튼 disabled** — 내공 부족 시 `disabled` 속성 + `is-disabled` 클래스 (기존 게이지 `sm-pad-cd` 위 보강)
+- **`.sm-pad-btn` 라벨 가운데 정렬 + 줄바꿈 차단** — `width: 56` → `min-width: 56` + `padding: 0 10px` + `display: inline-flex` + `align-items/justify-content: center` + `white-space: nowrap` (이형환위 4자 라벨 폭 자동 fit + 글자 가운데)
+- **`.sm-pad-btn:disabled / .is-disabled` 시각** — opacity 0.42 + grayscale 0.4 + cursor not-allowed + pointer-events none
+
+### Notes
+- 검증: typecheck 0 / vite build 0 / check-secrets 0
+- 메뉴 화면도 dialog card 가 viewport 차지 (이전엔 content fit) — 무한 축소 루프 차단 우선
+
+---
+
 ## [v0.2.6] — 2026-05-17
 
 ### Reverted

@@ -1047,6 +1047,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
   // 쿨다운 기반 비율은 의미 없음 (0 / 0 = NaN). ki 진행률이 *사용 가능까지의 거리* 를 더 정확히 표현.
   const dashCdFraction = clamp(1 - Math.min(ki, DASH_COST) / DASH_COST, 0, 1)
   const dashReady = ki >= DASH_COST
+  const qiReady = ki >= QI_COST
 
   return (
     <div className="mini-game-frame mini-game-frame--landscape sm-frame">
@@ -1211,14 +1212,6 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
             </div>
           </footer>
 
-          {/* 모바일 가상 패드 (좌측 영역 swipe = 이동) — 검기생존록 정합 */}
-          {phase === 'playing' && !view.isDesktop && (
-            <>
-              <div ref={padBaseRef} className="sm-pad-base" aria-hidden="true" />
-              <div ref={padDotRef} className="sm-pad-dot" aria-hidden="true" />
-            </>
-          )}
-
           {/* 모바일 액션 버튼 (우측) */}
           {phase === 'playing' && !view.isDesktop && (
             <div className="sm-pad">
@@ -1226,13 +1219,21 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
                 <button type="button" className="sm-pad-btn sm-pad-slash" aria-label="베기"
                         onPointerDown={onPadDown('slash')}>베기
                 </button>
-                <button type="button" className="sm-pad-btn sm-pad-qi" aria-label="장풍"
-                        onPointerDown={onPadDown('qi')}>장풍
+                <button
+                  type="button"
+                  className={'sm-pad-btn sm-pad-qi' + (qiReady ? '' : ' is-disabled')}
+                  aria-label="장풍"
+                  aria-disabled={!qiReady}
+                  disabled={!qiReady}
+                  onPointerDown={onPadDown('qi')}
+                >장풍
                 </button>
                 <button
                   type="button"
-                  className={'sm-pad-btn sm-pad-dash' + (dashReady ? '' : ' sm-pad-cd')}
+                  className={'sm-pad-btn sm-pad-dash' + (dashReady ? '' : ' sm-pad-cd is-disabled')}
                   aria-label="이형환위"
+                  aria-disabled={!dashReady}
+                  disabled={!dashReady}
                   onPointerDown={onPadDown('dash')}
                   style={{'--sm-cd': dashCdFraction} as CSSProperties}
                 >이형환위
@@ -1261,6 +1262,13 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
             </div>
           )}
         </div>
+        {/* 모바일 가상 패드 — sm-world 밖 (transform: scale 영향 X), sm-stage 자식. */}
+        {phase === 'playing' && !view.isDesktop && (
+          <>
+            <div ref={padBaseRef} className="sm-pad-base" aria-hidden="true" />
+            <div ref={padDotRef} className="sm-pad-dot" aria-hidden="true" />
+          </>
+        )}
       </div>
     </div>
   )
