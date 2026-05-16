@@ -112,6 +112,21 @@
   object-fit: cover;
   display: block;
 }
+
+/* 챕터 본문 안 inline 이미지 (소제목별 컷). markdown ![](...) → <p><img></p>.
+   16:9 webp 1600x900 원본을 컨테이너 폭에 맞춰 자동 축소. */
+.page-chapter .article img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: var(--s-5) auto;
+  border-radius: var(--r-md);
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+}
+.page-chapter .article p:has(> img) {
+  margin: 0;
+}
 .chapter-hero {
   margin: 0 0 var(--s-6);
   padding-bottom: var(--s-5);

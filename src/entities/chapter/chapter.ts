@@ -24,7 +24,7 @@ export async function loadChapter(
   if (!index) {
     throw new Error(`chapter not found in manifest: ${slug} ep ${episode}`)
   }
-  const path = `./content/series/${slug}/chapters/ep-${zeroPad2(index.episode)}-${index.slug}.md`
+  const path = `./content/series/${slug}/chapters/ep-${zeroPad2(index.episode)}.md`
   const raw = await fetchMarkdown(path)
   const doc: DocFile<ChapterFrontmatter> = parseFrontmatter<ChapterFrontmatter>(raw)
   const bodyHtml = renderMarkdown(doc.body)

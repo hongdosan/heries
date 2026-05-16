@@ -1,3 +1,14 @@
+import { assetUrl } from './env.js'
+
+// 이미지 src 해석: 절대 URL / 외부 URL / data 는 그대로,
+// 상대 경로는 BASE_URL prefix 자동 적용 (production = /heries/ / dev = /).
+function resolveImgUrl(raw: string): string {
+  const safe = safeUrl(raw)
+  if (safe === '#') return safe
+  if (/^(https?:)?\/\//.test(safe) || safe.startsWith('data:') || safe.startsWith('/')) return safe
+  return assetUrl(safe)
+}
+
 export function renderMarkdown(src: string): string {
   const stripped = src.replace(/<!--[\s\S]*?-->/g, '')
   const lines = stripped.replace(/\r\n/g, '\n').split('\n')
@@ -163,7 +174,7 @@ function safeUrl(raw: string): string {
 export function renderInline(src: string): string {
   let s = escapeHtml(src)
   s = s.replace(/`([^`]+)`/g, (_, c: string) => `<code>${c}</code>`)
-  s = s.replace(new RegExp(`!\\[([^\\]]*)]\\((${URL_RE})\\)`, 'g'), (_, alt: string, url: string) => `<img src="${safeUrl(url)}" alt="${escapeAttr(String(alt))}">`)
+  s = s.replace(new RegExp(`!\\[([^\\]]*)]\\((${URL_RE})\\)`, 'g'), (_, alt: string, url: string) => `<img src="${resolveImgUrl(url)}" alt="${escapeAttr(String(alt))}" loading="lazy">`)
   s = s.replace(new RegExp(`\\[([^\\]]+)]\\((${URL_RE})\\)`, 'g'), (_, txt: string, url: string) => `<a href="${safeUrl(url)}">${txt}</a>`)
   s = s.replace(/\*\*([^\n]+?)\*\*(?!\*)/g, '<strong>$1</strong>')
   s = s.replace(/(?<!\*)\*(?!\s)([^*\n]+?)(?<!\s)\*(?!\*)/g, '<em>$1</em>')

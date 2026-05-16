@@ -1,10 +1,30 @@
 {
   "slug": "clash-of-multiverses",
   "title": "차원의 격돌",
-  "status": "tba",
+  "status": "연재 중",
   "thumbnail": "thumbnails/cover.webp",
   "characters": [
-    { "id": "woo-jin-hyeok", "folder": "1-protagonist", "name": "우진혁", "summary": "동생을 위해 운동을 포기하고 입대한 군인." }
+    {
+      "id": "woo-jin-hyeok",
+      "folder": "1-protagonist",
+      "name": "우진혁",
+      "summary": "동생을 위해 운동을 포기하고 입대한 군인."
+    }
   ],
-  "chapters": []
+  "chapters": [
+    {
+      "episode": 1,
+      "slug": "ep-01",
+      "title": "마수의 등장",
+      "published": "2026-05-15",
+      "thumbnail": "thumbnails/ep-01.webp"
+    },
+    {
+      "episode": 2,
+      "slug": "ep-02",
+      "title": "마수와 사람 사이",
+      "published": "2026-05-15",
+      "thumbnail": "thumbnails/ep-02.webp"
+    }
+  ]
 }

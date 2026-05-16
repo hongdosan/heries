@@ -1,50 +1,77 @@
 <!-- © 2026 홍도산. All rights reserved. Original creator work. -->
 
-# CURRENT 핸드오프 (2026-05-15, 우진혁 카드 디테일 완성 + 운영 문서 톤 정리)
+# CURRENT 핸드오프 (2026-05-15, 챕터 1~2 발행 + 카드 갱신)
 
 ## 한 줄
 
-(1) 프로젝트 전반의 운영 문서 톤을 자작 강조 형태로 정리. 공개 표면 (footer / NOTICE / about / README) 부터 운영 문서 (CLAUDE.md / 6 agents / harness 3 / workflow template / handoff) 까지. (2) 우진혁 카드 자율 28 라운드 디테일 완성 — 700+ 줄. 모든 작가 백엔드 절 (외형·성격·습관·가족·운동·군·각성·능력 단계·연대기·인간관계·트라우마·선악·시선·전투·대화·일상·결정·본인 시간·자아 침투·약점·철학·목표·말 못 한 마음·권속 템플릿·갈등 분기·끝 시나리오·챕터 가이드·시그니처·대표 한 컷·마수 풍경·한 줄 요약·다른 작품 연결) 채움.
+*차원의 격돌* ep-01 *마수의 등장* + ep-02 *마수와 사람 사이* 본문 발행. 우진혁 카드 reader_snapshot ep-02 갱신 + 독자 절에
+ep-01·ep-02 사실 채움. 카드 §운동 시절·§시그니처 등 14 곳의 *격투기* / *종합격투기* → *킥복싱* 일괄 정정 (본문 정정 정합). _
+series·series.json·manifest.json 의 status `tba` → *연재 중*, started `2026-05-15`. 챕터 1·2 의 대표 이미지 +
+§1·§2·§3·§4 소제목별 이미지 생성 프롬프트도 `thumbnails/PROMPT.md` 에 작성.
 
 ## 사용자 commit 정책
 
-본 세션 모든 변경은 *working copy* 상태. main 브랜치 + 사용자 직접 commit. 다음 세션 진입 시 `git status` 확인 → 분할 commit 권장.
+본 세션 모든 변경은 *working copy* 상태. main 브랜치 + 사용자 직접 commit (현 라운드 = commit 금지 명시).
 
 ## 현 상태
 
 ### 콘텐츠
-- `content/series/clash-of-multiverses/characters/1-protagonist/woo-jin-hyeok.md` = 700+ 줄. 작가 백엔드 32+ 절. 독자 절은 본문 발행 0 상태로 tba 유지 (정책 정합).
-- `content/series/clash-of-multiverses/_series.md` = 본문 헤더 1 단락 + 시놉시스 절 (작가 모드 마스킹) 작성.
-- `content/series/clash-of-multiverses/manifest.json` = 우진혁 summary = *동생을 위해 운동을 포기하고 입대한 군인*.
-- `content/series/clash-of-multiverses/worldbuilding/character-doctrine.md` = 정책 SSOT (C1 사이클).
 
-### 운영 문서 톤 정리
-- 공개 표면: `src/widgets/footer/footer.tsx`, `NOTICE.md`, `content/notice.md`, `content/about.md`, `README.md` 정리.
-- 운영 문서: `.claude/CLAUDE.md` 원칙 #2, agents 6종 + orchestrator skill, harness 4종, workflow template 2종, handoff/handoff.md 정리.
-- 정책 v2 정합: publisher.md / frontend-engineer.md 의 정책 v1 stale 표현 → 단일 빌드 + runtime 마스킹 + check-secrets 정합.
+- `content/series/clash-of-multiverses/chapters/ep-01.md` = *마수의 등장*. 약 4000자. §1 회상 / §2 일상 / §3 운동
+  시절 / §4 졸업식·마수.
+- `content/series/clash-of-multiverses/chapters/ep-02.md` = *마수와 사람 사이*. 약 4000자. §1 강당·마수 대치 / §2
+  후송·미각성자 부대 인지 (선아 시점) / §3 병원·결심 / §4 도장·입대 결정.
+- `content/series/clash-of-multiverses/characters/1-protagonist/woo-jin-hyeok.md` = 작가 백엔드 700+ 줄 +
+  독자 절 ep-02 시점 사실 5 절 확장. frontmatter `reader_snapshot: ep-02`.
+- `content/series/clash-of-multiverses/_series.md` = status *연재 중* / started 2026-05-15.
+- `content/series.json` = 시리즈 status·started 정합.
+- `content/series/clash-of-multiverses/manifest.json` = chapters[] 에 ep-01·ep-02 등록 + status 정합.
+- `content/series/clash-of-multiverses/thumbnails/PROMPT.md` = 시리즈 cover + ep-01 (대표 +
+  §1·§2·§3·§4) + ep-02 (대표 + §1·§2·§3·§4) 프롬프트.
+
+### 작품 톤 / 메모리
+
+- 챕터 본문 = 평이한 한국 웹소설 산문. 시적 표현·은유적 마무리·단어 한 줄 강조 X.
+- 대화 중심. 시점 묘사 짧음.
+- 메모리 추가: `feedback_no_poetic_prose.md`.
+
+### 코드
+
+- `src/entities/chapter/chapter.ts` = 챕터 파일 경로 패턴 `ep-{NN}.md` 단순화 (구 `ep-{NN}-{slug}.md` 정정).
 
 ### 검증
+
 - typecheck 0 / build 0 / build-storybook 통과 / check-secrets 0 누수.
-- dist css 43.30 KB / js 286.30 KB.
+- dist css 43.30 KB / js 286.29 KB.
 
 ## 다음 세션 진입 체크리스트
 
-1. **`git status`** — 본 세션 누적 변경 확인 (large diff).
-2. **분할 commit 권장**:
-   - (a) 운영 문서 톤 정리 (16~17 파일)
-   - (b) 우진혁 카드 디테일 완성 (1 파일 대형 변경)
-   - (c) `_series.md` 시놉시스 + 핸드오프 갱신
-3. **다음 트랙 결정**:
-   - 첫 챕터 시놉시스 받기 (단계 1 챕터 — 일상 + 마수 출몰 + 처리)
-   - 우선아 카드 단독 승격 여부 결정 (현재 우진혁 카드 안에 디테일 포함)
-   - 새 캐릭터 (각성 사건 동료 / 단계 1→2 흡수 첫 대상) 카드 신설 결정
+1. **`git status`** — 본 세션 누적 변경 확인.
+2. **분할 commit 권장** (현재 commit 금지 명시 — 사용자 OK 후):
+    - (a) ep-01·ep-02 본문 + manifest·_series·series.json + 카드 독자 절 확장
+    - (b) 카드 §킥복싱 정정 (격투기 → 킥복싱 14 곳)
+    - (c) thumbnails/PROMPT.md 시리즈 cover + ep-01·ep-02 프롬프트
+    - (d) chapter loader 경로 패턴 정정 (`src/entities/chapter/chapter.ts`)
+    - (e) handoff·harness-state 갱신
+3. **이미지 생성** — `PROMPT.md` 의 ep-01·ep-02 프롬프트로 작가가 직접 webp 생성 → `thumbnails/` 배치 → `manifest.json`
+   chapters[].thumbnail 필드 추가.
+4. **다음 트랙**:
+    - ep-03 시놉시스 — 군 입대 / 훈련소 / 부대 배치 / 첫 임무 (카드 §군 정합).
+    - 우선아 단독 카드 승격 여부 (이름·대사·인과 모두 있음 — character-doctrine §2-6 자격 충족).
+    - 챕터 1·2 등장 *킥복싱 도장 코치* / *마수 사태 헌터* 단독 카드 승격 여부.
 
 ## Relevant Files
 
+- **챕터**: `content/series/clash-of-multiverses/chapters/ep-01.md`, `ep-02.md`
 - **카드**: `content/series/clash-of-multiverses/characters/1-protagonist/woo-jin-hyeok.md`
-- **시리즈 메타**: `content/series/clash-of-multiverses/_series.md`
-- **정책**: `.claude/CLAUDE.md`, `content/series/clash-of-multiverses/worldbuilding/character-doctrine.md`
-- **agents**: `.claude/agents/heries-{lorekeeper,worldsmith,author,continuity-reviewer,frontend-engineer,publisher}.md`
-- **공개 표면**: `src/widgets/footer/footer.tsx`, `NOTICE.md`, `content/notice.md`, `content/about.md`, `README.md`
-- **운영**: `.claude/harness/{harness,harness-setup,harness-install,harness-state}.md`, `.claude/handoff/{handoff,CURRENT}.md`, `.claude/workflow/template/{prompt-reference,prompt-template-review}.md`
-- **빌드**: `package.json`, `vite.config.ts`, `.github/workflows/deploy.yml`, `scripts/{copy-content,check-secrets,check-images}.mjs`
+- **시리즈 메타**: `content/series/clash-of-multiverses/_series.md`, `content/series.json`,
+  `content/series/clash-of-multiverses/manifest.json`
+- **이미지 프롬프트**: `content/series/clash-of-multiverses/thumbnails/PROMPT.md`
+- **정책**: `.claude/CLAUDE.md`,
+  `content/series/clash-of-multiverses/worldbuilding/character-doctrine.md`
+- **agents**:
+  `.claude/agents/heries-{lorekeeper,worldsmith,author,continuity-reviewer,frontend-engineer,publisher}.md`
+- **운영**: `.claude/harness/{harness,harness-setup,harness-install,harness-state}.md`,
+  `.claude/handoff/{handoff,CURRENT}.md`
+- **빌드 코드**: `src/entities/chapter/chapter.ts`, `package.json`, `vite.config.ts`,
+  `.github/workflows/deploy.yml`
