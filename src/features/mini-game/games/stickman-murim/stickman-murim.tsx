@@ -155,8 +155,6 @@ const COLOR_PLAYER_HURT = '#fda4af'  // see --sm-danger
 const JUDGE_FADE_MS = 420
 const SHAKE_MS = 140
 const SHAKE_KILL_MS = 220
-const STAGE_FIT_MIN_W = 300
-const STAGE_FIT_MIN_H = 420
 const STAGE_FIT_DESKTOP_BREAK = 768
 const STAGE_FIT_DESKTOP_PAD = 36
 const STAGE_FIT_DESKTOP_MAX_SCALE = 1.25
@@ -412,14 +410,20 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
   }, [player, enemies, waves, phase, ki])
 
   // ─── 스테이지 fit ──────────────────────────────────────────
+  // ResizeObserver 미사용 — 광살검은 가로형(820×460)이라 stage size 가
+  // sm-frame content size 결정 → ResizeObserver 가 그 변경을 감지 →
+  // 다시 fit() → 무한 축소 루프 야기. globalThis resize/orientationchange 만 사용.
   useLayoutEffect(() => {
     const fit = () => {
       const el = stageRef.current
       if (!el) return
       const parent = el.parentElement
       if (!parent) return
-      const vw = Math.max(STAGE_FIT_MIN_W, parent.clientWidth)
-      const vh = Math.max(STAGE_FIT_MIN_H, parent.clientHeight || globalThis.innerHeight - 200)
+      // 사용자 의도 "무조건 fit". MIN 강제 폐기 — viewport 짧으면 그만큼 작아짐.
+      // rect 0 시 skip (마운트 직전).
+      const vw = parent.clientWidth
+      const vh = parent.clientHeight
+      if (vw <= 0 || vh <= 0) return
       const isDesktop = vw >= STAGE_FIT_DESKTOP_BREAK
       const scale = isDesktop
         ? Math.min((vw - STAGE_FIT_DESKTOP_PAD) / WORLD_W, (vh - STAGE_FIT_DESKTOP_PAD) / WORLD_H, STAGE_FIT_DESKTOP_MAX_SCALE)
@@ -1043,6 +1047,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
   // 쿨다운 기반 비율은 의미 없음 (0 / 0 = NaN). ki 진행률이 *사용 가능까지의 거리* 를 더 정확히 표현.
   const dashCdFraction = clamp(1 - Math.min(ki, DASH_COST) / DASH_COST, 0, 1)
   const dashReady = ki >= DASH_COST
+  const qiReady = ki >= QI_COST
 
   return (
     <div className="mini-game-frame mini-game-frame--landscape sm-frame">
@@ -1207,14 +1212,6 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
             </div>
           </footer>
 
-          {/* 모바일 가상 패드 (좌측 영역 swipe = 이동) — 검기생존록 정합 */}
-          {phase === 'playing' && !view.isDesktop && (
-            <>
-              <div ref={padBaseRef} className="sm-pad-base" aria-hidden="true" />
-              <div ref={padDotRef} className="sm-pad-dot" aria-hidden="true" />
-            </>
-          )}
-
           {/* 모바일 액션 버튼 (우측) */}
           {phase === 'playing' && !view.isDesktop && (
             <div className="sm-pad">
@@ -1222,13 +1219,21 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
                 <button type="button" className="sm-pad-btn sm-pad-slash" aria-label="베기"
                         onPointerDown={onPadDown('slash')}>베기
                 </button>
-                <button type="button" className="sm-pad-btn sm-pad-qi" aria-label="장풍"
-                        onPointerDown={onPadDown('qi')}>장풍
+                <button
+                  type="button"
+                  className={'sm-pad-btn sm-pad-qi' + (qiReady ? '' : ' is-disabled')}
+                  aria-label="장풍"
+                  aria-disabled={!qiReady}
+                  disabled={!qiReady}
+                  onPointerDown={onPadDown('qi')}
+                >장풍
                 </button>
                 <button
                   type="button"
-                  className={'sm-pad-btn sm-pad-dash' + (dashReady ? '' : ' sm-pad-cd')}
+                  className={'sm-pad-btn sm-pad-dash' + (dashReady ? '' : ' sm-pad-cd is-disabled')}
                   aria-label="이형환위"
+                  aria-disabled={!dashReady}
+                  disabled={!dashReady}
                   onPointerDown={onPadDown('dash')}
                   style={{'--sm-cd': dashCdFraction} as CSSProperties}
                 >이형환위
@@ -1257,6 +1262,13 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
             </div>
           )}
         </div>
+        {/* 모바일 가상 패드 — sm-world 밖 (transform: scale 영향 X), sm-stage 자식. */}
+        {phase === 'playing' && !view.isDesktop && (
+          <>
+            <div ref={padBaseRef} className="sm-pad-base" aria-hidden="true" />
+            <div ref={padDotRef} className="sm-pad-dot" aria-hidden="true" />
+          </>
+        )}
       </div>
     </div>
   )

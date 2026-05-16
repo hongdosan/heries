@@ -92,6 +92,9 @@
   border: 1px solid var(--rule);
   display: flex;
   flex-direction: column;
+  /* height 명시 — content fit 시 frame size 가 stage state 따라가 resize 시 무한 축소 루프 야기.
+     height 고정 = body flex 1 이 head 제외 영역 안정 차지 → frame 독립. */
+  height: calc(100dvh - var(--mg-dialog-gap));
   max-height: calc(100dvh - var(--mg-dialog-gap));
 }
 
@@ -180,7 +183,8 @@
 }
 
 .mini-game-dialog-body {
-  padding: var(--s-3);
+  /* 게임 frame 과 dialog 경계 사이 작은 여백 (너무 딱 붙음 방지). */
+  padding: var(--s-2);
   background: var(--bg-sunken);
   display: flex;
   justify-content: center;
@@ -199,20 +203,22 @@
   height: auto;
 }
 
-/* 가로형 게임은 9:16 강제 미적용. dialog 가용 공간 100% 활용 후 게임 자체 fit. */
+/* 가로형 게임은 9:16 강제 미적용. dialog 가용 공간 100% 활용 후 게임 자체 fit.
+   min-height = desktop 에서 stage 너무 작아짐 방지하되 viewport height 짧으면 자동 축소.
+   min(420px, calc(100dvh - 120px)) = viewport 540px 이상이면 420 floor, 미만이면 자동 작아짐. */
 .mini-game-dialog-body .mini-game-frame--landscape {
   width: 100%;
   max-width: 100%;
   height: 100%;
   max-height: calc(100dvh - var(--mg-dialog-gap) - var(--mg-dialog-head) - var(--s-5));
-  min-height: 320px;
+  min-height: min(420px, calc(100dvh - 120px));
 }
 
 @media (max-width: 640px) {
-  /* 모바일 = 전체화면 고정. 헤더만 sticky, 게임 영역 = viewport 전체에 fit. */
+  /* 모바일 = 전체화면 고정. 헤더 슬림 = 게임 영역 가용 height 최대 확보. */
   .mini-game-dialog {
     --mg-dialog-gap: 0px;
-    --mg-dialog-head: var(--s-7);  /* 모바일 헤더 더 컴팩트 (약 48px) */
+    --mg-dialog-head: 36px;  /* 모바일 헤더 슬림 — close 28 + padding 4 (실측 정합) */
     --mg-dialog-frame-max: 100%;
     width: 100vw;
     max-width: 100vw;
@@ -229,26 +235,40 @@
     border: 0;
   }
 
+  /* 모바일 헤더 슬림 — close 28 + 작은 title. */
   .mini-game-dialog-head {
-    padding: var(--s-2) var(--s-3);
+    padding: 2px var(--s-2);
+    min-height: var(--mg-dialog-head);
+  }
+  .mini-game-dialog-title {
+    font-size: var(--fs-sm);
+  }
+  .mini-game-dialog-close {
+    width: 28px;
+    height: 28px;
+    font-size: var(--fs-sm);
+  }
+  .mini-game-dialog-back {
+    padding: 2px var(--s-2);
+    font-size: var(--fs-xs);
   }
 
   .mini-game-dialog-body {
-    padding: var(--s-1);
+    padding: var(--s-2);  /* 모바일도 작은 여백 — 게임 frame 이 viewport 경계 딱 붙지 않게 */
   }
 
   .mini-game-dialog-body .mini-game-frame {
     /* SSOT 변수로 calc — viewport 전체 fit (9:16). */
-    width: min(100%, calc((100dvh - var(--mg-dialog-head) - var(--s-3)) * 9 / 16));
+    width: min(100%, calc((100dvh - var(--mg-dialog-head)) * 9 / 16));
     max-width: 100%;
-    max-height: calc(100dvh - var(--mg-dialog-head) - var(--s-3));
+    max-height: calc(100dvh - var(--mg-dialog-head));
   }
   /* 가로형 — viewport 전체 가로 활용 (portrait 모바일에서도 풀폭). */
   .mini-game-dialog-body .mini-game-frame--landscape {
     width: 100%;
     max-width: 100%;
     height: 100%;
-    max-height: calc(100dvh - var(--mg-dialog-head) - var(--s-3));
+    max-height: calc(100dvh - var(--mg-dialog-head));
     min-height: 0;
   }
 }
@@ -278,6 +298,13 @@
   font-size: var(--fs-sm);
   color: var(--fg-3);
   text-align: center;
+  line-height: 1.6;
+}
+
+.mini-game-select-hint {
+  font-size: var(--fs-xs);
+  color: var(--fg-4);
+  letter-spacing: 0.04em;
 }
 
 .mini-game-select-list {
@@ -285,12 +312,12 @@
   padding: 0;
   margin: 0 auto;
   display: grid;
-  /* 카드 가로폭 균등 — 각 카드는 cell 의 1fr 차지, min-width 0 으로 content
-   * 길이에 따른 trace 확장 차단. dialog 가 넓어지면 카드 폭도 동등하게 ↑. */
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  /* 좁은 viewport 에서 grid cell 이 minmax 의 min (200px) 보다 작아지면 overflow.
+     min(200px, 100%) = viewport 가 200 미만이면 100% (단일 컬럼), 이상이면 200px floor. */
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
   gap: var(--s-3);
   width: 100%;
-  max-width: 640px;  /* 카드 ≥3 일 때도 한 줄 안 너무 옆으로 퍼지지 않도록 제한 */
+  max-width: 640px;
 }
 
 .mini-game-select-card {
@@ -298,8 +325,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--s-2);
-  padding: var(--s-5) var(--s-4);
+  gap: var(--s-1);
+  padding: var(--s-3);
   background: var(--surface);
   border: 1px solid var(--rule);
   border-radius: var(--r-md);
@@ -308,11 +335,17 @@
   transition: border-color var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
   font: inherit;
   text-align: center;
-  /* 카드 가로폭·세로폭 모두 균등 강제. height 고정 + content overflow ellipsis. */
+  /* 카드 폭은 grid cell 따라가되 최소 0 (좁은 viewport 시 carousel·overflow 방지). */
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  height: 148px;
+  /* content fit + 최소 보장 — 좁은 viewport 에서 글씨 wrap 시 카드도 늘어남. */
+  min-height: 128px;
+  overflow: hidden;
+}
+
+.mini-game-select-card > * {
+  max-width: 100%;
 }
 
 .mini-game-select-card:hover {
@@ -322,24 +355,26 @@
 }
 
 .mini-game-select-emoji {
-  font-size: var(--fs-2xl);
+  font-size: var(--fs-xl);
   line-height: 1;
 }
 
 .mini-game-select-title {
-  font-size: var(--fs-md);
+  font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--fg);
+  /* 한 줄 강제 + 좁은 카드 폭 초과 시 ellipsis (양쪽 잘림 차단). */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .mini-game-select-desc {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-xs);
   color: var(--fg-3);
   line-height: 1.4;
-  /* 설명 길이가 카드 높이에 영향 주지 않도록 2 줄 강제 + ellipsis. */
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  /* 설명 1 줄 강제 + ellipsis (이전 2 줄 → 카드 height 압박 해소). */
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;

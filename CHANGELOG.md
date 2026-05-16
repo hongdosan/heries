@@ -36,6 +36,49 @@ develop 안 누적 변경 (향후 release 후보 — 버전 미할당):
 
 ---
 
+## [v0.2.7] — 2026-05-17
+
+### Fixed (광살검 모바일 결함 보강 — v0.2.6 hotfix)
+- **모바일 가상 패드 위치 정합** — `sm-pad-base/dot` → `sm-stage` 자식 (`sm-world` 밖) 으로 이동. 이전 = `sm-world` 안 `transform: scale(view.scale)` 영역에 갇혀 JS 가 설정한 viewport px 좌표가 scale 적용 후 작아져 항상 좌상단 쪽 표시
+- **`mini-game-dialog-card` height 명시** — `max-height` 만 → `height + max-height` 둘 다 `calc(100dvh - gap)`. 이전 = content fit → body flex 1 의 부모 height 가 frame content 따라감 → frame content 가 sm-stage size 따라가서 resize 시 무한 축소 루프. 광살검에서 브라우저 너비 줄였다 늘릴 때 stage 가 무한히 얇아지는 결함
+
+### Changed (광살검 패드 버튼)
+- **장풍 버튼 disabled** — `qiReady = ki >= QI_COST` 신규 + 내공 부족 시 `disabled` 속성 + `is-disabled` 클래스
+- **이형환위 버튼 disabled** — 내공 부족 시 `disabled` 속성 + `is-disabled` 클래스 (기존 게이지 `sm-pad-cd` 위 보강)
+- **`.sm-pad-btn` 라벨 가운데 정렬 + 줄바꿈 차단** — `width: 56` → `min-width: 56` + `padding: 0 10px` + `display: inline-flex` + `align-items/justify-content: center` + `white-space: nowrap` (이형환위 4자 라벨 폭 자동 fit + 글자 가운데)
+- **`.sm-pad-btn:disabled / .is-disabled` 시각** — opacity 0.42 + grayscale 0.4 + cursor not-allowed + pointer-events none
+
+### Notes
+- 검증: typecheck 0 / vite build 0 / check-secrets 0
+- 메뉴 화면도 dialog card 가 viewport 차지 (이전엔 content fit) — 무한 축소 루프 차단 우선
+
+---
+
+## [v0.2.6] — 2026-05-17
+
+### Reverted
+- **v0.2.4 / v0.2.5 모바일 변경 일괄 revert** — iOS 모바일에서 화면 자체 잘림 + 검기생존록 9:16 비율 깨짐 야기. v0.2.3 (`b5eaf3c`) 상태로 코드 복원
+- v0.2.4 / v0.2.5 tag 는 history 보존 (이후 참고용)
+
+### Fixed (광살검 무조건 fit)
+- **`stickman-murim.tsx` fit() `STAGE_FIT_MIN_W/H` 폐기** — `Math.max(MIN, rect)` 가 viewport 가용 height (가로 모바일 ~322px) 보다 큰 `MIN_H = 420` 강제 → stage viewport 밖 삐져나옴. MIN 폐기로 "어떤 화면이든 fit" 보장. rect 0 시만 skip
+- **`frame--landscape` min-height 동적** — `420px` → `min(420px, calc(100dvh - 120px))` (viewport 짧으면 자동 축소, 큰 viewport 는 420 floor 유지)
+- **`sm-frame::after` 가로 회전 풀스크린 안내 폐기** — 게임 영역 가림 + 디자인 부적합. PC 권장 안내는 select intro 로 이동
+- **모바일 헤더 슬림** — `--mg-dialog-head` 48 → 36, padding s-2 s-3 → 2px s-2, close 44 → 28, title font fs-md → fs-sm (가용 게임 height 증가)
+- **`dialog-body` padding `s-2`** — 게임 frame 과 dialog 경계 분리 (이전 = 딱 붙음)
+
+### Changed
+- **PC 환경 권장 안내** — `mini-game-select-intro` 안에 `(PC 환경 권장)` 한 줄 추가 (모든 미니 게임 공통, 메뉴 화면 1회 안내)
+- **`mini-game-select` grid** — `minmax(200px, 1fr)` → `minmax(min(200px, 100%), 1fr)` (좁은 viewport 시 단일 컬럼 fallback, 우측 overflow 차단)
+- **`mini-game-select-card` 컴팩트** — padding s-5 s-4 → s-3, height 148 → min-height 128, emoji fs-2xl → fs-xl, title fs-md → fs-sm + nowrap ellipsis, desc 2줄 → 1줄 nowrap ellipsis (좁은 card 폭 글씨 잘림 차단)
+
+### Notes
+- 검증: typecheck 0 / vite build 0 / check-secrets 0
+- 사용자 시연 후 v0.2.4 / v0.2.5 의 모바일 결함 호소 → 즉시 롤백 + fit 본질 해결 + UI 정합 동시 처리
+- 단일 push 로 사이트 안정 복구 + 광살검 무조건 fit + 미니 게임 메뉴 정합 적용
+
+---
+
 ## [v0.2.3] — 2026-05-16
 
 ### Changed (광살검 모바일 UX)
