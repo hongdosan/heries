@@ -12,13 +12,9 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 ## [Unreleased]
 
-(다음 release 후보 — develop 안 누적 변경)
+develop 안 누적 변경 (향후 release 후보 — 버전 미할당):
 
----
-
-## [v0.3.0] — 2026-05-16
-
-### Added (dev tooling)
+### Added (dev tooling — develop 안 commit `be024d7`)
 - **React Compiler (babel-plugin-react-compiler)** 도입 — `compilationMode: 'all'` 모드. 자동 메모이제이션 → 수동 `React.memo / useCallback / useMemo` 부담 ↓
 - **ESLint 9** flat config (`eslint.config.js`) 신규 + `lint` / `lint:fix` script
   - `@typescript-eslint/parser` + `eslint-plugin-react` + `eslint-plugin-react-hooks@5`
@@ -29,18 +25,29 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
   - 기존 슬라이스 CSS 모두 유지 — 신규 컴포넌트는 Tailwind 우선, 기존 컴포넌트는 점진 마이그레이션
   - 전략 SSOT: `src/shared/styles/tailwind-migration.md` (5 Phase 로드맵)
 
-### Changed (devDep)
-- 신규 devDep 추가 — babel-plugin-react-compiler / eslint + plugins / tailwindcss + @tailwindcss/vite
-- 런타임 의존 = 변경 0 (React 19 + React Router 7 그대로). 정책 #3 정합
-
-### Performance / Bundle
-- dist js: 303.63 KB raw / **107.53 KB gzip** (+10.2 KB — React Compiler runtime)
-- dist css: 56.37 → 66.63 KB raw / 11.33 → **13.64 KB gzip** (+2.3 KB — Tailwind preflight reset)
-- 빌드 시간: 0.5s → **1.96s** (compiler 분석 + Tailwind purge)
+### Bundle (예상)
+- dist js: +10.2 KB gzip (React Compiler runtime)
+- dist css: +2.3 KB gzip (Tailwind preflight reset)
+- 빌드 시간: +1.4s (compiler 분석 + Tailwind purge)
 
 ### Notes
-- 사용자-facing 변경 0 (시각·동작 동일)
-- 작가 측 개발 편의 ↑ (자동 메모이제이션 / lint / 향후 atomic class)
+- 이전 v0.3.0 첫 시도에서 사이트 장애 → 즉시 롤백 (main = v0.2.2 복귀). 본 작업은 develop 에 보존, *재검토·테스트* 후 별도 release 진입 예정
+- 사용자-facing 변경 0 (시각·동작 동일 — dev tooling 만)
+
+---
+
+## [v0.2.3] — 2026-05-16
+
+### Changed (광살검 모바일 UX)
+- **좌측 [←][→] 버튼 → 좌측 영역 swipe 가상 패드** (검기생존록 패턴 정합)
+  - 터치한 자리에 반투명 ring + dot (조이스틱) 표시, drag dx 부호로 좌/우 이동
+  - 우측 영역 = 베기·장풍·이형환위 버튼 (기존 유지)
+- **모바일 portrait 시 가로 회전 안내** — `↻ 기기를 가로로 돌려 주세요` 풀스크린 (z-index 200). landscape 회전 시 자동 해제
+- **터치 차단** — `user-select: none`, `touch-action: none`, `-webkit-touch-callout: none`, `-webkit-tap-highlight-color: transparent`, `overscroll-behavior: contain`, `onContextMenu` 차단. 더블탭 확대·텍스트 선택·long-press 메뉴·overscroll bounce 모두 차단
+
+### Notes
+- 사용자 시연 후 OK 확인 → main 직접 commit (release 사이클 단축)
+- v0.3.0 (Compiler/ESLint/Tailwind) 은 develop 에만 보존 — 별도 release 진입 대기
 
 ---
 
