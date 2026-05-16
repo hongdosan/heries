@@ -12,46 +12,72 @@
 
 @import 'tailwindcss';
 
+/* SSOT 정합 — tailwind @theme 은 tokens.css 의 :root var 를 직접 참조.
+   다크 모드도 tokens.css 의 [data-theme="dark"] / @media prefers-color-scheme 에서 갱신된 var 자동 반영.
+   tailwind class (bg-bg, text-fg 등) ≡ 기존 CSS (var(--bg), var(--fg))  → 단일 SSOT. */
 @theme {
-  /* surface — 기존 tokens.css 의 :root var 와 일치 */
-  --color-bg: #ffffff;
-  --color-bg-soft: #f7f7f5;
-  --color-bg-sunken: #efefec;
-  --color-surface: #ffffff;
+  /* surface */
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-bg-sunken: var(--bg-sunken);
+  --color-surface: var(--surface);
 
   /* text */
-  --color-fg: #16161a;
-  --color-fg-2: #3a3a40;
-  --color-fg-3: #6e6e76;
-  --color-fg-4: #9e9ea6;
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-fg-4: var(--fg-4);
 
-  /* accent — ink blue */
-  --color-accent: #3050a0;
-  --color-accent-hover: #1f3878;
+  /* accent */
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ring: var(--accent-ring);
 
   /* rules */
-  --color-rule: #e6e6e2;
-  --color-rule-strong: #cfcfcb;
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
 
   /* warn / code */
-  --color-warn-bg: #fff7df;
-  --color-warn-rule: #c89417;
-  --color-warn-fg: #745812;
-  --color-code-bg: #f0efea;
+  --color-warn-bg: var(--warn-bg);
+  --color-warn-rule: var(--warn-rule);
+  --color-warn-fg: var(--warn-fg);
+  --color-code-bg: var(--code-bg);
 
-  /* spacing — 기존 --s-* 와 일치 */
-  --spacing-1: 4px;
-  --spacing-2: 8px;
-  --spacing-3: 12px;
-  --spacing-4: 16px;
-  --spacing-5: 24px;
-  --spacing-6: 32px;
-  --spacing-7: 48px;
-  --spacing-8: 64px;
-  --spacing-9: 96px;
+  /* spacing — 기존 --s-* 와 동기화 */
+  --spacing-1: var(--s-1);
+  --spacing-2: var(--s-2);
+  --spacing-3: var(--s-3);
+  --spacing-4: var(--s-4);
+  --spacing-5: var(--s-5);
+  --spacing-6: var(--s-6);
+  --spacing-7: var(--s-7);
+  --spacing-8: var(--s-8);
+  --spacing-9: var(--s-9);
 
-  /* font */
-  --font-sans: "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo",
-               -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  /* font family */
+  --font-sans: var(--font);
+  --font-mono: var(--font-mono);
+
+  /* font-size — text-{key} utility */
+  --text-xs: var(--fs-xs);
+  --text-sm: var(--fs-sm);
+  --text-base: var(--fs-base);
+  --text-md: var(--fs-md);
+  --text-lg: var(--fs-lg);
+  --text-xl: var(--fs-xl);
+  --text-display: var(--fs-display);
+
+  /* border-radius — rounded-{key} utility */
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-pill: var(--r-pill);
+
+  /* shadow — shadow-{key} utility */
+  --shadow-soft: var(--shadow);
 }
+
+/* Dark mode variant — Tailwind v4 의 dark: prefix 활성.
+   실제 색은 tokens.css 의 [data-theme="dark"] 룰이 :root var 를 자동 override → @theme 자동 갱신. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));

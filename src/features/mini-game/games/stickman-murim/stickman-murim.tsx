@@ -654,7 +654,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
     flashText('허공', 'stone')
     setCombo(0)
     setKi((v) => clamp(v + KI_PER_WHIFF, 0, KI_MAX))
-  }, [combo, flashText, hitStop, spawnBurst, triggerShake])
+  }, [combo, flashText, hitStop, spawnBurst, spawnEffect, triggerShake])
 
   const qiAttack = useCallback(() => {
     const s = stateRef.current
@@ -777,7 +777,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
 
       // player update
       setPlayer((p) => {
-        let vx = p.vx * FRICTION
+        const vx = p.vx * FRICTION
         let dir: 1 | -1 = p.dir
         let x = p.x
         const speed = PLAYER_SPEED * (dt / DT_BASE_MS)

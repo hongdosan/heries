@@ -63,13 +63,84 @@ export default [
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
       }],
+      '@typescript-eslint/consistent-type-imports': ['warn', { prefer: 'type-imports' }],
+      '@typescript-eslint/no-explicit-any': 'warn',
 
       // 본 프로젝트는 React 17+ 의 new JSX transform — React import 강제 X.
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',  // TS 가 prop 검증
+      'react/jsx-key': 'error',
+      'react/jsx-no-target-blank': 'error',
+      'react/self-closing-comp': 'warn',
+
+      // 코드 품질 — 정책 #5 strict 정합.
+      'eqeqeq': ['error', 'smart'],
+      'no-var': 'error',
+      'prefer-const': 'warn',
+      'no-unused-expressions': 'warn',
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
     settings: {
       react: { version: '19' },
+    },
+  },
+  // FSD 격리 — 상위 레이어 → 하위 레이어만 import. 슬라이스 외부 접근 = index.ts (Public API) 만.
+  // CLAUDE.md 정책 #4 정합. 본 룰은 각 레이어별 src/{layer}/ 안에서 상위 레이어 import 차단.
+  {
+    files: ['src/shared/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { group: ['../app/**', '../pages/**', '../widgets/**', '../features/**', '../entities/**'], message: 'shared 레이어는 상위 레이어 import 금지 (FSD 정책 #4)' },
+        ],
+      }],
+    },
+  },
+  {
+    files: ['src/entities/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { group: ['../app/**', '../pages/**', '../widgets/**', '../features/**'], message: 'entities 레이어는 상위 레이어 import 금지 (FSD 정책 #4)' },
+        ],
+      }],
+    },
+  },
+  {
+    files: ['src/features/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { group: ['../app/**', '../pages/**', '../widgets/**'], message: 'features 레이어는 상위 레이어 import 금지 (FSD 정책 #4)' },
+        ],
+      }],
+    },
+  },
+  {
+    files: ['src/widgets/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { group: ['../app/**', '../pages/**'], message: 'widgets 레이어는 상위 레이어 import 금지 (FSD 정책 #4)' },
+        ],
+      }],
+    },
+  },
+  {
+    files: ['src/pages/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          { group: ['../app/**'], message: 'pages 레이어는 app import 금지 (FSD 정책 #4)' },
+        ],
+      }],
+    },
+  },
+  // .stories.tsx — TS strict 완화 (Storybook decorator·meta 타입).
+  {
+    files: ['src/**/*.stories.tsx'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 ]
