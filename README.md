@@ -4,7 +4,9 @@
 
 **H-eries** = `홍도산` + `(s)eries`. 단일 작가(`홍도산`)가 운영하는 **오리지널 웹 시리즈 컬렉션**.
 
-**최소 의존 — 런타임은 React 19 + React Router + Vite + TypeScript.** dev 도구 (Storybook 등) 는 devDependencies. 외부 UI/상태 라이브러리 미사용. *코드만 있으면 어디서든 실행 가능* 한 이식성을 우선한다. GitHub Pages 로 발행 (BrowserRouter, `.nojekyll`).
+**최소 의존 — 런타임은 React 19 + React Router + Vite + TypeScript.** dev 도구 (Storybook 등) 는
+devDependencies. 외부 UI/상태 라이브러리 미사용. *코드만 있으면 어디서든 실행 가능* 한 이식성을 우선한다. GitHub Pages 로 발행 (
+BrowserRouter, `.nojekyll`).
 
 ---
 
@@ -17,7 +19,8 @@
 ```
 
 - **모든 저작권은 홍도산 에게 단독 귀속**. 복제·배포·전송·번역·각색·기계학습 모델 학습 데이터 사용 모두 사전 서면 허가 필수.
-- **코드·구조도 동일하게 All Rights Reserved** — *코드·구조* (TypeScript·CSS·AI 에이전트 정의·빌드 스크립트·운영 문서) 와 *서사 콘텐츠* (`content/`) 모두 홍도산 단독 귀속. 오픈소스 라이선스 아님. 상세: [`LICENSE`](./LICENSE).
+- **코드·구조도 동일하게 All Rights Reserved** — *코드·구조* (TypeScript·CSS·AI 에이전트 정의·빌드 스크립트·운영 문서) 와 *서사
+  콘텐츠* (`content/`) 모두 홍도산 단독 귀속. 오픈소스 라이선스 아님. 상세: [`LICENSE`](./LICENSE).
 - 라이선스·권리 문의: `contact_hongdosan@naver.com` 또는 GitHub Issue.
 - 자세한 정책: [NOTICE](./NOTICE.md).
 
@@ -32,25 +35,67 @@
 ## 빠른 시작
 
 ```bash
-npm install              # 1회
-npm run dev              # 개발 서버 (http://localhost:8000)
+# 작가 (서브모듈 권한 있음)
+git clone --recursive https://github.com/hongdosan/heries.git
+cd heries
+./scripts/init-private.sh   # .claude/handoff·workflow/plan·prompt/custom 심링크 생성
+npm install
+npm run dev                 # 개발 서버 (http://localhost:8000)
+
+# 외부 기여자 (서브모듈 권한 없음)
+git clone https://github.com/hongdosan/heries.git
+cd heries
+./scripts/init-private.sh   # 안내만 출력, Mock 모드 진입
+npm install
+npm run dev                 # handoff·plan·prompt 미반영 상태로 빌드 가능
+```
+
+기타 명령:
+
+```bash
 npm run build            # 프로덕션 빌드 (dist/) — GitHub Pages 배포용
 npm run typecheck        # 타입 체크
 npm run storybook        # Storybook dev 서버 (port 6006)
 npm run build-storybook  # Storybook 정적 빌드 (storybook-static/, 미배포)
+npm run optimize:images  # 이미지 자동 압축 (500 KB 이하)
 ```
 
-`.env.local` (gitignored) 또는 GitHub Secret 으로 `VITE_AUTHOR_KEY=<임의문자열>` 주입 시 `/unlock` 페이지에서 작가 모드 진입 가능.
+`.env.local` (gitignored) 또는 GitHub Secret 으로 `VITE_AUTHOR_KEY=<임의문자열>` 주입 시 `/unlock` 페이지에서 작가 모드
+진입 가능.
+
+## 브랜치 전략
+
+3 branch + tag (SemVer):
+
+- `develop` = 활발 개발 (작가 직접 commit)
+- `release` = release candidate (검수)
+- `main` = 배포 대상 (release → main merge + `vX.Y.Z` tag → GitHub Pages auto-deploy)
+
+자세한 운영 규약 = [`.claude/harness/git-strategy.md`](./.claude/harness/git-strategy.md). 변경 누적 = [
+`CHANGELOG.md`](./CHANGELOG.md).
+
+## 프라이빗 자료 (서브모듈)
+
+작가 운영 내부 자료 (세션 핸드오프·작업 계획·커스텀 프롬프트) 는 별도 프라이빗 저장소 [
+`martial-arts-config`](https://github.com/hongdosan/martial-arts-config) 의 `heries/` 폴더에 분리 보관,
+서브모듈로 연결한다. 본 repo 의 `.claude/handoff/`, `.claude/workflow/plan/`, `.claude/workflow/prompt/custom/`
+는 심링크 (gitignored). 자세한 절차 = [
+`.claude/harness/private-config.md`](./.claude/harness/private-config.md).
 
 ## 배포
 
-`main` 브랜치 push 시 [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) 가 자동으로 GitHub Pages 에 단일 빌드를 배포한다 (`https://hongdosan.github.io/heries/`). 워크플로우는 GitHub Secret `VITE_AUTHOR_KEY` 를 빌드 env 로 주입한다.
+`main` 브랜치 push (또는 `vX.Y.Z` tag push) 시 [
+`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) 가 자동으로 GitHub Pages 에 단일 빌드를 배포한다 (
+`https://hongdosan.github.io/heries/`). 워크플로우는 GitHub Secret `VITE_AUTHOR_KEY` 를 빌드 env 로 주입한다.
 
 ---
 
 ## 스포일러 분리 (작가 모드 vs 독자 모드)
 
-정책 #9 v2 (2026-05-14) — **단일 라이브 빌드**. 작가 콘텐츠는 dist 산출물에 평문 포함되며, 기본 화면에서는 runtime 마스킹 (`shared/lib/spoiler.ts` + `useAuthorMode` hook) 으로 가려진다. 작가 모드 진입은 [`/unlock`](https://hongdosan.github.io/heries/unlock) 페이지에서 `VITE_AUTHOR_KEY` 검증 통과 시 sessionStorage `heries:author=1` 플래그 set. 탭을 닫으면 자동 잠금.
+정책 #9 v2 (2026-05-14) — **단일 라이브 빌드**. 작가 콘텐츠는 dist 산출물에 평문 포함되며, 기본 화면에서는 runtime 마스킹 (
+`shared/lib/spoiler.ts` + `useAuthorMode` hook) 으로 가려진다. 작가 모드 진입은 [
+`/unlock`](https://hongdosan.github.io/heries/unlock) 페이지에서 `VITE_AUTHOR_KEY` 검증 통과 시 sessionStorage
+`heries:author=1` 플래그 set. 탭을 닫으면 자동 잠금.
 
 **마스킹 대상** (비-작가 모드에서 가림):
 
@@ -60,7 +105,9 @@ npm run build-storybook  # Storybook 정적 빌드 (storybook-static/, 미배포
 - `worldbuilding/`, `timeline/`, `glossary/` 디렉토리
 - 등장인물 상세 페이지 (주인공 제외) — 라우트 가드로 잠금 안내
 
-**보안 책임 분리** — 작가는 기본 마스킹과 환경변수 격리를 보장한다. reader 가 devtools / git clone 등으로 능동적으로 우회해 스포일러를 읽는 경우는 reader 자신의 책임 (지손해). 단 **개인정보·API 키·시크릿·작가 키는 절대 코드에 hardcode 금지** (CLAUDE.md #13). 빌드 시 `scripts/check-secrets.mjs` 가 dist 시크릿 패턴 누수를 검증.
+**보안 책임 분리** — 작가는 기본 마스킹과 환경변수 격리를 보장한다. reader 가 devtools / git clone 등으로 능동적으로 우회해 스포일러를 읽는 경우는
+reader 오로지 독자 본인의 책임 (스포에 대한 책임지지 않음.). 단 **개인정보·API 키·시크릿·작가 키는 절대 코드에 hardcode 금지** (CLAUDE.md
+#13). 빌드 시 `scripts/check-secrets.mjs` 가 dist 시크릿 패턴 누수를 검증.
 
 정책 SSOT: [`.claude/CLAUDE.md`](./.claude/CLAUDE.md) §원칙 #9 / #13.
 
@@ -68,8 +115,8 @@ npm run build-storybook  # Storybook 정적 빌드 (storybook-static/, 미배포
 
 ## 작품 목록
 
-| 슬러그 | 상태 |
-|---|---|
+| 슬러그                                                              | 상태  |
+|------------------------------------------------------------------|-----|
 | [`clash-of-multiverses`](./content/series/clash-of-multiverses/) | tba |
 
 > 신규 작품 추가 시 `content/series/{slug}/` 트리 + `content/series.json` `series[]` + `manifest.json` 생성.
@@ -128,12 +175,16 @@ summary: 한 줄 요약
 # (캐릭터명)
 
 ## 핵심 정체성
+
 ## 능력
+
 ## 외형
+
 ## 인간관계
+
 ## 출신 배경
 
-## H-eries 분기 — (작품명) 변형  ← reader 빌드에서 마스킹
+## H-eries 분기 — (작품명) 변형 ← reader 빌드에서 마스킹
 ```
 
 - 모든 캐릭터는 `origin: original`.
@@ -147,7 +198,8 @@ summary: 한 줄 요약
 `src/` 는 **Feature-Sliced Design (FSD)** 6 레이어. React 19 + React Router 7 (BrowserRouter) + Vite 6.
 
 - FSD 가이드: [`src/README.md`](./src/README.md)
-- CSS 슬라이스 분산 — shared/styles (tokens/base/typography/layout/utilities/author-mode/responsive) + 각 위젯·페이지·feature 슬라이스 옆 `{name}.css`
+- CSS 슬라이스 분산 — shared/styles (tokens/base/typography/layout/utilities/author-mode/responsive) + 각
+  위젯·페이지·feature 슬라이스 옆 `{name}.css`
 - 공통 UI 컴포넌트 (`shared/ui/`) 추가 시 `{name}.stories.tsx` 강제 (Storybook)
 
 ---
@@ -158,14 +210,14 @@ summary: 한 줄 요약
 
 운영 문서 진입점: [`.claude/harness/harness.md`](./.claude/harness/harness.md)
 
-| 에이전트 | 역할 |
-|---|---|
-| `heries-lorekeeper` | 캐릭터 카드 SSOT 관리·검증 |
-| `heries-worldsmith` | 세계관·연표·용어 SSOT |
-| `heries-author` | 챕터 집필 |
-| `heries-continuity-reviewer` | 신규 챕터 정합성 감사 |
-| `heries-frontend-engineer` | `src/` + 빌드 설정 |
-| `heries-publisher` | 발행·배포 |
+| 에이전트                         | 역할                |
+|------------------------------|-------------------|
+| `heries-lorekeeper`          | 캐릭터 카드 SSOT 관리·검증 |
+| `heries-worldsmith`          | 세계관·연표·용어 SSOT    |
+| `heries-author`              | 챕터 집필             |
+| `heries-continuity-reviewer` | 신규 챕터 정합성 감사      |
+| `heries-frontend-engineer`   | `src/` + 빌드 설정    |
+| `heries-publisher`           | 발행·배포             |
 
 라우터 = [`heries-orchestrator`](./.claude/skills/heries-orchestrator/SKILL.md) 스킬.
 

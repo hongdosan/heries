@@ -44,3 +44,10 @@ storybook-static/
 content/_legacy_*/
 
 /secret-dir/
+
+# 서브모듈 (.private-config) 으로 옮긴 자료의 심링크 — git tracking X.
+# 본 심링크는 scripts/init-private.sh 가 로컬에서 재생성.
+# 절차: .claude/harness/private-config.md
+.claude/handoff
+.claude/workflow/plan
+.claude/workflow/prompt/custom
