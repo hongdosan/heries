@@ -14,6 +14,12 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 develop 안 누적 변경 (향후 release 후보 — 버전 미할당):
 
+### Added (CSS 아키텍처)
+- **ITCSS 7 layer** (Inverted Triangle CSS, Harry Roberts) 차용 + 명시 — Settings / Tools / Generic / Elements / Objects / Components / Utilities. 본 프로젝트 매핑: tokens.css = Settings, base.css reset = Generic, base.css 의 a/button/img + typography.css h1~h6 = Elements, layout.css + utilities.css = Objects, 슬라이스 .css = Components, Tailwind class = Utilities
+- **`src/shared/lib/cn.ts`** 신규 — shadcn/ui 패턴의 `cn()` class composition helper (런타임 의존 0 자체 구현, 0.2 KB)
+- **`scripts/check-manifest.mjs`** 신규 — manifest.json vs filesystem 정합 자동 검증 (누락=error, 고아=warning). build 게이트 추가
+- **`tailwind.css @theme` 토큰 보강** — `--text-2xl/3xl`, `--container-page/reader`, `--shadow-soft`, `--radius-*`, `--accent-soft/ring`
+
 ### Added (dev tooling)
 - **React Compiler (babel-plugin-react-compiler)** — `compilationMode: 'all'`. 자동 메모이제이션
 - **ESLint 9** flat config + plugins
@@ -27,10 +33,14 @@ develop 안 누적 변경 (향후 release 후보 — 버전 미할당):
   - 전략 SSOT: `tailwind-migration.md` (토큰 매핑 + Phase 로드맵)
 - **`tsconfig.verbatimModuleSyntax: true`** — type-only import 명시 강제
 
-### Changed (CSS 점진 마이그레이션)
+### Changed (CSS Tailwind 전면 전환 — 점진)
 - **not-found 페이지** — Tailwind utility 전환, `not-found.css` 폐기
 - **footer widget** — Tailwind utility 전환, `footer.css` 폐기
-- **storybook preview** — tailwind.css import 추가, 폐기된 .css import 제거
+- **header widget** — Tailwind utility 전환 (backdrop-blur + responsive max-sm:hidden 등), `header.css` 폐기
+- **error-boundary** — Tailwind utility 전환 (시각 + dev stack trace details 모두), `error-boundary.css` 폐기
+- **about / notice 페이지 wrapper** — Tailwind utility 전환 (`page-about/notice/about-meta` 폐기). breadcrumb / loading / empty / article-prose 는 ITCSS layer 4-5 (전역 element/object) 보존
+- **storybook preview** — tailwind.css import 추가, 폐기된 .css import 모두 제거
+- **마이그레이션 보류** — 게임 슬라이스 (mini-game / stickman-murim / swordsman-survival — 좌표계 / keyframe / scale var Tailwind 표현 어려움), 큰 페이지 (home / series / chapter / character — 시각 회귀 위험 + 사용자 시연 필요)
 
 ### Changed (보안)
 - **`check-secrets.mjs`** 패턴 7종 추가 — GitHub fine-grained PAT / OAuth, Anthropic API, Stripe live/restricted, Slack token, PEM private key, JWT
@@ -39,9 +49,22 @@ develop 안 누적 변경 (향후 release 후보 — 버전 미할당):
 - **deploy.yml** = Lint step 추가 (typecheck 직전)
 
 ### Bundle (현 상태)
-- dist js: 108.25 KB gzip (v0.2.7 = 97.62 → +10.6 KB, React Compiler runtime)
-- dist css: 14.59 KB gzip (v0.2.7 = 11.65 → +2.94 KB, Tailwind preflight + 첫 utility 사용분)
-- 빌드 시간: ~1.9s
+- dist js: 107.22 KB gzip (v0.2.7 = 97.62 → +9.6 KB, React Compiler runtime)
+- dist css: 14.96 KB gzip (v0.2.7 = 11.65 → +3.3 KB, Tailwind preflight + utility 사용분)
+- 빌드 시간: ~1.5s
+
+### Fixed (자율 사이클 진행 중)
+- **React Compiler `compilationMode 'all'` → `'infer'`** — `'all'` 모드가 plain utility 함수 (theme.ts / makePlayer 등) 도 컴파일 → `useMemoCache` hook 호출 → module top-level 또는 React tree 밖 호출 시 "Invalid hook call" fail. `'infer'` (React default) = 컴포넌트 (PascalCase + JSX 반환) + hook (`use` prefix) 자동 감지·컴파일 = 안전 + 자동 메모이제이션 효과 유지
+- **`applyTheme(getTheme())` module top-level 호출 이동** — main.tsx 의 React 진입 전 호출을 `index.html` inline script 로 이동 (first-paint 전 FOUC 차단)
+- **CSP meta `frame-ancestors 'none'` 제거** — `<meta>` 태그에서 무시되는 directive (HTTP header 만 유효), console warning 해소
+
+### Changed (운영 정합 — 자율 사이클)
+- 디렉토리 정합 — `dist-author/` (정책 #9 v2 단일 빌드 후 폐기), `content/_shared/` (v0.2.0 이미지 이동 후 빈) 폐기
+- `.claude/CLAUDE.md` 정책 #3: v0.3.0 dev tooling (React Compiler / ESLint / Tailwind) 명시 + `compilationMode 'infer'` 권장 주석
+- `.claude/agents/heries-{frontend-engineer, publisher}.md`: "Tailwind 도입 X" stale 정정 + `npm run validate` 게이트 안내
+- `.claude/workflow/template/*.md`: "CLAUDE.md 11 원칙" → "13 원칙" 정합 + validate / check-manifest 게이트 추가
+- `src/shared/lib/types.ts`: `CharacterFrontmatter.reader_snapshot` 필드 추가
+- `src/README.md`: v0.3.0 dev tooling + CSS 아키텍처 명시
 
 ### Notes
 - 이전 v0.3.0 첫 시도에서 사이트 장애 → 즉시 롤백. 본 작업은 develop 에 보존, *재검토·테스트* 후 별도 release 진입
