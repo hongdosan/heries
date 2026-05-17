@@ -76,6 +76,9 @@
 
   /* shadow — shadow-{key} utility */
   --shadow-soft: var(--shadow);
+
+  /* container — max-w-{key} utility (예: max-w-page) */
+  --container-page: var(--w-page);
 }
 
 /* Dark mode variant — Tailwind v4 의 dark: prefix 활성.

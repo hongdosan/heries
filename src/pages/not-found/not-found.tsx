@@ -6,8 +6,8 @@ export function NotFoundPage() {
   return (
     <main>
       <p className="empty">페이지를 찾을 수 없습니다.</p>
-      <p className="not-found-back">
-        <Link to="/">홈으로</Link>
+      <p className="text-center mt-5 text-sm">
+        <Link to="/" className="text-fg-3 hover:text-accent">홈으로</Link>
       </p>
     </main>
   )
