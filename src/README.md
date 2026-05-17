@@ -2,7 +2,11 @@
 
 # src/ — Feature-Sliced Design (FSD)
 
-`H-eries` 의 프론트엔드. **React 19 + React Router 7 (BrowserRouter) + Vite 6 + TypeScript strict**. 외부 UI/상태 라이브러리 미사용 — *코드만 있으면 어디서든 실행 가능* 한 이식성을 우선한다. GitHub Pages 배포는 `public/404.html` SPA fallback 트릭으로 deep link 호환 (의존성 추가 0).
+`H-eries` 의 프론트엔드. **React 19 + React Router 7 (BrowserRouter) + Vite 6 + TypeScript strict**. 런타임 외부 UI/상태 라이브러리 미사용 — *코드만 있으면 어디서든 실행 가능* 한 이식성 우선. GitHub Pages 배포는 `public/404.html` SPA fallback 트릭으로 deep link 호환 (런타임 의존성 추가 0).
+
+**dev 도구 (v0.3.0+)**: Storybook · ESLint 9 (flat config + typescript / react / react-hooks / jsx-a11y plugins) · `babel-plugin-react-compiler` (`compilationMode: 'infer'` — 컴포넌트·hook 자동 메모이제이션) · **Tailwind v4** (`tailwindcss` + `@tailwindcss/vite`) · TypeScript 5. 모두 devDependencies — dist 영향 0~수 KB.
+
+**CSS 아키텍처**: ITCSS 7 layer (Settings → Tools → Generic → Elements → Objects → Components → Utilities) + Utility-first Tailwind + shadcn/ui 패턴 `cn()` helper (`src/shared/lib/cn.ts`). 상세 = [`shared/styles/tailwind-migration.md`](./shared/styles/tailwind-migration.md).
 
 ## 6 레이어 (의존 방향: 위 → 아래만)
 
