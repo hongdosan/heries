@@ -20,7 +20,7 @@ export interface MiniGameDefinition {
 // 동적 import 방지 = 카탈로그 자체가 SSOT. 새 게임 추가 시 import 1줄 +
 // 배열 1 entry. launcher 는 본 배열만 알고 게임 내부는 모름 (FSD 정합).
 import { SwordsmanSurvival } from './games/swordsman-survival'
-import { StickmanMurim } from './games/stickman-murim'
+import { Gwangsalgeom } from './games/gwangsalgeom'
 
 export const MINI_GAMES: ReadonlyArray<MiniGameDefinition> = [
   {
@@ -31,11 +31,11 @@ export const MINI_GAMES: ReadonlyArray<MiniGameDefinition> = [
     component: SwordsmanSurvival,
   },
   {
-    id: 'stickman-murim',
+    id: 'gwangsalgeom',
     title: '광살검',
     description: '몰려오는 자객을 베어라.',
     emoji: '🗡️',
-    component: StickmanMurim,
+    component: Gwangsalgeom,
   },
 ]
 

@@ -47,13 +47,14 @@
 
 ## 완료 조건 (DoD)
 
-- [ ] `npm run typecheck` 0 에러
-- [ ] `npm run build` 0 에러 + 마스킹 누수 0
+- [ ] `npm run validate` (lint + typecheck + build 단일 게이트) 0 에러
 - [ ] `npm run build-storybook` 0 에러 (영향 시)
+- [ ] `npm run lint` 0 error / 0 warning
+- [ ] check-secrets + check-manifest + check-images 모두 통과 (build 안 자동)
 - [ ] 동작 회귀 0 (기존 기능 변경 X — 의도된 변경만)
 - [ ] dist CSS/JS 크기 변화 ±N KB 안 (현재 사이즈 기준 ±5% 권고)
 - [ ] FSD 단방향 import 위반 0
-- [ ] CLAUDE.md 11 원칙 위반 0
+- [ ] CLAUDE.md 13 원칙 위반 0
 - [ ] 변경 이력 1행 (`.claude/harness/harness-state.md`)
 
 ## 검증 방법

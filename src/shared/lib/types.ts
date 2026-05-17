@@ -67,7 +67,10 @@ export interface CharacterFrontmatter {
   affiliation?: string
   role?: string
   first_appearance?: string
+  /** 캐릭터 카드의 *공개 절* 갱신 시점 챕터 슬러그 (예: "ep-03"). reader build 에서 카드 노출 사실의 시점 명시. */
+  reader_snapshot?: string
   aliases?: string[]
+  /** H-eries 분기 (본 작품) 의 소환 시점. 작가 모드 전용 (정책 #9 v2 마스킹 대상). */
   heries_arc?: string
   summary?: string
 }

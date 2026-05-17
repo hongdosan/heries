@@ -1,7 +1,6 @@
 // © 2026 홍도산. All rights reserved. Original creator work.
 import type { Meta, StoryObj } from '@storybook/react'
 import { ErrorBoundary } from './error-boundary'
-import './error-boundary.css'
 
 /**
  * `ErrorBoundary` 는 React 19 Class Component 로, 자식 트리에서 throw 된 동기 예외를
@@ -16,7 +15,7 @@ import './error-boundary.css'
  * 동기화 유지).
  */
 const meta: Meta<typeof ErrorBoundary> = {
-  title: 'shared/ui/ErrorBoundary',
+  title: 'shared/ui/에러 경계 (ErrorBoundary)',
   component: ErrorBoundary,
   parameters: {
     layout: 'fullscreen',

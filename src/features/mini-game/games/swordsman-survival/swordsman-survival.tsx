@@ -1,5 +1,4 @@
-import type {KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent} from 'react'
-import {useCallback, useEffect, useLayoutEffect, useRef, useState,} from 'react'
+import {type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react'
 import SLASH_SPRITE from '../../../../shared/images/mini-game/swordsman-survival/slash.webp?url'
 import IMPACT_ELITE_SPRITE from '../../../../shared/images/mini-game/swordsman-survival/impact-amber.webp?url'
 import IMPACT_NORMAL_SPRITE from '../../../../shared/images/mini-game/swordsman-survival/impact-crimson.webp?url'

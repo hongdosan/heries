@@ -1,7 +1,8 @@
-import {useEffect, useState, type FormEvent} from 'react'
+import {type FormEvent, useEffect, useState} from 'react'
 import {Link, useNavigate, useSearchParams} from 'react-router-dom'
 import {isAuthorMode, setAuthorMode, verifyAuthorKey} from '../../shared/lib/env.js'
 import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
+import {Button} from '../../shared/ui/button'
 
 // 작가 모드 진입 페이지. 정책 #9 v2 (2026-05-14).
 // - 폼: 작가 키 입력 → verifyAuthorKey 검증 통과 시 sessionStorage 플래그 set.
@@ -56,34 +57,38 @@ export function UnlockPage() {
   }
 
   return (
-    <main className="page-unlock">
+    <main className="max-w-[480px] mx-auto pt-5 px-4 pb-7">
       <nav className="breadcrumb">
         <Link to="/">H-eries</Link>
         <span className="sep">/</span>
         <span>작가 모드</span>
       </nav>
 
-      <h1>작가 모드</h1>
+      <h1 className="mt-4 mb-5">작가 모드</h1>
 
       {authored ? (
-        <section className="unlock-status">
-          <p>현재 <span className="author-only-badge">AUTHOR</span> 모드 활성 상태. 탭을 닫으면 자동 잠금.</p>
-          <div className="unlock-actions">
-            <Link to="/" className="unlock-btn unlock-btn-primary">홈으로</Link>
-            <button type="button" className="unlock-btn" onClick={onLock}>잠그기</button>
+        <section className="flex flex-col gap-4 p-4 bg-bg-soft border border-rule rounded-md">
+          <p className="m-0 text-fg-2">현재 <span className="author-only-badge">AUTHOR</span> 모드 활성
+            상태. 탭을 닫으면 자동 잠금.</p>
+          <div className="flex gap-2 flex-wrap mt-2">
+            <Button variant="primary" onClick={() => navigate('/')}>홈으로</Button>
+            <Button variant="secondary" onClick={onLock}>잠그기</Button>
           </div>
         </section>
       ) : (
-        <form className="unlock-form" onSubmit={onSubmit} noValidate>
-          <p className="unlock-desc">
+        <form className="flex flex-col gap-3 p-4 bg-bg-soft border border-rule rounded-md"
+              onSubmit={onSubmit} noValidate>
+          <p className="m-0 text-sm text-fg-3 leading-[1.6]">
             작가 키를 입력하면 시놉시스·세계관·연표·캐릭터 분기 등 스포일러 영역이 노출됩니다.
             세션 한정 (탭 종료 시 자동 잠금).
           </p>
-          <label htmlFor="unlock-key" className="unlock-label">작가 키</label>
+          <label htmlFor="unlock-key"
+                 className="text-xs font-semibold uppercase tracking-[0.08em] text-fg-3">작가
+            키</label>
           <input
             id="unlock-key"
             type="password"
-            className="unlock-input"
+            className="px-3 py-2 text-base font-mono bg-surface text-fg border border-rule rounded-sm transition-[border-color,box-shadow] focus-visible:border-accent focus-visible:outline-none focus-visible:[box-shadow:0_0_0_2px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
             value={input}
             onChange={(e) => {
               setInput(e.target.value)
@@ -93,10 +98,10 @@ export function UnlockPage() {
             autoFocus
             spellCheck={false}
           />
-          {error && <p className="unlock-error" role="alert">{error}</p>}
-          <div className="unlock-actions">
-            <button type="submit" className="unlock-btn unlock-btn-primary">잠금 해제</button>
-            <Link to="/" className="unlock-btn">취소</Link>
+          {error && <p className="m-0 text-sm text-warn-fg" role="alert">{error}</p>}
+          <div className="flex gap-2 flex-wrap mt-2">
+            <Button type="submit" variant="primary">잠금 해제</Button>
+            <Button variant="secondary" onClick={() => navigate('/')}>취소</Button>
           </div>
         </form>
       )}

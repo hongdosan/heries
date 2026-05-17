@@ -20,7 +20,7 @@
 > 다중 선택 가능. 본 검토의 *우선 관점*.
 
 - [ ] **버그** — race condition / 메모리 누수 / edge case / 잘못된 분기
-- [ ] **CLAUDE.md 정책** — 11 원칙 위반 점검
+- [ ] **CLAUDE.md 정책** — 13 원칙 위반 점검
 - [ ] **FSD 정합** — 단방향 import / 슬라이스 격리
 - [ ] **TypeScript strict** — strict 7 옵션 잠재 위반
 - [ ] **의존성** — 런타임 의존 0 정책 / dev 도구 dist 영향 0

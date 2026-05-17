@@ -4,6 +4,8 @@ import { renderMarkdown } from '../../shared/lib/markdown.js'
 import { parseFrontmatter } from '../../shared/lib/frontmatter.js'
 import { useAsync } from '../../shared/lib/use-async.js'
 import { useDocumentTitle } from '../../shared/lib/use-document-title.js'
+import { Empty } from '../../shared/ui/empty'
+import { Loading } from '../../shared/ui/loading'
 
 type NoticeFrontmatter = { title?: string; updated?: string }
 
@@ -18,19 +20,19 @@ export function NoticePage() {
   }, [])
 
   return (
-    <main className="page-notice">
+    <main className="flex-1 w-full max-w-page mx-auto pt-7 px-[clamp(16px,4vw,32px)] pb-9">
       <nav className="breadcrumb">
         <Link to="/">H-eries</Link>
         <span className="sep">/</span>
         <span>저작권</span>
       </nav>
 
-      {state.status === 'loading' && <p className="loading">불러오는 중…</p>}
-      {state.status === 'error' && <p className="empty">오류: {state.error.message}</p>}
+      {state.status === 'loading' && <Loading />}
+      {state.status === 'error' && <Empty>오류: {state.error.message}</Empty>}
       {state.status === 'success' && (
         <>
           {state.data.frontmatter.updated && (
-            <p className="about-meta">
+            <p className="m-0 mb-5 text-xs text-fg-4 font-mono">
               마지막 업데이트{' '}
               <time dateTime={state.data.frontmatter.updated}>{state.data.frontmatter.updated}</time>
             </p>

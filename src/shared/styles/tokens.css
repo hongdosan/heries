@@ -26,6 +26,8 @@
   --accent-hover: #1f3878;
   --accent-soft: rgba(48, 80, 160, 0.08);
   --accent-ring: rgba(48, 80, 160, 0.28);
+  /* accent 배경 위 텍스트 색 — 라이트 = 흰색 (남색 위), 다크 = 진한 글자 (밝은 파랑 위). 다크 [data-theme] 룰에서 override. */
+  --accent-fg: #ffffff;
 
   --rule: #e6e6e2;
   --rule-strong: #cfcfcb;
@@ -89,6 +91,8 @@
     --accent-hover: #b0c5ff;
     --accent-soft: rgba(138, 170, 255, 0.10);
     --accent-ring: rgba(138, 170, 255, 0.30);
+    /* 다크 모드의 --accent 가 밝은 파랑 → 위에 진한 글자가 가독성 ↑ */
+    --accent-fg: #16161a;
 
     --rule: #2a2a30;
     --rule-strong: #3a3a42;
@@ -118,6 +122,7 @@
   --accent-hover: #b0c5ff;
   --accent-soft: rgba(138, 170, 255, 0.10);
   --accent-ring: rgba(138, 170, 255, 0.30);
+  --accent-fg: #16161a;
 
   --rule: #2a2a30;
   --rule-strong: #3a3a42;

@@ -1,0 +1,92 @@
+/* Tailwind v4 entry — CSS-first config (별도 tailwind.config.js 폐기).
+ *
+ * @theme 의 *색 토큰* = tokens.css :root var 를 직접 참조 → 다크 모드 자동 반영.
+ *   - tokens.css 의 [data-theme="dark"] 가 :root --bg/--fg 등 override
+ *   - Tailwind utility (bg-bg, text-fg) = var(--color-bg) = var(--bg) = 자동 다크
+ *   - SSOT 단일 (tokens.css 가 색 정의의 진실)
+ *
+ * @theme 의 *비-색 토큰* (spacing/font/radius/shadow/container) = 정적 값. 다크 모드 무관.
+ *
+ * 마이그레이션 = 점진. 신규 컴포넌트 = Tailwind class 우선.
+ * 전략 SSOT: src/shared/styles/tailwind-migration.md
+ */
+
+@import 'tailwindcss';
+
+@theme {
+  /* surface — tokens.css :root var 직접 참조 (다크 모드 자동 반영) */
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-bg-sunken: var(--bg-sunken);
+  --color-surface: var(--surface);
+
+  /* text */
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-fg-4: var(--fg-4);
+
+  /* accent */
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ring: var(--accent-ring);
+  --color-accent-fg: var(--accent-fg);
+
+  /* rules */
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+
+  /* warn / code */
+  --color-warn-bg: var(--warn-bg);
+  --color-warn-rule: var(--warn-rule);
+  --color-warn-fg: var(--warn-fg);
+  --color-code-bg: var(--code-bg);
+
+  /* spacing — 기존 --s-* 와 일치 */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 24px;
+  --spacing-6: 32px;
+  --spacing-7: 48px;
+  --spacing-8: 64px;
+  --spacing-9: 96px;
+
+  /* font */
+  --font-sans: "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo",
+               -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* font-size — text-{key} utility */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-md: 17px;
+  --text-lg: 19px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 38px;
+  --text-display: clamp(40px, 6vw, 56px);
+
+  /* border-radius — rounded-{key} utility */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* shadow — shadow-{key} utility */
+  --shadow-soft: 0 1px 2px rgba(20, 20, 26, 0.04);
+
+  /* container — max-w-{key} utility (예: max-w-page) */
+  --container-page: 1100px;
+  --container-reader: 680px;
+}
+
+/* Dark mode variant — Tailwind v4 의 dark: prefix 활성.
+   다크 색은 tokens.css 의 [data-theme="dark"] 이 :root var 를 override → 일반 CSS class
+   (var(--bg) 등) 가 자동 반영. Tailwind utility (bg-bg 등) 는 위 @theme 값 정적이라
+   다크 모드에서도 light 색 유지. → 다크 모드는 *기존 CSS 위주* 사용, Tailwind utility 는
+   배경·색 비-결정 utility (spacing, layout 등) 위주로 사용 권장. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));

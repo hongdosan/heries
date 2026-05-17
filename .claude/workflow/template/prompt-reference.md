@@ -54,7 +54,7 @@ src/
 - **Public API**: 슬라이스 외부에서는 `index.ts` (Public API) 만 import.
 - **css 분산**: 슬라이스 옆 `{slice}.css` + `index.ts` 의 `import './{slice}.css'`. shared 전역 = `shared/styles/` (tokens / base / typography / layout / utilities / author-mode / responsive).
 
-## 4. CLAUDE.md 핵심 원칙 11 항 (강제)
+## 4. CLAUDE.md 핵심 원칙 13 항 (강제)
 
 1. 모든 `.md` 첫 줄 (또는 frontmatter 직후) HTML 주석 1줄 저작권 고지 부착
 2. 모든 캐릭터 카드 `origin: original` + 카드 절 구조 (독자 절 / 작가 절 분리, reader 빌드 마스킹)
@@ -72,6 +72,8 @@ src/
 
 | 게이트 | 명령 | 통과 기준 |
 |---|---|---|
+| **통합** | `npm run validate` | lint + typecheck + build 단일 게이트 (v0.3.0+) |
+| Lint | `npm run lint` | 0 error / 0 warning |
 | TypeScript | `npm run typecheck` | 0 에러 |
 | 빌드 | `npm run build` | 0 에러 + 시크릿 누수 0 |
 | 스토리북 | `npm run build-storybook` | 0 에러 (storybook 영향 변경 시) |

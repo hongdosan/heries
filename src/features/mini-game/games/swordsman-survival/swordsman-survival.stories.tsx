@@ -7,14 +7,14 @@ import { MiniGame } from './swordsman-survival'
 // (2) 가상 패드는 터치 환경에서만 자연스러움 — 데스크탑 마우스로도 동작은 함
 // (3) Default 스토리는 idle 상태로 시작. AutoStart 스토리는 마운트 직후 시작.
 const meta: Meta<typeof MiniGame> = {
-  title: 'features/mini-game/SwordsmanSurvival',
+  title: 'features/mini-game/검기생존록',
   component: MiniGame,
   parameters: {
     layout: 'centered',
   },
   decorators: [
     (Story) => (
-      <div style={{ width: 'min(480px, 100%)', padding: 'var(--s-4)' }}>
+      <div style={{ width: 'min(360px, 100%)', height: 640, padding: 'var(--s-4)' }}>
         <Story />
       </div>
     ),

@@ -1,5 +1,6 @@
 // © 2026 홍도산. All rights reserved. Original creator work.
-import { Component, type ErrorInfo, type ReactNode } from 'react'
+import {Component, type ErrorInfo, type ReactNode} from 'react'
+import {Button} from '../button'
 
 /**
  * 전역 ErrorBoundary — React 19 Class Component (의존성 추가 0 정책 준수).
@@ -25,18 +26,18 @@ interface ErrorBoundaryState {
 }
 
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  override state: ErrorBoundaryState = { error: null, info: null }
+  override state: ErrorBoundaryState = {error: null, info: null}
 
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    return { error }
+    return {error}
   }
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
     // production 에서도 console 에 남겨 사용자의 브라우저 콘솔 / 디버그 시
     // 추적 가능. 외부 보고 채널은 없음 (의존성 0 정책).
-    // eslint-disable-next-line no-console
+
     console.error('[H-eries] ErrorBoundary caught:', error, info)
-    this.setState({ info })
+    this.setState({info})
   }
 
   handleReload = (): void => {
@@ -50,39 +51,45 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   override render(): ReactNode {
-    const { error, info } = this.state
+    const {error, info} = this.state
     if (!error) return this.props.children
 
     const isDev = import.meta.env.DEV
     return (
-      <main className="error-boundary" role="alert">
-        <div className="error-boundary-card">
-          <p className="error-boundary-eyebrow">ERROR</p>
-          <h1 className="error-boundary-title">
+      <main className="flex-1 w-full max-w-reader mx-auto pt-7 px-[clamp(16px,4vw,32px)] pb-9"
+            role="alert">
+        <div
+          className="bg-bg-soft border border-rule border-l-[3px] border-l-warn-rule rounded-md p-5 px-6">
+          <p
+            className="m-0 mb-2 font-mono text-xs font-semibold tracking-[0.18em] text-warn-fg uppercase">ERROR</p>
+          <h1 className="m-0 mb-3 text-2xl font-bold tracking-[-0.02em] text-fg break-keep">
             {isDev ? error.message : '문제가 발생했습니다'}
           </h1>
           {!isDev && (
-            <p className="error-boundary-desc">
-              페이지를 표시하는 도중 오류가 발생했습니다. 다시 시도하거나 홈으로 이동해
-              주세요.
+            <p className="m-0 mb-4 text-sm text-fg-3 leading-[1.7] break-keep">
+              페이지를 표시하는 도중 오류가 발생했습니다. 다시 시도하거나 홈으로 이동해 주세요.
             </p>
           )}
-          <div className="error-boundary-actions">
-            <button type="button" className="error-boundary-btn primary" onClick={this.handleReload}>
-              다시 시도
-            </button>
-            <button type="button" className="error-boundary-btn" onClick={this.handleHome}>
-              홈으로
-            </button>
+          <div className="inline-flex flex-wrap gap-2 mt-2">
+            <Button variant="primary" onClick={this.handleReload}>다시 시도</Button>
+            <Button variant="secondary" onClick={this.handleHome}>홈으로</Button>
           </div>
           {isDev && error.stack && (
-            <details className="error-boundary-detail" open>
-              <summary>stack trace</summary>
-              <pre>{error.stack}</pre>
+            <details className="mt-5 p-3 px-4 bg-bg-sunken border border-rule rounded-sm text-xs"
+                     open>
+              <summary
+                className="cursor-pointer font-mono font-semibold text-fg-3 tracking-wider uppercase">stack
+                trace
+              </summary>
+              <pre
+                className="mt-3 p-3 bg-bg border border-rule rounded-sm overflow-x-auto font-mono text-[11px] leading-relaxed text-fg-2 whitespace-pre-wrap break-all">{error.stack}</pre>
               {info?.componentStack && (
                 <>
-                  <p className="error-boundary-detail-label">component stack</p>
-                  <pre>{info.componentStack}</pre>
+                  <p
+                    className="mt-3 font-mono text-xs font-semibold text-fg-3 tracking-wider uppercase">component
+                    stack</p>
+                  <pre
+                    className="mt-3 p-3 bg-bg border border-rule rounded-sm overflow-x-auto font-mono text-[11px] leading-relaxed text-fg-2 whitespace-pre-wrap break-all">{info.componentStack}</pre>
                 </>
               )}
             </details>

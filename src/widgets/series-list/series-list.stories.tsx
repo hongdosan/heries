@@ -4,7 +4,7 @@ import { SeriesList } from './series-list'
 import type { SeriesIndex } from '../../shared/lib/types'
 
 const meta: Meta<typeof SeriesList> = {
-  title: 'widgets/SeriesList',
+  title: 'widgets/시리즈 목록 (SeriesList)',
   component: SeriesList,
   decorators: [
     (Story) => (

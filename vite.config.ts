@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 // content/ 디렉토리는 dev 서버에서 vite 가 자동 서빙 (root 하위 파일).
 // build 시에는 npm scripts 의 후처리 (`scripts/copy-content.mjs`) 로 복사한다.
@@ -17,16 +18,52 @@ import react from '@vitejs/plugin-react'
 // 정책 #9 v2 (2026-05-14) — 단일 라이브 빌드. 작가 콘텐츠도 dist 평문 포함.
 // 기본 화면은 runtime 마스킹 (`spoiler.ts`), 작가 모드 진입은 `/unlock` 페이지
 // 에서 `VITE_AUTHOR_KEY` 검증 → sessionStorage `heries:author=1` 플래그.
+//
+// React Compiler (RC) — React 19 의 자동 메모이제이션 컴파일러.
+// 분석 가능한 컴포넌트/hook 을 자동으로 memo·useCallback·useMemo 처리.
+// Rules of React 준수하지 않는 코드는 자동 skip (동작 정합 보장).
+// 특정 컴포넌트 opt-out = 함수 앞 'use no memo' directive.
+// devDep 만 추가 — dist 의 react-compiler-runtime 은 매우 작음 (수 KB).
+const reactCompilerConfig = {
+  // 컴파일러 적용 범위 = 'infer' (default) — *컴포넌트* (PascalCase, JSX 반환) + *hook* (`use` prefix) 만 자동 감지.
+  // plain utility 함수 (makePlayer / clamp / rand / nextId 등 객체·값 반환) 는 자동 제외 = 안전.
+  //   - 'all' 모드는 plain utility 함수도 컴파일 → useMemoCache hook 호출 →
+  //     module top-level 또는 비-React 콜백 호출 시 fail ("Invalid hook call").
+  //   - 'infer' = React 의도된 기본값. 자동 메모이제이션 효과는 컴포넌트·hook 에 그대로 적용.
+  compilationMode: 'infer' as const,
+}
+
 export default defineConfig(({ command }) => {
   const isBuild = command === 'build'
   return {
-    plugins: [react()],
+    plugins: [
+      react({
+        babel: {
+          plugins: [['babel-plugin-react-compiler', reactCompilerConfig]],
+        },
+      }),
+      // Tailwind v4 — CSS-first 패턴. 사용된 utility class 만 추출 (purge 자동).
+      // 기존 디자인 토큰 (tokens.css / mini-game.css / stickman-murim.css) 와 coexist.
+      tailwindcss(),
+    ],
     base: isBuild ? '/heries/' : '/',
     publicDir: 'public',
     build: {
       outDir: 'dist',
       emptyOutDir: true,
       target: 'es2022',
+      // chunk size warning 임계 = 300 KB (default 500). 큰 chunk = mini-game (게임 sprite + 로직).
+      // 본 임계 미달 = code-split + lazy 정합 / 초과 = budget 위반 알림.
+      chunkSizeWarningLimit: 300,
+      rollupOptions: {
+        output: {
+          // vendor chunk 분리 — react/react-dom/react-router 가 별도 chunk 로 cache 친화적.
+          // 새 release 마다 메인 chunk 만 변경 → 사용자 브라우저는 vendor chunk 캐시 재사용.
+          manualChunks: {
+            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          },
+        },
+      },
     },
     server: {
       port: 8000,

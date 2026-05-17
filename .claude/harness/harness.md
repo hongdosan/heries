@@ -34,4 +34,4 @@
 
 ## 누적 산출물 최적화
 
-`harness-state.md` §변경 이력 은 **20행** 임계, `.claude/handoff/` 는 **3개** 임계. 초과 시 archive 로 이동. 정책 SSOT: [`../CLAUDE.md`](../CLAUDE.md) §누적 산출물. 점검 시점 = *세션 시작 직후* + *세션 종료 직전*. 임계 점검 결과는 필요 시 사용자에게 보고.
+`harness-state.md` §변경 이력 은 **20행** 임계, `.claude/handoff/CURRENT.md` 는 **단일 파일 덮어쓰기** (정책 v3, 2026-05-11). 변경 이력 hot 초과 시 `harness-state-archive.md` 로 이동. 정책 SSOT: [`../CLAUDE.md`](../CLAUDE.md) §누적 산출물. 점검 시점 = *세션 시작 직후* + *세션 종료 직전*. 임계 점검 결과는 필요 시 사용자에게 보고.

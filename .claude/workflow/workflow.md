@@ -55,7 +55,7 @@ H-eries 의 모든 작업 산출물은 **문서 ↔ 코드 동기** 원칙. 사�
 ### Step 04 — Technical Review (계획 승인)
 
 - 계획서가 있는 경우 본인 검토:
-  - CLAUDE.md 11 원칙 위반 0?
+  - CLAUDE.md 13 원칙 위반 0?
   - 의존성 0 정책 위반 0? (런타임 의존 추가 X / dev 도구는 OK)
   - FSD 단방향 import 위반 0?
   - TypeScript strict 위반 0?
@@ -128,7 +128,7 @@ H-eries 의 모든 작업 산출물은 **문서 ↔ 코드 동기** 원칙. 사�
 ## 5. 참고
 
 - [`template/prompt-reference.md`](./template/prompt-reference.md) — H-eries SSOT (필수 정독)
-- [`../CLAUDE.md`](../CLAUDE.md) — 핵심 원칙 11 항 + 도구 우선순위
+- [`../CLAUDE.md`](../CLAUDE.md) — 핵심 원칙 13 항 + 도구 우선순위
 - [`../harness/harness-state.md`](../harness/harness-state.md) — 현 상태 + 변경 이력
 - [`../handoff/CURRENT.md`](../handoff/CURRENT.md) — 세션 핸드오프
 - [`../agents/`](../agents/) — 6 에이전트 정의 (lorekeeper / worldsmith / author / continuity-reviewer / frontend-engineer / publisher)

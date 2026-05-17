@@ -1,6 +1,5 @@
-import type {CSSProperties, KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent,} from 'react'
-import {memo, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react'
-import './stickman-murim.css'
+import {memo, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react'
+import './gwangsalgeom.css'
 
 // 스프라이트 — vite ?url import. 빌드 시 자동 hash + dist/assets/ 통합.
 import SPRITE_HERO from '../../../../shared/images/mini-game/stickman-murim/hero.webp?url'
@@ -366,11 +365,11 @@ function actionOf(key: string, code: string): ActionKey | null {
 }
 
 // ─── 컴포넌트 ─────────────────────────────────────────────────
-interface StickmanMurimProps {
+interface GwangsalgeomProps {
   readonly autoFocus?: boolean
 }
 
-export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
+export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
   const [phase, setPhase] = useState<Phase>('idle')
   const [player, setPlayer] = useState<Player>(makePlayer)
   const [enemies, setEnemies] = useState<readonly Enemy[]>([])
@@ -654,7 +653,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
     flashText('허공', 'stone')
     setCombo(0)
     setKi((v) => clamp(v + KI_PER_WHIFF, 0, KI_MAX))
-  }, [combo, flashText, hitStop, spawnBurst, triggerShake])
+  }, [combo, flashText, hitStop, spawnBurst, spawnEffect, triggerShake])
 
   const qiAttack = useCallback(() => {
     const s = stateRef.current
@@ -777,7 +776,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
 
       // player update
       setPlayer((p) => {
-        let vx = p.vx * FRICTION
+        const vx = p.vx * FRICTION
         let dir: 1 | -1 = p.dir
         let x = p.x
         const speed = PLAYER_SPEED * (dt / DT_BASE_MS)
@@ -1053,7 +1052,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
     <div className="mini-game-frame mini-game-frame--landscape sm-frame">
       <div
         ref={stageRef}
-        className={'sm-stage' + (shake ? ' sm-shake' : '')}
+        className={`sm-stage${  shake ? ' sm-shake' : ''}`}
         tabIndex={0}
         role="application"
         aria-label="광살검"
@@ -1221,7 +1220,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
                 </button>
                 <button
                   type="button"
-                  className={'sm-pad-btn sm-pad-qi' + (qiReady ? '' : ' is-disabled')}
+                  className={`sm-pad-btn sm-pad-qi${  qiReady ? '' : ' is-disabled'}`}
                   aria-label="장풍"
                   aria-disabled={!qiReady}
                   disabled={!qiReady}
@@ -1230,7 +1229,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
                 </button>
                 <button
                   type="button"
-                  className={'sm-pad-btn sm-pad-dash' + (dashReady ? '' : ' sm-pad-cd is-disabled')}
+                  className={`sm-pad-btn sm-pad-dash${  dashReady ? '' : ' sm-pad-cd is-disabled'}`}
                   aria-label="이형환위"
                   aria-disabled={!dashReady}
                   disabled={!dashReady}
@@ -1246,7 +1245,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
           {phase !== 'playing' && (
             <div className="sm-overlay">
               <div className="sm-overlay-card">
-                <div className="sm-overlay-emoji" aria-hidden="true">🥋</div>
+                <div className="sm-overlay-emoji" aria-hidden="true">🥷</div>
                 <h1 className="sm-overlay-title">광살검</h1>
                 <p className="sm-overlay-desc">
                   {phase === 'over'
@@ -1346,7 +1345,7 @@ const EnemyView = memo(function EnemyView({enemy}: EnemyViewProps) {
   const eliteClass = enemy.elite ? ' sm-enemy-elite' : ''
   return (
     <div
-      className={'sm-enemy' + stunClass + eliteClass}
+      className={`sm-enemy${  stunClass  }${eliteClass}`}
       style={{
         transform: `translate(${enemy.x}px, ${enemy.y}px)${isRight ? '' : ' scaleX(-1)'}`,
         width: ENEMY_W,

@@ -1,51 +1,7 @@
 /* H-eries — Mini game (검기생존록) */
 /* 게임 박스는 사이트 토큰 무시 (어두운 게임 톤 자체 정의). */
 
-/* ─── Launcher (floating 우측 트리거 버튼) ─────────────── */
-.mini-game-launcher {
-  position: fixed;
-  right: clamp(var(--s-3), 3vw, var(--s-6));
-  bottom: clamp(var(--s-3), 4vw, var(--s-6));
-  z-index: 80;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s-2);
-  padding: var(--s-2) var(--s-4) var(--s-2) var(--s-3);
-  border-radius: var(--r-pill);
-  background: var(--accent);
-  color: #fff;
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  border: 0;
-  box-shadow: var(--shadow);
-  transition: transform var(--t-fast), box-shadow var(--t-fast), background var(--t-fast);
-  cursor: pointer;
-}
-
-.mini-game-launcher:hover {
-  background: var(--accent-hover);
-  transform: translateY(-2px);
-}
-
-.mini-game-launcher-emoji {
-  font-size: var(--fs-base);
-  line-height: 1;
-}
-
-@media (max-width: 640px) {
-  .mini-game-launcher-label {
-    display: none;
-  }
-
-  .mini-game-launcher {
-    padding: var(--s-3) var(--s-3);
-  }
-
-  .mini-game-launcher-emoji {
-    font-size: var(--fs-md);
-  }
-}
+/* mini-game-launcher = src/features/mini-game/launcher/launcher.tsx 의 Tailwind utility 인라인으로 전환 (floating 우측 트리거 버튼). */
 
 /* ─── Dialog (native &lt;dialog&gt;) ──────────────────────────
  * 비율 정합: 게임 stage 는 aspect-ratio 9:16 고정. dialog 자체는
@@ -168,13 +124,11 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
-
 .mini-game-dialog-close:hover {
   background: var(--bg-sunken);
   color: var(--fg);
 }
 @media (max-width: 640px), (pointer: coarse) {
-  /* 모바일 = 닫기 버튼 손가락 정확 터치 (a11y 44px 권장 이상). */
   .mini-game-dialog-close {
     width: clamp(44px, 12vw, 52px);
     height: clamp(44px, 12vw, 52px);
@@ -196,11 +150,13 @@
   overscroll-behavior: contain;
 }
 
-/* mini-game-frame 은 9:16 고정 (세로형). width 우선 fit 후, height 가 부족하면 height 우선. */
+/* mini-game-frame 은 9:16 고정 (세로형). width 우선 fit 후, height 가 부족하면 height 우선.
+   aspect-ratio 명시 = cascade 안정 (base .mini-game-frame 의 9:16 룰 보강). */
 .mini-game-dialog-body .mini-game-frame {
   width: min(100%, calc((100dvh - var(--mg-dialog-gap) - var(--mg-dialog-head) - var(--s-5)) * 9 / 16));
   max-width: var(--mg-dialog-frame-max);
   height: auto;
+  aspect-ratio: 360 / 640;
 }
 
 /* 가로형 게임은 9:16 강제 미적용. dialog 가용 공간 100% 활용 후 게임 자체 fit.

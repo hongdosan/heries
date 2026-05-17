@@ -76,12 +76,15 @@ export function MiniGameLauncher() {
     <>
       <button
         type="button"
-        className="mini-game-launcher"
+        className="fixed right-[clamp(12px,3vw,32px)] bottom-[clamp(12px,4vw,32px)] z-80 inline-flex items-center gap-2 py-2 pr-4 pl-3 rounded-pill text-sm font-bold tracking-[0.02em] border-0 shadow-soft transition-[transform,box-shadow,background-color] cursor-pointer hover:-translate-y-0.5 max-sm:p-3"
+        style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-fg)' }}
         aria-label="미니 게임 열기"
         onClick={openDialog}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--accent-hover)')}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--accent)')}
       >
-        <span className="mini-game-launcher-emoji" aria-hidden="true">🎮</span>
-        <span className="mini-game-launcher-label">미니 게임</span>
+        <span className="text-base leading-none max-sm:text-md" aria-hidden="true">🎮</span>
+        <span className="max-sm:hidden">미니 게임</span>
       </button>
 
       <dialog
@@ -109,8 +112,7 @@ export function MiniGameLauncher() {
               className="mini-game-dialog-close"
               aria-label="닫기"
               onClick={closeDialog}
-            >✕
-            </button>
+            >✕</button>
           </header>
 
           {/* 게임 선택 화면 — selected 없을 때 항상 표시 */}

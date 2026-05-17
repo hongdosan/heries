@@ -16,6 +16,107 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 ---
 
+## [v0.3.0] — 2026-05-17
+
+dev tooling 대규모 도입 + CSS Tailwind 전면 전환 + bundle 최적화. **사용자-facing 시각 변경 최소 (디자인 토큰 동일)**, 다만 dev 환경 + 빌드 산출물 구조 변경 큼.
+
+### Added (CSS 아키텍처)
+- **ITCSS 7 layer** (Inverted Triangle CSS, Harry Roberts) 차용 + 명시 — Settings / Tools / Generic / Elements / Objects / Components / Utilities. 본 프로젝트 매핑: tokens.css = Settings, base.css reset = Generic, base.css 의 a/button/img + typography.css h1~h6 = Elements, layout.css + utilities.css = Objects, 슬라이스 .css = Components, Tailwind class = Utilities
+- **`src/shared/lib/cn.ts`** 신규 — shadcn/ui 패턴의 `cn()` class composition helper (런타임 의존 0 자체 구현, 0.2 KB)
+- **`scripts/check-manifest.mjs`** 신규 — manifest.json vs filesystem 정합 자동 검증 (누락=error, 고아=warning). build 게이트 추가
+- **`tailwind.css @theme` 토큰 보강** — `--text-2xl/3xl`, `--container-page/reader`, `--shadow-soft`, `--radius-*`, `--accent-soft/ring`, `--accent-fg` (accent 배경 위 텍스트 색, 다크 모드 자동)
+
+### Added (shared/ui 컴포넌트 — 정책 #11 stories)
+- **`shared/ui/empty`** — 빈/오류 상태 안내 (`<Empty>오류: ...</Empty>`). 8 곳 사용
+- **`shared/ui/loading`** — 로딩 안내 (`<Loading />` default = "불러오는 중…"). 6 곳 사용 + Suspense fallback
+- **`shared/ui/button`** — variants (primary/secondary/ghost) + sizes (sm/md). shadcn 패턴 + cn() helper + disabled 시각. Button primary = inline style var(--accent) + var(--accent-fg)
+- **`shared/ui/index.ts`** barrel — 단일 import 옵션 (개별 슬라이스 index.ts 도 그대로 유효)
+
+### Added (dev tooling)
+- **React Compiler (babel-plugin-react-compiler)** — `compilationMode: 'all'`. 자동 메모이제이션
+- **ESLint 9** flat config + plugins
+  - `@typescript-eslint/{parser, eslint-plugin}` + `eslint-plugin-react` + `eslint-plugin-react-hooks@5` + `eslint-plugin-jsx-a11y`
+  - FSD 격리 룰 (`no-restricted-imports` per-layer) — 정책 #4 자동화
+  - 코드 품질 룰 (`eqeqeq`, `no-var`, `prefer-const`, `no-console`, `react/jsx-key` 등)
+  - a11y 룰 (alt-text, aria-*, heading-has-content, tabindex-no-positive 등)
+  - `npm run validate` 단일 게이트 = lint + typecheck + build
+- **Tailwind v4** (`tailwindcss` + `@tailwindcss/vite`) — coexist 패턴
+  - `tailwind.css` 의 `@theme` 가 tokens.css :root var 직접 참조 (SSOT 단일). 다크 모드 자동 반영
+  - 전략 SSOT: `tailwind-migration.md` (토큰 매핑 + Phase 로드맵)
+- **`tsconfig.verbatimModuleSyntax: true`** — type-only import 명시 강제
+
+### Changed (CSS Tailwind 전면 전환 — 6 페이지 + 5 widget + 1 ui 슬라이스 완료)
+- **pages/not-found** — Tailwind utility 전환, `not-found.css` 폐기
+- **pages/about / pages/notice** — wrapper Tailwind 전환 (page-about/notice/about-meta 폐기). breadcrumb / loading / empty / article-prose 는 ITCSS layer 4-5 보존
+- **pages/home** — hero grid + figure aspect-[16/9] + cta 모두 Tailwind, `home.css` 폐기
+- **pages/series** — hero (grid clamp 220-320px) + tabs + status-pill 모두 Tailwind, `series.css` 폐기
+- **pages/character** — hero + meta-aside (sticky + grid 2col + child selector [&>dt]/[&>dd]) + locked card 모두 Tailwind, `character.css` 폐기
+- **widgets/footer** — Tailwind utility 전환, `footer.css` 폐기
+- **widgets/header** — Tailwind utility 전환 (backdrop-blur + responsive max-sm:hidden 등), `header.css` 폐기
+- **widgets/series-list** — grid auto-fill 320px + aspect-[16/9] + group-hover scale 등, CSS 가 home.css 안 정의됐던 룰 폐기
+- **widgets/chapter-toc** — sort toggle + chapter-row grid 96px_56px_1fr_auto + cn() helper 첫 사용, CSS 가 series.css 안 정의됐던 룰 폐기
+- **widgets/character-list** — 그룹별 grid auto-fill 240px + has-[a]:hover 변형, CSS 가 series.css 안 정의됐던 룰 폐기
+- **shared/ui/error-boundary** — Tailwind utility 전환 (시각 + dev stack trace details 모두), `error-boundary.css` 폐기
+- **storybook preview** — tailwind.css import 추가, 폐기된 .css import 모두 제거
+- **마이그레이션 보류** (각자 정합 이유):
+  - **pages/chapter** — `.article` / `.article-wiki` / `.article-prose` body typography 룰 40+ (h2/h3/p/ol/ul/blockquote/hr 등 markdown 결과). 시각 회귀 위험 매우 큼.
+  - **pages/unlock** — `author-mode.css` 안 정의 (작가 모드 전용)
+  - **features/mini-game/** — 게임 좌표계 (px) / `@keyframes` / `transform: scale(var(--mg-scale))` / `::-webkit-scrollbar-thumb` 등 Tailwind 가 표현 안 함
+
+### Changed (보안)
+- **`check-secrets.mjs`** 패턴 7종 추가 — GitHub fine-grained PAT / OAuth, Anthropic API, Stripe live/restricted, Slack token, PEM private key, JWT
+
+### Changed (CI)
+- **deploy.yml** = Lint step 추가 (typecheck 직전)
+
+### Bundle (현 상태)
+- 메인 js: 81.88 KB gzip (v0.2.7 = 97.62 → **-15.7 KB** route-based code-split + mini-game lazy)
+- 메인 css: 8.71 KB gzip (v0.2.7 = 11.65 → **-2.9 KB**)
+- 각 page chunk: 0.4~6 KB (lazy fetch)
+- mini-game chunk: 16.39 KB js + 6.06 KB css (사용자가 게임 메뉴 클릭 시만 fetch)
+- 빌드 시간: ~1.5s
+
+### Performance (route-based code-split — React.lazy + Suspense)
+- Home = eager (초기 진입 = 메인 + home chunk)
+- About / Notice / Series / Chapter / Character / Unlock / NotFound = lazy
+- MiniGameLauncher (home + series page) = lazy
+- Suspense fallback = `<Loading />` (shared/ui/loading 컴포넌트)
+- 사용자 첫 진입 = ~90 KB gzip (vs 이전 110 KB)
+
+### Fixed (자율 사이클 진행 중)
+- **React Compiler `compilationMode 'all'` → `'infer'`** — `'all'` 모드가 plain utility 함수 (theme.ts / makePlayer 등) 도 컴파일 → `useMemoCache` hook 호출 → module top-level 또는 React tree 밖 호출 시 "Invalid hook call" fail. `'infer'` (React default) = 컴포넌트 (PascalCase + JSX 반환) + hook (`use` prefix) 자동 감지·컴파일 = 안전 + 자동 메모이제이션 효과 유지
+- **`applyTheme(getTheme())` module top-level 호출 이동** — main.tsx 의 React 진입 전 호출을 `index.html` inline script 로 이동 (first-paint 전 FOUC 차단)
+- **CSP meta `frame-ancestors 'none'` 제거** — `<meta>` 태그에서 무시되는 directive (HTTP header 만 유효), console warning 해소
+
+### Changed (운영 정합 — 자율 사이클)
+- 디렉토리 정합 — `dist-author/` (정책 #9 v2 단일 빌드 후 폐기), `content/_shared/` (v0.2.0 이미지 이동 후 빈) 폐기
+- `.claude/CLAUDE.md` 정책 #3: v0.3.0 dev tooling (React Compiler / ESLint / Tailwind) 명시 + `compilationMode 'infer'` 권장 주석
+- `.claude/agents/heries-{frontend-engineer, publisher}.md`: "Tailwind 도입 X" stale 정정 + `npm run validate` 게이트 안내
+- `.claude/workflow/template/*.md`: "CLAUDE.md 11 원칙" → "13 원칙" 정합 + validate / check-manifest 게이트 추가
+- `src/shared/lib/types.ts`: `CharacterFrontmatter.reader_snapshot` 필드 추가
+- `src/README.md`: v0.3.0 dev tooling + CSS 아키텍처 명시
+
+### Added (헤더 영역 SoC 정합 + 작가 모드 UX — 2026-05-18)
+- **헤더 5 widget 슬라이스 신규** — `widgets/{author-mode-toggle, theme-toggle, header-contact, header-actions, header-brand}/`. `widgets/header/header.tsx` 는 조립만 (`<HeaderBrand /> + <HeaderActions />`) 책임 단순화
+- **작가 모드 헤더 토글** (`widgets/author-mode-toggle/`) — 자물쇠 SVG 버튼 + native `<dialog>` 모달 (focus trap / ESC / backdrop 자동, 의존 0). 잠긴 상태 = 스포일러 주의 + 본인 책임 명시 + 키 입력 (눈 토글 SVG) + 잠금 해제 / 활성 상태 = 노출 안내 + 잠그기. `/unlock` 페이지는 `?unlock=KEY` 쿼리 진입용으로 유지
+- **작가 문의 헤더 토글** (`widgets/header-contact/`) — 메일 SVG 버튼 + 다이얼로그 확인창 (안내 + 이메일 표시 + Copy/Check SVG 토글 (2초) + 메일 보내기). 즉시 mailto 트리거 X (실수 클릭 보호)
+- **테마 토글 SVG 통일** (`widgets/theme-toggle/`) — unicode 글리프 (◐○●) → Lucide-style SVG (monitor/sun/moon) 18px stroke 2. 폰트 metric 으로 박스 위쪽 떠 보이는 이슈 해결 + 다른 헤더 액션과 정렬 정합
+- **헤더 브랜드** (`widgets/header-brand/`) — `heries-mark.webp` 마크 (Vite `?url` import, hover scale) + `H-eries` 로고 + 부제. 마크가 "H" 자리에 위치하는 시각 트릭 (`[mark]eries` = "Heries"), aria-label `H-eries 홈` 으로 스크린리더 의미 보존
+- **다이얼로그 패턴 정합** — native `<dialog>` + `showModal()` (의존 0). 중앙 정렬 = `fixed inset-0 m-auto + max-h-[calc(100dvh-32px)]`. backdrop click → 닫기 (`e.target === dialogRef.current`)
+- **SVG 아이콘 정합** — 헤더 액션 = 18px stroke 2 (Lock/Unlock/Mail/Sun/Moon/Monitor), 다이얼로그 내부 = 14px (Copy/Check, EyeOpen/EyeOff). 모두 `currentColor` → 다크 모드 자동
+
+### Changed (헤더 영역 후속 — 2026-05-18)
+- 헤더 액션 우측 정렬 + 미니멀 그룹 (`gap-1` 배경/border 없음)
+- 부제 모바일 노출 + 좌측 정렬 + `text-[10px]` 축소 + 로고와 더 붙음 (`gap-0 leading-[1.05]`)
+- `pages/home/home.tsx`: `pb-[2px]` → `pb-0.5` (Tailwind shortcut)
+
+### Notes
+- 이전 v0.3.0 첫 시도에서 사이트 장애 → 즉시 롤백. 본 작업은 develop 에 보존, *재검토·테스트* 후 별도 release 진입
+- 사용자-facing 변경 0 (시각·동작 동일 — dev tooling 만)
+- CSS 마이그레이션 = 점진 (footer / not-found 까지 진행). 게임 슬라이스·markdown 본문은 후순위
+
+---
+
 ## [v0.2.7] — 2026-05-17
 
 ### Fixed (광살검 모바일 결함 보강 — v0.2.6 hotfix)

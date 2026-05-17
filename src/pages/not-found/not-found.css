@@ -1,8 +1,0 @@
-/* H-eries — Not Found page */
-.not-found-back {
-  text-align: center;
-  margin-top: var(--s-5);
-  font-size: var(--fs-sm);
-}
-.not-found-back a { color: var(--fg-3); }
-.not-found-back a:hover { color: var(--accent); }

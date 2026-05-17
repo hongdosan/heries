@@ -10,7 +10,9 @@
 |---|---|---|---|---|
 | **`develop`** | 활발 개발의 기본 작업 branch — 챕터·미니 게임·코드 변경 모두 여기서 시작 | ✅ (작가 직접) | ❌ | 자유 |
 | **`release`** | release candidate — `develop` 안정 시점을 옮겨 사전 검수 (빌드·시각 확인) | ⚠️ hotfix 만 (예외) | ❌ | merge 대상 |
-| **`main`** | 배포 대상 — GitHub Pages auto-deploy 트리거. **tag 가 붙는 시점** | ❌ (release → main merge 만) | ✅ `deploy.yml` (push 트리거) | merge + tag 만 |
+| **`main`** | 배포 대상 — GitHub Pages auto-deploy 트리거. **tag 가 붙는 시점** | ⚠️ 사용자 명시 시 직접 commit 가능 (긴급 patch / 단축 사이클). 기본 = release → main merge | ✅ `deploy.yml` (push 트리거) | merge + tag 또는 사용자 명시 직접 commit |
+
+> **사용자 commit 정책 (메모리 정합)**: main push 는 *사용자 명시 시에만* (예: "main 브랜치 0.2.4 진행"). 에이전트의 자율 해석 X. "develop 진행", "release 사이클" 등은 main 자동 위임 아님.
 
 ## 2. 흐름
 
