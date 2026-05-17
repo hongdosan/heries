@@ -96,6 +96,20 @@ dev tooling 대규모 도입 + CSS Tailwind 전면 전환 + bundle 최적화. **
 - `src/shared/lib/types.ts`: `CharacterFrontmatter.reader_snapshot` 필드 추가
 - `src/README.md`: v0.3.0 dev tooling + CSS 아키텍처 명시
 
+### Added (헤더 영역 SoC 정합 + 작가 모드 UX — 2026-05-18)
+- **헤더 5 widget 슬라이스 신규** — `widgets/{author-mode-toggle, theme-toggle, header-contact, header-actions, header-brand}/`. `widgets/header/header.tsx` 는 조립만 (`<HeaderBrand /> + <HeaderActions />`) 책임 단순화
+- **작가 모드 헤더 토글** (`widgets/author-mode-toggle/`) — 자물쇠 SVG 버튼 + native `<dialog>` 모달 (focus trap / ESC / backdrop 자동, 의존 0). 잠긴 상태 = 스포일러 주의 + 본인 책임 명시 + 키 입력 (눈 토글 SVG) + 잠금 해제 / 활성 상태 = 노출 안내 + 잠그기. `/unlock` 페이지는 `?unlock=KEY` 쿼리 진입용으로 유지
+- **작가 문의 헤더 토글** (`widgets/header-contact/`) — 메일 SVG 버튼 + 다이얼로그 확인창 (안내 + 이메일 표시 + Copy/Check SVG 토글 (2초) + 메일 보내기). 즉시 mailto 트리거 X (실수 클릭 보호)
+- **테마 토글 SVG 통일** (`widgets/theme-toggle/`) — unicode 글리프 (◐○●) → Lucide-style SVG (monitor/sun/moon) 18px stroke 2. 폰트 metric 으로 박스 위쪽 떠 보이는 이슈 해결 + 다른 헤더 액션과 정렬 정합
+- **헤더 브랜드** (`widgets/header-brand/`) — `heries-mark.webp` 마크 (Vite `?url` import, hover scale) + `H-eries` 로고 + 부제. 마크가 "H" 자리에 위치하는 시각 트릭 (`[mark]eries` = "Heries"), aria-label `H-eries 홈` 으로 스크린리더 의미 보존
+- **다이얼로그 패턴 정합** — native `<dialog>` + `showModal()` (의존 0). 중앙 정렬 = `fixed inset-0 m-auto + max-h-[calc(100dvh-32px)]`. backdrop click → 닫기 (`e.target === dialogRef.current`)
+- **SVG 아이콘 정합** — 헤더 액션 = 18px stroke 2 (Lock/Unlock/Mail/Sun/Moon/Monitor), 다이얼로그 내부 = 14px (Copy/Check, EyeOpen/EyeOff). 모두 `currentColor` → 다크 모드 자동
+
+### Changed (헤더 영역 후속 — 2026-05-18)
+- 헤더 액션 우측 정렬 + 미니멀 그룹 (`gap-1` 배경/border 없음)
+- 부제 모바일 노출 + 좌측 정렬 + `text-[10px]` 축소 + 로고와 더 붙음 (`gap-0 leading-[1.05]`)
+- `pages/home/home.tsx`: `pb-[2px]` → `pb-0.5` (Tailwind shortcut)
+
 ### Notes
 - 이전 v0.3.0 첫 시도에서 사이트 장애 → 즉시 롤백. 본 작업은 develop 에 보존, *재검토·테스트* 후 별도 release 진입
 - 사용자-facing 변경 0 (시각·동작 동일 — dev tooling 만)
