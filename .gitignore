@@ -52,3 +52,6 @@ content/_legacy_*/
 .claude/harness/harness-state.md
 .claude/workflow/plan
 .claude/workflow/prompt/custom
+
+# IDE 스크린샷 임시 파일 (작가 보고용)
+content/img*.png

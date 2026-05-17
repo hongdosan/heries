@@ -95,21 +95,21 @@ export function MiniGameLauncher() {
         aria-label="미니 게임"
       >
         <div className="mini-game-dialog-card">
-          <header className="flex items-center justify-between gap-3 py-3 px-4 border-b border-rule bg-bg-soft max-sm:py-0.5 max-sm:px-2 max-sm:min-h-9">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+          <header className="mini-game-dialog-head">
+            <div className="mini-game-dialog-head-left">
               {selected && (
                 <button
                   type="button"
-                  className="shrink-0 inline-flex items-center gap-1 py-1 px-3 border border-rule rounded-pill bg-surface text-fg-2 text-xs font-semibold cursor-pointer transition-[background,color,border-color] hover:bg-bg-sunken hover:text-fg hover:border-accent-ring touch-manipulation [-webkit-tap-highlight-color:transparent] max-[640px]:py-0.5 max-[640px]:px-2 max-[640px]:text-xs"
+                  className="mini-game-dialog-back"
                   aria-label="메뉴로 돌아가기"
                   onClick={backToMenu}
                 >← 메뉴</button>
               )}
-              <h2 className="m-0 text-md font-bold text-fg overflow-hidden text-ellipsis whitespace-nowrap max-sm:text-sm">{dialogTitle}</h2>
+              <h2 className="mini-game-dialog-title">{dialogTitle}</h2>
             </div>
             <button
               type="button"
-              className="rounded-pill border-0 bg-transparent text-fg-3 cursor-pointer transition-[background,color] hover:bg-bg-sunken hover:text-fg touch-manipulation [-webkit-tap-highlight-color:transparent] w-[clamp(36px,5vw,44px)] h-[clamp(36px,5vw,44px)] text-md max-[640px]:w-7 max-[640px]:h-7 max-[640px]:text-sm"
+              className="mini-game-dialog-close"
               aria-label="닫기"
               onClick={closeDialog}
             >✕</button>

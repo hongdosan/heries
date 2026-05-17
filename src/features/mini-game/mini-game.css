@@ -54,7 +54,87 @@
   max-height: calc(100dvh - var(--mg-dialog-gap));
 }
 
-/* mini-game-dialog-{head, head-left, title, back, close} = launcher.tsx 의 Tailwind utility 인라인으로 전환. */
+.mini-game-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg-soft);
+}
+
+.mini-game-dialog-head-left {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-width: 0;
+  flex: 1;
+}
+
+.mini-game-dialog-title {
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mini-game-dialog-back {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  padding: var(--s-1) var(--s-3);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--fg-2);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.mini-game-dialog-back:hover {
+  background: var(--bg-sunken);
+  color: var(--fg);
+  border-color: var(--accent-ring);
+}
+@media (max-width: 640px), (pointer: coarse) {
+  .mini-game-dialog-back {
+    padding: var(--s-2) var(--s-3);
+    font-size: var(--fs-sm);
+  }
+}
+
+.mini-game-dialog-close {
+  width: clamp(36px, 5vw, 44px);
+  height: clamp(36px, 5vw, 44px);
+  border-radius: var(--r-pill);
+  border: 0;
+  background: transparent;
+  color: var(--fg-3);
+  font-size: var(--fs-md);
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.mini-game-dialog-close:hover {
+  background: var(--bg-sunken);
+  color: var(--fg);
+}
+@media (max-width: 640px), (pointer: coarse) {
+  .mini-game-dialog-close {
+    width: clamp(44px, 12vw, 52px);
+    height: clamp(44px, 12vw, 52px);
+    font-size: var(--fs-lg);
+  }
+}
 
 .mini-game-dialog-body {
   /* 게임 frame 과 dialog 경계 사이 작은 여백 (너무 딱 붙음 방지). */
@@ -70,11 +150,13 @@
   overscroll-behavior: contain;
 }
 
-/* mini-game-frame 은 9:16 고정 (세로형). width 우선 fit 후, height 가 부족하면 height 우선. */
+/* mini-game-frame 은 9:16 고정 (세로형). width 우선 fit 후, height 가 부족하면 height 우선.
+   aspect-ratio 명시 = cascade 안정 (base .mini-game-frame 의 9:16 룰 보강). */
 .mini-game-dialog-body .mini-game-frame {
   width: min(100%, calc((100dvh - var(--mg-dialog-gap) - var(--mg-dialog-head) - var(--s-5)) * 9 / 16));
   max-width: var(--mg-dialog-frame-max);
   height: auto;
+  aspect-ratio: 360 / 640;
 }
 
 /* 가로형 게임은 9:16 강제 미적용. dialog 가용 공간 100% 활용 후 게임 자체 fit.
@@ -109,7 +191,23 @@
     border: 0;
   }
 
-  /* 모바일 헤더 슬림 = launcher.tsx 의 max-sm:* 인라인 utility 로 대체. */
+  /* 모바일 헤더 슬림 — close 28 + 작은 title. */
+  .mini-game-dialog-head {
+    padding: 2px var(--s-2);
+    min-height: var(--mg-dialog-head);
+  }
+  .mini-game-dialog-title {
+    font-size: var(--fs-sm);
+  }
+  .mini-game-dialog-close {
+    width: 28px;
+    height: 28px;
+    font-size: var(--fs-sm);
+  }
+  .mini-game-dialog-back {
+    padding: 2px var(--s-2);
+    font-size: var(--fs-xs);
+  }
 
   .mini-game-dialog-body {
     padding: var(--s-2);  /* 모바일도 작은 여백 — 게임 frame 이 viewport 경계 딱 붙지 않게 */
