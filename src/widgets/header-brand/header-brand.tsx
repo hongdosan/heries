@@ -11,13 +11,13 @@ import markUrl from '../../shared/images/heries-mark.webp?url'
 export function HeaderBrand() {
   return (
     <div className="flex flex-col items-start gap-1 leading-[1.1]">
-      <Link to="/" className="inline-flex items-center gap-2 text-fg no-underline group">
+      <Link to="/" className="inline-flex items-center gap-1 text-fg no-underline group">
         <img
           src={markUrl}
           alt=""
-          width={20}
-          height={20}
-          className="w-5 h-5 shrink-0 select-none transition-transform duration-200 group-hover:scale-105"
+          width={16}
+          height={16}
+          className="w-4 h-4 shrink-0 select-none transition-transform duration-200 group-hover:scale-105"
         />
         <span className="text-xl font-bold tracking-[-0.02em]">H-eries</span>
       </Link>

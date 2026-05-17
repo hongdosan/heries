@@ -20,8 +20,8 @@ export function HeaderActions() {
   return (
     <div className="inline-flex items-center gap-1">
       <ThemeToggle/>
-      <AuthorModeToggle/>
       <HeaderContact/>
+      <AuthorModeToggle/>
     </div>
   )
 }
