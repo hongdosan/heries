@@ -7,6 +7,7 @@ import { useAuthorMode } from '../../shared/lib/use-author-mode.js'
 import { useDocumentTitle } from '../../shared/lib/use-document-title.js'
 import { Empty } from '../../shared/ui/empty'
 import { Loading } from '../../shared/ui/loading'
+import { Button } from '../../shared/ui/button'
 
 const FOLDER_LABEL: Record<string, string> = {
   '1-protagonist': '주인공',
@@ -51,8 +52,12 @@ export function CharacterPage() {
           <p className="m-0 mb-3 text-fg-2">본 캐릭터의 상세 정보는 <Link to="/unlock">작가 모드</Link>에서 열람할 수 있습니다.</p>
           <p className="text-sm text-fg-3 m-0 mb-5">{manifest.title} · {FOLDER_LABEL[data.index.folder] || data.index.folder}</p>
           <div className="inline-flex gap-2 flex-wrap justify-center">
-            <Link to={`/series/${slug}?tab=characters`} className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-md border bg-accent text-white border-accent hover:bg-accent-hover hover:border-accent-hover no-underline">등장인물 목록으로</Link>
-            <Link to="/unlock" className="inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-md border bg-surface text-fg-2 border-rule hover:text-accent hover:border-accent no-underline">작가 모드 잠금 해제</Link>
+            <Link to={`/series/${slug}?tab=characters`}>
+              <Button variant="primary">등장인물 목록으로</Button>
+            </Link>
+            <Link to="/unlock">
+              <Button variant="secondary">작가 모드 잠금 해제</Button>
+            </Link>
           </div>
         </div>
       </main>

@@ -1,5 +1,6 @@
 // © 2026 홍도산. All rights reserved. Original creator work.
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { Button } from '../button/index.js'
 
 /**
  * 전역 ErrorBoundary — React 19 Class Component (의존성 추가 0 정책 준수).
@@ -67,16 +68,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             </p>
           )}
           <div className="inline-flex flex-wrap gap-2 mt-2">
-            <button
-              type="button"
-              className="px-4 py-2 text-sm font-semibold text-white bg-accent border border-accent rounded-sm transition-colors hover:bg-accent-hover hover:border-accent-hover"
-              onClick={this.handleReload}
-            >다시 시도</button>
-            <button
-              type="button"
-              className="px-4 py-2 text-sm font-semibold text-fg-2 bg-surface border border-rule rounded-sm transition-colors hover:text-accent hover:border-accent-ring"
-              onClick={this.handleHome}
-            >홈으로</button>
+            <Button variant="primary" onClick={this.handleReload}>다시 시도</Button>
+            <Button variant="secondary" onClick={this.handleHome}>홈으로</Button>
           </div>
           {isDev && error.stack && (
             <details className="mt-5 p-3 px-4 bg-bg-sunken border border-rule rounded-sm text-xs" open>

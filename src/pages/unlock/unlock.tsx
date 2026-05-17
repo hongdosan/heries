@@ -2,6 +2,7 @@ import {useEffect, useState, type FormEvent} from 'react'
 import {Link, useNavigate, useSearchParams} from 'react-router-dom'
 import {isAuthorMode, setAuthorMode, verifyAuthorKey} from '../../shared/lib/env.js'
 import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
+import {Button} from '../../shared/ui/button'
 
 // 작가 모드 진입 페이지. 정책 #9 v2 (2026-05-14).
 // - 폼: 작가 키 입력 → verifyAuthorKey 검증 통과 시 sessionStorage 플래그 set.
@@ -55,10 +56,6 @@ export function UnlockPage() {
     setAuthored(false)
   }
 
-  const btnBase = 'inline-flex items-center justify-center px-4 py-2 text-sm font-semibold rounded-md border transition-colors cursor-pointer no-underline'
-  const btnPrimary = `${btnBase} bg-accent text-white border-accent hover:bg-accent-hover hover:border-accent-hover`
-  const btnSecondary = `${btnBase} bg-surface text-fg-2 border-rule hover:text-accent hover:border-accent`
-
   return (
     <main className="max-w-[480px] mx-auto pt-5 px-4 pb-7">
       <nav className="breadcrumb">
@@ -73,8 +70,8 @@ export function UnlockPage() {
         <section className="flex flex-col gap-4 p-4 bg-bg-soft border border-rule rounded-md">
           <p className="m-0 text-fg-2">현재 <span className="author-only-badge">AUTHOR</span> 모드 활성 상태. 탭을 닫으면 자동 잠금.</p>
           <div className="flex gap-2 flex-wrap mt-2">
-            <Link to="/" className={btnPrimary}>홈으로</Link>
-            <button type="button" className={btnSecondary} onClick={onLock}>잠그기</button>
+            <Button variant="primary" onClick={() => navigate('/')}>홈으로</Button>
+            <Button variant="secondary" onClick={onLock}>잠그기</Button>
           </div>
         </section>
       ) : (
@@ -99,8 +96,8 @@ export function UnlockPage() {
           />
           {error && <p className="m-0 text-sm text-warn-fg" role="alert">{error}</p>}
           <div className="flex gap-2 flex-wrap mt-2">
-            <button type="submit" className={btnPrimary}>잠금 해제</button>
-            <Link to="/" className={btnSecondary}>취소</Link>
+            <Button type="submit" variant="primary">잠금 해제</Button>
+            <Button variant="secondary" onClick={() => navigate('/')}>취소</Button>
           </div>
         </form>
       )}
