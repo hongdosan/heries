@@ -9,6 +9,12 @@
       "folder": "1-protagonist",
       "name": "우진혁",
       "summary": "동생을 위해 운동을 포기하고 입대한 군인."
+    },
+    {
+      "id": "woo-seon-a",
+      "folder": "2-major-supporting",
+      "name": "우선아",
+      "summary": "주인공 우진혁의 동생. 부모 사망 후 형과 둘이 사는 고등학생."
     }
   ],
   "chapters": [
@@ -32,6 +38,13 @@
       "title": "입소",
       "published": "2026-05-16",
       "thumbnail": "thumbnails/ep-03/ep-03.webp"
+    },
+    {
+      "episode": 4,
+      "slug": "ep-04",
+      "title": "자대",
+      "published": "2026-05-18",
+      "thumbnail": "thumbnails/ep-04/ep-04.webp"
     }
   ]
 }
