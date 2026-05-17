@@ -52,6 +52,15 @@ export default defineConfig(({ command }) => {
       outDir: 'dist',
       emptyOutDir: true,
       target: 'es2022',
+      rollupOptions: {
+        output: {
+          // vendor chunk 분리 — react/react-dom/react-router 가 별도 chunk 로 cache 친화적.
+          // 새 release 마다 메인 chunk 만 변경 → 사용자 브라우저는 vendor chunk 캐시 재사용.
+          manualChunks: {
+            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          },
+        },
+      },
     },
     server: {
       port: 8000,
