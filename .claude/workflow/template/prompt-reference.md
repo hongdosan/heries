@@ -72,6 +72,8 @@ src/
 
 | 게이트 | 명령 | 통과 기준 |
 |---|---|---|
+| **통합** | `npm run validate` | lint + typecheck + build 단일 게이트 (v0.3.0+) |
+| Lint | `npm run lint` | 0 error / 0 warning |
 | TypeScript | `npm run typecheck` | 0 에러 |
 | 빌드 | `npm run build` | 0 에러 + 시크릿 누수 0 |
 | 스토리북 | `npm run build-storybook` | 0 에러 (storybook 영향 변경 시) |

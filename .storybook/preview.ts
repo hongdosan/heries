@@ -12,7 +12,6 @@ import '../src/shared/styles/responsive.css'
 // 사이트는 각 슬라이스 index.ts 가 자기 css 를 import 하지만, stories 가
 // `./{slice}` (파일 직접) 패턴이면 index 우회 → preview 에서 보강.
 // 마이그레이션 완료된 슬라이스 (Tailwind only) 는 본 import 에서 제외.
-import '../src/widgets/header/header.css'
 import '../src/shared/ui/error-boundary/error-boundary.css'
 import '../src/features/mini-game/mini-game.css'
 // chapter-toc / character-list / series-list 의 룰은 page 슬라이스 css

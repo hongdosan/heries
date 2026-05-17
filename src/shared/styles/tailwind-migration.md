@@ -1,101 +1,121 @@
 <!-- © 2026 홍도산. All rights reserved. Original creator work. -->
 
-# Tailwind 마이그레이션 전략
+# CSS 아키텍처 — Tailwind v4 utility-first (전면 전환)
 
-H-eries 의 CSS 운영은 *coexist* 패턴 — 기존 디자인 토큰 + 슬라이스 CSS 와 Tailwind 가 병존. 점진 마이그레이션.
+## 0. 정책 (2026-05-17, 사용자 명시)
 
-## 1. 도입 배경
+**Tailwind 만 사용 가능하면 Tailwind 로 전환**. 프론트엔드 트렌드 = *Utility-first + Design tokens centralized*. 슬라이스 옆 `.css` 파일 = 점진 폐기.
 
-- **v0.3.0** (2026-05-16) — React Compiler + ESLint + Tailwind v4 도입 milestone
-- 사용자 명시 = *어려워도 미리 도입* — 향후 페이지 확장 시 atomic class 생산성 + 토큰 utility 일관 가치
-- *전면 마이그레이션* 일시 진입 = 회귀 위험 큼 → **점진 마이그레이션** 채택
+예외 (CSS 파일 유지):
+1. **`src/shared/styles/`** = 전역 reset / typography / utility / responsive / author-mode / scrollbar — Tailwind utility 로 표현 어려운 *전역 동작* 및 *디자인 토큰*.
+2. **게임 슬라이스** (`features/mini-game/*.css`, `features/mini-game/games/*/*.css`) = 게임 좌표계 (`px` 고정), `@keyframes`, `transform: scale(var(--mg-scale))`, `::-webkit-scrollbar-thumb` 등 Tailwind 가 표현 안 하는 패턴 다수. 점진 보류.
+3. **마크다운 본문** = `.article-prose` 등 → typography 슬라이스 + Tailwind 의 `prose` plugin 도입 검토.
 
-## 2. 현 상태
+## 1. 차용 아키텍처
 
-| 항목 | 상태 |
+### 1-1. ITCSS (Inverted Triangle CSS) — CSS 메인 아키텍처
+
+CSS specificity 가 *낮음 → 높음* 으로 점진 증가하는 7 레이어 (Harry Roberts 발표, 2014 — 프론트엔드 표준 중 하나):
+
+| ITCSS layer | 본 프로젝트 매핑 | 특징 |
+|---|---|---|
+| **1. Settings** | `tokens.css :root var` + `tailwind.css @theme` | 디자인 토큰 (색·spacing·font·radius). 정적 값. specificity 0. |
+| **2. Tools** | (미사용) | Sass mixin 등. Tailwind v4 + CSS var 로 대체 가능 → 도입 X. |
+| **3. Generic** | `base.css` *reset* (`box-sizing`, `margin: 0` 등) + Tailwind preflight | 브라우저 reset. element selector. |
+| **4. Elements** | `base.css` 의 `a / button / img` + `typography.css` 의 `h1~h6 / main h*` | unstyled HTML element 기본 룰. |
+| **5. Objects** | `layout.css` (`main`, `.breadcrumb`) + `utilities.css` (`.empty`, `.skip-link`, `.route-transition`) | layout pattern (cosmetic 없음). 재사용 가능 시맨틱. |
+| **6. Components** | 슬라이스 별 `.css` (게임 = mini-game.css / stickman-murim.css 등) + shadcn 형 컴포넌트 시맨틱 class | UI 컴포넌트 구체 룰. |
+| **7. Utilities** | **Tailwind utility class** (`bg-accent`, `p-4`, `flex` 등) | 가장 높은 specificity. 빈번한 직접 적용. atomic. |
+
+**원칙**: 컴포넌트는 utility (layer 7) 우선 → 표현 안 되면 component class (layer 6) → 그래도 안 되면 object / element / generic 으로 내려감. Settings (token) 은 모든 layer 의 SSOT.
+
+### 1-2. 보조 아키텍처 / 패턴
+
+| 아키텍처 / 패턴 | 차용 부분 |
 |---|---|
-| Tailwind v4 설치 | ✅ `tailwindcss` + `@tailwindcss/vite` (devDep) |
-| Vite plugin 등록 | ✅ `vite.config.ts` |
-| 토큰 통합 | ✅ `src/shared/styles/tailwind.css` 의 `@theme` 블록에 기존 디자인 토큰 노출 (bg / fg / accent / spacing / font) |
-| main.tsx import | ✅ tokens.css 직후 |
-| 기존 CSS | ✅ 그대로 유지 (tokens.css / base / typography / layout / utilities / author-mode / responsive / 슬라이스 .css 모두 활성) |
+| **Utility-first (Tailwind v4)** | ITCSS layer 7 의 구체화. 모든 컴포넌트 슬라이스에서 `className` 직접 사용. |
+| **shadcn/ui 패턴** | `cn()` helper (조건부 class 조합) + headless 컴포넌트 + variants. `src/shared/lib/cn.ts` 신규. |
+| **Design tokens centralized** | `tokens.css` 가 SSOT (Settings layer). `tailwind.css @theme` 가 정적 동기화. 다크 모드 = tokens.css 의 `[data-theme="dark"]` 가 :root var override → utility 가 자동 반영. |
+| **FSD (Feature-Sliced Design)** | 프론트엔드 코드 6 레이어 (정책 #4). CSS 측면에서는 *슬라이스 옆 .css* = ITCSS Components layer. |
 
-## 3. 사용 컨벤션
+## 2. cn() helper
 
-### 신규 컴포넌트
-**Tailwind utility class 우선**. 예:
-```tsx
-<button className="bg-accent text-white px-4 py-2 rounded">
-  Click
-</button>
+```ts
+import { cn } from '@/shared/lib/cn'
+
+<button className={cn(
+  'inline-flex items-center px-4 py-2 rounded-md font-semibold',
+  variant === 'primary' && 'bg-accent text-white hover:bg-accent-hover',
+  variant === 'secondary' && 'bg-bg-soft text-fg-2 hover:bg-bg-sunken',
+  disabled && 'opacity-50 cursor-not-allowed',
+  className,  // 외부에서 prop 으로 받은 추가 class
+)} />
 ```
 
-토큰 활용: `bg-accent`, `text-fg-2`, `bg-bg-soft` 등 (`tailwind.css` 의 `@theme` 에 정의된 var 자동 노출).
+`clsx` / `classnames` 같은 npm lib 미사용 — *런타임 의존 0 정책* 정합 (자체 구현 0.2 KB).
 
-### 기존 컴포넌트
-**그대로 유지**. 슬라이스 .css 의 명명 클래스 (`mini-game-launcher`, `sm-stickman` 등) 변경 X.
+## 3. 토큰 매핑 (기존 → Tailwind utility)
 
-### 점진 마이그레이션 트리거
-- 컴포넌트를 *큰 폭으로 정정* 할 때 (예: 디자인 변경 / 메커닉 추가)
-- 검토 사이클에서 *시각 개선 요청* 받을 때
-- 새 페이지 / 새 mini-game 신규 작성 시
-
-기존 코드를 *마이그레이션만 목적* 으로 건드리지 않는다 (회귀 위험 > 가치).
-
-## 4. 토큰 매핑 (기존 → Tailwind utility)
-
-`tailwind.css` 의 `@theme` 은 tokens.css 의 :root var 를 **직접 참조** (SSOT 단일). 다크 모드도 tokens.css 의 `[data-theme="dark"]` 가 var override → Tailwind utility 자동 반영.
+`tailwind.css` 의 `@theme` = 정적 값. tokens.css `:root` var 와 *수동 동기화* (작가 책임). 다크 모드 = tokens.css 의 `[data-theme="dark"]` 가 :root var override → `bg-bg`/`text-fg` 같은 utility 가 자동 다크 반영 (Tailwind class 자체는 light 값 정의이지만 CSS resolution 단계에서 var 가 다크 값으로).
 
 | 기존 var | Tailwind utility |
 |---|---|
-| `var(--bg)` / `var(--bg-soft)` / `var(--bg-sunken)` / `var(--surface)` | `bg-bg` / `bg-bg-soft` / `bg-bg-sunken` / `bg-surface` |
-| `var(--fg)` / `var(--fg-2)` / `var(--fg-3)` / `var(--fg-4)` | `text-fg` / `text-fg-2` / `text-fg-3` / `text-fg-4` |
-| `var(--accent)` | `bg-accent` / `text-accent` / `border-accent` |
-| `var(--accent-soft)` / `var(--accent-ring)` | `bg-accent-soft` / `ring-accent-ring` |
-| `var(--rule)` / `var(--rule-strong)` | `border-rule` / `border-rule-strong` |
-| `var(--warn-bg)` / `var(--warn-fg)` / `var(--warn-rule)` | `bg-warn-bg` / `text-warn-fg` / `border-warn-rule` |
+| `var(--bg)` / `--bg-soft` / `--bg-sunken` / `--surface` | `bg-bg` / `bg-bg-soft` / `bg-bg-sunken` / `bg-surface` |
+| `var(--fg)` / `--fg-2/3/4` | `text-fg` / `text-fg-2/3/4` |
+| `var(--accent)` / `--accent-soft` / `--accent-ring` | `bg-accent` / `text-accent` / `border-accent` / `bg-accent-soft` / `ring-accent-ring` |
+| `var(--rule)` / `--rule-strong` | `border-rule` / `border-rule-strong` |
+| `var(--warn-*)` | `bg-warn-bg` / `text-warn-fg` / `border-warn-rule` |
 | `var(--code-bg)` | `bg-code-bg` |
 | `var(--s-1)` ~ `var(--s-9)` (4~96px) | `p-1` / `m-2` / `gap-4` 등 (spacing-N) |
-| `var(--font)` / `var(--font-mono)` | `font-sans` / `font-mono` |
-| `var(--fs-xs)` ~ `var(--fs-display)` | `text-xs` / `text-sm` / `text-md` / `text-lg` / `text-xl` / `text-display` |
+| `var(--font)` / `--font-mono` | `font-sans` / `font-mono` |
+| `var(--fs-xs)` ~ `var(--fs-display)` | `text-xs` / `text-sm` / `text-base` / `text-md` / `text-lg` / `text-xl` / `text-display` |
 | `var(--r-sm)` ~ `var(--r-pill)` | `rounded-sm` / `rounded-md` / `rounded-lg` / `rounded-pill` |
 | `var(--shadow)` | `shadow-soft` |
+| `var(--w-page)` | `max-w-page` |
+| `var(--gutter)` | `px-[clamp(16px,4vw,32px)]` (clamp arbitrary value) |
 
-**다크 모드** = `dark:` prefix (예: `dark:bg-bg-soft`). 또는 자동 — bg-bg utility 가 tokens.css 의 다크 override 자동 반영이라 *대부분 prefix 불필요*.
+## 4. 반응형 (breakpoint)
 
-mini-game (`--mg-*`) 와 광살검 (`--sm-*`) 토큰 = Tailwind `@theme` 미통합 (게임 자체 어두운 톤 고정, 사이트 테마 무관). 게임 슬라이스 안에서는 기존 var 그대로 사용 (게임 = 점진 마이그레이션 후순위).
+Tailwind v4 의 기본:
+- `sm:` = min-width: 640px 이상
+- `md:` = 768px+, `lg:` = 1024px+, `xl:` = 1280px+
 
-## 5. 마이그레이션 제외 항목
+본 프로젝트 모바일 break = 640px → `sm:` 와 정합.
 
-- **게임 슬라이스** (`mini-game/`) — 게임 RAF loop / 동적 inline style 다수 → Tailwind 가치 작음
-- **마크다운 렌더링** (`shared/lib/markdown.ts`) — 본문 자체 클래스는 typography.css 의 `.article-prose` 등 유지
-- **storybook stories** — 시연만 (변경 가치 작음)
+**모바일 hidden / desktop visible** = `max-sm:hidden` (mobile 미만 hidden) 또는 `hidden sm:block` (default hidden, sm 이상 block).
+
+## 5. 마이그레이션 진행 상태
+
+| 슬라이스 | 상태 |
+|---|---|
+| `widgets/footer` | ✅ Tailwind 전환 (footer.css 폐기) |
+| `widgets/header` | ✅ Tailwind 전환 (header.css 폐기) |
+| `widgets/chapter-toc` | 진행 예정 |
+| `widgets/character-list` | 진행 예정 |
+| `widgets/series-list` | 진행 예정 |
+| `pages/not-found` | ✅ Tailwind 전환 (not-found.css 폐기) |
+| `pages/{home, series, chapter, character, unlock, about, notice}` | 진행 예정 |
+| `shared/ui/error-boundary` | 진행 예정 |
+| `features/mini-game/**` | 보류 (게임 좌표계·keyframe·scale var — Tailwind 가치 작음) |
+| `shared/styles/{tokens, base, typography, layout, utilities, author-mode, responsive}.css` | **보존** — 전역 reset / 디자인 토큰 / scrollbar / a11y. Tailwind 가 표현 안 하는 패턴. |
 
 ## 6. 빌드·번들 영향
 
 - Tailwind v4 = 사용 utility 만 추출 (purge 자동)
-- 현 상태 (`@theme` 정의만 / utility 사용 0) = dist css 영향 ~0 KB
-- 점진 마이그레이션 시 = 새 utility 사용분만 추가, 기존 CSS 점진 제거 후 *전체 dist css size 변동 최소*
+- 현 상태 (v0.3.0) = dist css 14.96 KB gzip (v0.2.7 = 11.65 → +3.3 KB Tailwind preflight + 초기 utility)
+- 마이그레이션 누적 시 = 슬라이스 .css 폐기 + utility 공유 → 추가 증가 미미
 
 ## 7. 측정·검증
 
-- 마이그레이션 PR 단위로 *시각 회귀 검증* (Storybook variant 비교)
+- 매 슬라이스 마이그레이션 = `npm run validate` + 시각 검증 (사용자 시연 or storybook variant)
 - dist css gzip 추이 monitoring
-- 사용자 시연 (개발자 본인) 으로 *행동 회귀 0* 확인
+- 시각 회귀 확인 후 .css 폐기 + index.ts 의 import 제거
 
-## 8. 향후 로드맵 (예시)
-
-| Phase | 범위 | 시점 |
-|---|---|---|
-| 1 (v0.3.0) | Tailwind 셋업 + 토큰 통합 + 본 문서 | 완료 |
-| 2 | 신규 페이지 / 컴포넌트 = Tailwind 우선 | 진행 중 (작가 자율) |
-| 3 | `widgets/` 의 작은 컴포넌트 점진 전환 (chapter-toc, character-list 등) | 사용자 결정 시 |
-| 4 | `pages/` 마이그레이션 | 사용자 결정 시 |
-| 5 | mini-game / markdown 등 마지막 보루 | 가치·필요성 검토 후 |
-
-## 9. 참고
+## 8. 참고
 
 - Tailwind v4 docs: https://tailwindcss.com/docs/v4-beta
+- shadcn/ui (디자인 패턴 차용): https://ui.shadcn.com
 - 본 프로젝트 디자인 토큰 SSOT: [`tokens.css`](./tokens.css)
-- 게임 토큰 (`--mg-*`): [`../../features/mini-game/mini-game.css`](../../features/mini-game/mini-game.css) line 349+
+- 게임 토큰 (`--mg-*`): [`../../features/mini-game/mini-game.css`](../../features/mini-game/mini-game.css)
 - 게임 토큰 (`--sm-*`): [`../../features/mini-game/games/stickman-murim/stickman-murim.css`](../../features/mini-game/games/stickman-murim/stickman-murim.css)
+- cn() helper: [`../lib/cn.ts`](../lib/cn.ts)

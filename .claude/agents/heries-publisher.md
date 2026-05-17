@@ -16,7 +16,7 @@ model: opus
 **담당:**
 - `content/series.json` (시리즈 인덱스) 갱신
 - `content/series/{slug}/manifest.json` (시리즈별 챕터 인덱스 + characters[]) 갱신
-- 빌드 검증 = `npm run typecheck` + `npm run build` + `npm run build-storybook` + `scripts/check-secrets.mjs`
+- 빌드 검증 = `npm run validate` (lint + typecheck + build, build 내부에 check-images + check-secrets) + `npm run build-storybook`
 - 이미지 최적화 (`npm run optimize:images`) — 신규 이미지 추가 후 강제
 - 썸네일 AI 프롬프트 작성 (시리즈 cover + 챕터별) — `content/series/{slug}/thumbnails/PROMPT_REQUEST.md`
 - 이미지 budget 검증 (`scripts/check-images.mjs`) — 500KB/이미지 한도

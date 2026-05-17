@@ -29,40 +29,44 @@ export function Header() {
   }
 
   return (
-    <header className="site-header">
-      <div className="site-header-row">
-        <div className="brand">
-          <div className="brand-row">
-            <Link to="/" className="brand-link">H-eries</Link>
+    <header className="sticky top-0 z-20 bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] backdrop-blur-[10px] backdrop-saturate-[1.8] border-b border-rule">
+      <div className="max-w-page mx-auto px-[clamp(16px,4vw,32px)] py-3 flex items-center justify-between gap-4 min-h-[clamp(52px,6vh,64px)] sm:min-h-[clamp(48px,6vh,56px)]">
+        <div className="flex flex-col gap-[2px] leading-[1.1]">
+          <div className="flex items-center gap-2">
+            <Link to="/" className="text-xl font-bold tracking-[-0.02em] text-fg">H-eries</Link>
             {isAuthor && (
-              <Link to="/unlock" className="author-badge" title="작가 모드 — 클릭하여 잠금 관리">AUTHOR</Link>
+              <Link
+                to="/unlock"
+                className="inline-block ml-2 px-2 py-[2px] bg-warn-bg text-warn-fg border border-warn-rule rounded-pill text-[11px] font-bold tracking-[0.06em] uppercase no-underline transition-[background-color,transform] duration-150 hover:bg-warn-rule hover:-translate-y-px focus-visible:bg-warn-rule focus-visible:-translate-y-px"
+                title="작가 모드 — 클릭하여 잠금 관리"
+              >AUTHOR</Link>
             )}
           </div>
-          <p className="meta">오리지널 웹 시리즈 컬렉션</p>
+          <p className="text-xs text-fg-3 m-0 font-normal max-sm:hidden">오리지널 웹 시리즈 컬렉션</p>
         </div>
-        <div className="site-header-actions">
+        <div className="inline-flex items-center gap-4 sm:gap-2">
           <a
-            className="header-contact"
+            className="inline-flex flex-col items-end gap-px text-fg-2 leading-[1.2] transition-colors whitespace-nowrap py-1 hover:text-accent"
             href={mailto}
             aria-label={`저작권 문의 또는 아이디어 제보 — ${CONTACT_USER}@${CONTACT_DOMAIN}`}
           >
-            <span className="header-contact-label">
-              <span className="header-contact-label-full">저작권 · 아이디어 문의</span>
-              <span className="header-contact-label-short" aria-hidden="true">문의</span>
+            <span className="font-semibold tracking-[0.02em] text-sm">
+              <span className="max-sm:hidden">저작권 · 아이디어 문의</span>
+              <span className="sm:hidden" aria-hidden="true">문의</span>
             </span>
-            <span className="header-contact-mail" aria-hidden="true">
+            <span className="font-mono text-[11px] text-fg-3 tracking-[0.01em] max-sm:hidden" aria-hidden="true">
               {CONTACT_USER}<span>@</span>{CONTACT_DOMAIN}
             </span>
           </a>
 
           <button
             type="button"
-            className="theme-toggle"
+            className="inline-flex items-baseline gap-2 px-2 py-1 text-fg-3 text-sm rounded-sm transition-[color,background] hover:text-accent hover:bg-accent-soft"
             onClick={cycleTheme}
             aria-label={`테마: ${THEME_LABEL[theme]} (눌러서 전환)`}
             title={`테마 — 현재: ${THEME_LABEL[theme]}`}
           >
-            <span className="theme-toggle-glyph" aria-hidden="true">{THEME_GLYPH[theme]}</span>
+            <span className="text-base leading-none" aria-hidden="true">{THEME_GLYPH[theme]}</span>
           </button>
         </div>
       </div>

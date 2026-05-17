@@ -30,14 +30,14 @@ model: opus
 
 ## 2. 작업 원칙
 
-1. **의존성 0 정책 (v2)** — React 19 + React Router + Vite 만 허용. 외부 라이브러리·UI 키트·상태 관리 도입 시 *반드시 사용자 확인*. 의존 추가의 정신 = "코드만 있으면 어디서든 실행 가능".
+1. **런타임 의존 최소 (v3, 2026-05-14)** — *런타임* = React 19 + React Router 7 + Vite 6 + TypeScript 만 허용. 외부 *런타임* 라이브러리·UI 키트·상태 관리 도입 시 *반드시 사용자 확인*. 의존 추가의 정신 = "코드만 있으면 어디서든 실행 가능". **dev 도구는 별도** — Storybook, ESLint 9 + plugins (typescript/react/react-hooks/jsx-a11y), babel-plugin-react-compiler, Tailwind v4 + `@tailwindcss/vite` 등 devDependencies 허용 (dist 영향 0~수 KB).
 2. **FSD 격리** — `app → pages → widgets → features → entities → shared` 단방향 import. 슬라이스 외부에서는 `index.ts` (Public API) 만 import.
 3. **TypeScript strict 유지** — `tsconfig.json` 의 `strict: true` 절대 완화 금지. 작업 후 `npm run typecheck` 0 에러 확인.
 4. **Serena MCP 우선** — `src/` 코드 탐색은 `mcp__serena-heries__find_symbol` / `get_symbols_overview` / `find_referencing_symbols` 우선. 광역 grep / 전체 Read 지양.
 5. **마스킹 정책 준수** (정책 v2) — 단일 빌드 + runtime 마스킹. sessionStorage `heries:author=1` 플래그 없을 때 *_series.md §시놉시스, 캐릭터 카드 §H-eries 분기, frontmatter heries_arc, worldbuilding/timeline/glossary/, 비-주인공 캐릭터 상세 라우트 가드* 마스킹.
 6. **렌더러 보수성** — 마크다운 렌더러 (`src/shared/lib/markdown.ts`) 수정 시 11+ 케이스 dry-render 검증 (bold containing italic, nested list, blockquote 재귀 등 기존 패턴 회귀 방지).
-7. **CSS 직접 작성** — Tailwind / styled-components 등 도입 X. `src/shared/styles/` 슬라이스 + 슬라이스 옆 `{name}.css` + CSS 변수.
-8. **빌드 검증 책임은 publisher 와 분담** — 본 에이전트 = `npm run typecheck` 까지. 전체 빌드 (`npm run build` + `npm run build-storybook` + `scripts/check-secrets.mjs`) 검증 = publisher.
+7. **CSS — coexist 패턴 (v0.3.0)** — `src/shared/styles/{tokens, base, typography, layout, utilities, author-mode, responsive}.css` + 슬라이스 옆 `{name}.css` (CSS 변수 기반) + **Tailwind v4** (`tailwind.css` 의 `@theme` 가 tokens.css var 와 동기화). 신규 컴포넌트 = Tailwind utility 우선, 기존 = 점진 마이그레이션 (게임 슬라이스·markdown 본문 후순위). 전략 SSOT = `src/shared/styles/tailwind-migration.md`. styled-components 등 CSS-in-JS 라이브러리 도입 X.
+8. **빌드 검증 책임은 publisher 와 분담** — 본 에이전트 = `npm run validate` (lint + typecheck + build 단일 게이트) 까지. 추가 `npm run build-storybook` + 사이트 시연 검증 = publisher.
 
 ## 3. 입력·출력
 
