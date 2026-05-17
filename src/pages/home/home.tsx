@@ -4,6 +4,8 @@ import {useAsync} from '../../shared/lib/use-async.js'
 import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
 import {SeriesList} from '../../widgets/series-list'
 import {MiniGameLauncher} from '../../features/mini-game'
+import {Empty} from '../../shared/ui/empty'
+import {Loading} from '../../shared/ui/loading'
 import HERO_IMAGE from '../../shared/images/thumbnail-placeholder.webp?url'
 const HERO_ALT = 'H-eries — 작가(홍도산) 의 오리지널 웹 시리즈 컬렉션'
 
@@ -36,8 +38,8 @@ export function HomePage() {
       <MiniGameLauncher/>
 
       <h2>작품 목록</h2>
-      {state.status === 'loading' && <p className="loading">불러오는 중…</p>}
-      {state.status === 'error' && <p className="empty">오류: {state.error.message}</p>}
+      {state.status === 'loading' && <Loading />}
+      {state.status === 'error' && <Empty>오류: {state.error.message}</Empty>}
       {state.status === 'success' && <SeriesList items={state.data.series}/>}
     </main>
   )

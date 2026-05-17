@@ -105,6 +105,8 @@ textarea:focus-visible {
   border-radius: var(--r-sm);
 }
 
+/* .loading 룰 = src/shared/ui/loading/ 컴포넌트로 추출됨 (정책 #11).
+   단 index.html 의 첫 paint placeholder (.loading "불러오는 중…") 가 본 클래스 사용 — minimal 룰 유지. */
 .loading {
   color: var(--fg-3);
   text-align: center;

@@ -5,6 +5,8 @@ import { renderInline } from '../../shared/lib/markdown.js'
 import { useAsync } from '../../shared/lib/use-async.js'
 import { useAuthorMode } from '../../shared/lib/use-author-mode.js'
 import { useDocumentTitle } from '../../shared/lib/use-document-title.js'
+import { Empty } from '../../shared/ui/empty'
+import { Loading } from '../../shared/ui/loading'
 
 const FOLDER_LABEL: Record<string, string> = {
   '1-protagonist': '주인공',
@@ -30,8 +32,8 @@ export function CharacterPage() {
     : ''
   useDocumentTitle(characterTitle)
 
-  if (state.status === 'loading') return <main className={MAIN_CLS}><p className="loading">불러오는 중…</p></main>
-  if (state.status === 'error') return <main className={MAIN_CLS}><p className="empty">오류: {state.error.message}</p></main>
+  if (state.status === 'loading') return <main className={MAIN_CLS}><Loading /></main>
+  if (state.status === 'error') return <main className={MAIN_CLS}><Empty>오류: {state.error.message}</Empty></main>
 
   const { manifest, data } = state.data
 

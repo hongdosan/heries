@@ -4,6 +4,8 @@ import {assetUrl} from '../../shared/lib/env.js'
 import {useAuthorMode} from '../../shared/lib/use-author-mode.js'
 import {useAsync} from '../../shared/lib/use-async.js'
 import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
+import {Empty} from '../../shared/ui/empty'
+import {Loading} from '../../shared/ui/loading'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
 import {ChapterToc} from '../../widgets/chapter-toc'
 import {CharacterList} from '../../widgets/character-list'
@@ -28,8 +30,8 @@ export function SeriesPage() {
   }
 
   const mainCls = 'flex-1 w-full max-w-page mx-auto pt-7 px-[clamp(16px,4vw,32px)] pb-9'
-  if (state.status === 'loading') return <main className={mainCls}><p className="loading">불러오는 중…</p></main>
-  if (state.status === 'error') return <main className={mainCls}><p className="empty">오류: {state.error.message}</p></main>
+  if (state.status === 'loading') return <main className={mainCls}><Loading /></main>
+  if (state.status === 'error') return <main className={mainCls}><Empty>오류: {state.error.message}</Empty></main>
 
   const {manifest, bodyHtml} = state.data
   const chapterCount = manifest.chapters.length

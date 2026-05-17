@@ -1,14 +1,5 @@
-/* H-eries — Utilities (empty/error common + a11y skip-link) */
-/* ─── Empty / error ─────────────────────────────────────── */
-.empty {
-  text-align: center;
-  color: var(--fg-3);
-  padding: var(--s-7) var(--s-4);
-  border: 1px dashed var(--rule);
-  border-radius: var(--r-md);
-  background: var(--bg-soft);
-  font-size: var(--fs-sm);
-}
+/* H-eries — Utilities (a11y skip-link + route transition) */
+/* .empty / .loading = src/shared/ui/{empty, loading}/ 컴포넌트로 추출됨 (정책 #11). */
 
 /* ─── a11y skip-link ────────────────────────────────────── */
 /* 키보드 사용자가 첫 Tab 한 번에 본문으로 건너뛸 수 있도록.

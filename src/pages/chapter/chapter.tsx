@@ -8,6 +8,8 @@ import {useAsync} from '../../shared/lib/use-async.js'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
 import {extractOutline} from '../../shared/lib/markdown.js'
 import type {ChapterIndex} from '../../shared/lib/types.js'
+import {Empty} from '../../shared/ui/empty'
+import {Loading} from '../../shared/ui/loading'
 
 // 본문이 viewport 보다 길어야 scroll-nav 표시 (스크롤 가치).
 function useIsScrollable(): boolean {
@@ -46,10 +48,8 @@ export function ChapterPage() {
     : ''
   useDocumentTitle(chapterTitle)
 
-  if (state.status === 'loading') return <main className="page-chapter"><p className="loading">불러오는
-    중…</p></main>
-  if (state.status === 'error') return <main className="page-chapter"><p
-    className="empty">오류: {state.error.message}</p></main>
+  if (state.status === 'loading') return <main className="page-chapter"><Loading /></main>
+  if (state.status === 'error') return <main className="page-chapter"><Empty>오류: {state.error.message}</Empty></main>
 
   const {manifest, data} = state.data
   const sorted = [...manifest.chapters].sort((a, b) => a.episode - b.episode)

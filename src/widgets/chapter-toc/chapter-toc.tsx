@@ -4,6 +4,7 @@ import { assetUrl } from '../../shared/lib/env.js'
 import type { ChapterIndex } from '../../shared/lib/types.js'
 import { useImgFallback, PLACEHOLDER_THUMB } from '../../shared/lib/use-img-fallback.js'
 import { cn } from '../../shared/lib/cn.js'
+import { Empty } from '../../shared/ui/empty'
 
 export interface ChapterTocProps {
   slug: string
@@ -35,7 +36,7 @@ export function ChapterToc({ slug, chapters }: ChapterTocProps) {
   }, [order])
 
   if (chapters.length === 0) {
-    return <p className="empty">아직 등록된 챕터가 없습니다. 작품 진행에 따라 추가됩니다.</p>
+    return <Empty>아직 등록된 챕터가 없습니다. 작품 진행에 따라 추가됩니다.</Empty>
   }
 
   const sorted = [...chapters].sort((a, b) =>

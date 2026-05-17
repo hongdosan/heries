@@ -4,6 +4,8 @@ import { renderMarkdown } from '../../shared/lib/markdown.js'
 import { parseFrontmatter } from '../../shared/lib/frontmatter.js'
 import { useAsync } from '../../shared/lib/use-async.js'
 import { useDocumentTitle } from '../../shared/lib/use-document-title.js'
+import { Empty } from '../../shared/ui/empty'
+import { Loading } from '../../shared/ui/loading'
 
 type NoticeFrontmatter = { title?: string; updated?: string }
 
@@ -25,8 +27,8 @@ export function NoticePage() {
         <span>저작권</span>
       </nav>
 
-      {state.status === 'loading' && <p className="loading">불러오는 중…</p>}
-      {state.status === 'error' && <p className="empty">오류: {state.error.message}</p>}
+      {state.status === 'loading' && <Loading />}
+      {state.status === 'error' && <Empty>오류: {state.error.message}</Empty>}
       {state.status === 'success' && (
         <>
           {state.data.frontmatter.updated && (
