@@ -45,38 +45,7 @@
   color: var(--fg-2);
 }
 
-.author-tab { margin: var(--s-5) 0 0; }
-.author-tab-desc {
-  margin: 0 0 var(--s-5);
-  padding: var(--s-3) var(--s-4);
-  border-left: 3px solid var(--warn-rule);
-  background: var(--bg-soft);
-  color: var(--fg-2);
-  font-size: var(--fs-sm);
-  border-radius: 0 var(--r-md) var(--r-md) 0;
-}
-.author-tab-desc em { color: var(--accent); font-style: normal; }
-.author-tab-list {
-  list-style: disc;
-  padding-left: var(--s-6);
-  margin: 0 0 var(--s-5);
-  font-size: var(--fs-sm);
-  line-height: 1.8;
-  color: var(--fg-2);
-}
-.author-tab-list strong { color: var(--fg); font-weight: 600; }
-.author-tab-list code {
-  background: var(--code-bg);
-  padding: 1px 6px;
-  border-radius: var(--r-sm);
-  font-family: var(--font-mono);
-  font-size: 0.88em;
-}
-.author-tab-note {
-  margin: 0;
-  font-size: var(--fs-xs);
-  color: var(--fg-3);
-}
+/* author-tab / author-tab-desc / author-tab-list = src/pages/series/series.tsx 의 Tailwind utility 인라인으로 전환 (작가 모드 series 페이지의 author 탭). */
 
 /* /unlock 페이지 (page-unlock / unlock-form / unlock-status / unlock-desc / unlock-label / unlock-input) = src/pages/unlock/unlock.tsx 의 Tailwind utility 인라인으로 전환. */
 /* unlock-error / unlock-actions / unlock-btn / unlock-btn-primary = src/pages/unlock/unlock.tsx + character.tsx 잠긴 카드의 Tailwind utility 인라인으로 전환. */

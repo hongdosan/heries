@@ -110,12 +110,12 @@ export function SeriesPage() {
         <CharacterList slug={slug} characters={manifest.characters}/>
       )}
       {tab === 'author' && isAuthor && (
-        <section className="author-tab">
-          <p className="author-tab-desc">
+        <section className="mt-5">
+          <p className="m-0 mb-5 p-3 px-4 border-l-[3px] border-l-warn-rule bg-bg-soft text-fg-2 text-sm rounded-r-md">
             본 탭은 <span className="author-only-badge">AUTHOR</span> 모드 빌드에서만 노출되는
-            작가 전용 자료 인덱스입니다. 시놉시스·세계관·연표·용어집·캐릭터 카드의 <em>H-eries 분기</em> 절은 reader 빌드에서 마스킹되므로, 본 탭에서 한곳에 모아 추적합니다.
+            작가 전용 자료 인덱스입니다. 시놉시스·세계관·연표·용어집·캐릭터 카드의 <em className="text-accent not-italic">H-eries 분기</em> 절은 reader 빌드에서 마스킹되므로, 본 탭에서 한곳에 모아 추적합니다.
           </p>
-          <ul className="author-tab-list">
+          <ul className="list-disc pl-6 m-0 mb-5 text-sm leading-[1.8] text-fg-2 [&_strong]:text-fg [&_strong]:font-semibold [&_code]:bg-code-bg [&_code]:py-px [&_code]:px-1.5 [&_code]:rounded-sm [&_code]:font-mono [&_code]:text-[0.88em] [&_em]:text-accent [&_em]:not-italic">
             <li><strong>시놉시스</strong> — 개요 탭의 <em>## 시놉시스</em> 절</li>
             <li><strong>세계관</strong> — <code>content/series/{slug}/worldbuilding/</code></li>
             <li><strong>연표</strong> — <code>content/series/{slug}/timeline/</code></li>
