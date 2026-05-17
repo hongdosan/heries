@@ -55,34 +55,37 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
     const isDev = import.meta.env.DEV
     return (
-      <main className="error-boundary" role="alert">
-        <div className="error-boundary-card">
-          <p className="error-boundary-eyebrow">ERROR</p>
-          <h1 className="error-boundary-title">
+      <main className="flex-1 w-full max-w-reader mx-auto pt-7 px-[clamp(16px,4vw,32px)] pb-9" role="alert">
+        <div className="bg-bg-soft border border-rule border-l-[3px] border-l-warn-rule rounded-md p-5 px-6">
+          <p className="m-0 mb-2 font-mono text-xs font-semibold tracking-[0.18em] text-warn-fg uppercase">ERROR</p>
+          <h1 className="m-0 mb-3 text-2xl font-bold tracking-[-0.02em] text-fg break-keep">
             {isDev ? error.message : '문제가 발생했습니다'}
           </h1>
           {!isDev && (
-            <p className="error-boundary-desc">
-              페이지를 표시하는 도중 오류가 발생했습니다. 다시 시도하거나 홈으로 이동해
-              주세요.
+            <p className="m-0 mb-4 text-sm text-fg-3 leading-[1.7] break-keep">
+              페이지를 표시하는 도중 오류가 발생했습니다. 다시 시도하거나 홈으로 이동해 주세요.
             </p>
           )}
-          <div className="error-boundary-actions">
-            <button type="button" className="error-boundary-btn primary" onClick={this.handleReload}>
-              다시 시도
-            </button>
-            <button type="button" className="error-boundary-btn" onClick={this.handleHome}>
-              홈으로
-            </button>
+          <div className="inline-flex flex-wrap gap-2 mt-2">
+            <button
+              type="button"
+              className="px-4 py-2 text-sm font-semibold text-white bg-accent border border-accent rounded-sm transition-colors hover:bg-accent-hover hover:border-accent-hover"
+              onClick={this.handleReload}
+            >다시 시도</button>
+            <button
+              type="button"
+              className="px-4 py-2 text-sm font-semibold text-fg-2 bg-surface border border-rule rounded-sm transition-colors hover:text-accent hover:border-accent-ring"
+              onClick={this.handleHome}
+            >홈으로</button>
           </div>
           {isDev && error.stack && (
-            <details className="error-boundary-detail" open>
-              <summary>stack trace</summary>
-              <pre>{error.stack}</pre>
+            <details className="mt-5 p-3 px-4 bg-bg-sunken border border-rule rounded-sm text-xs" open>
+              <summary className="cursor-pointer font-mono font-semibold text-fg-3 tracking-wider uppercase">stack trace</summary>
+              <pre className="mt-3 p-3 bg-bg border border-rule rounded-sm overflow-x-auto font-mono text-[11px] leading-relaxed text-fg-2 whitespace-pre-wrap break-all">{error.stack}</pre>
               {info?.componentStack && (
                 <>
-                  <p className="error-boundary-detail-label">component stack</p>
-                  <pre>{info.componentStack}</pre>
+                  <p className="mt-3 font-mono text-xs font-semibold text-fg-3 tracking-wider uppercase">component stack</p>
+                  <pre className="mt-3 p-3 bg-bg border border-rule rounded-sm overflow-x-auto font-mono text-[11px] leading-relaxed text-fg-2 whitespace-pre-wrap break-all">{info.componentStack}</pre>
                 </>
               )}
             </details>

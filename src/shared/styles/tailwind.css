@@ -68,6 +68,8 @@
   --text-md: 17px;
   --text-lg: 19px;
   --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 38px;
   --text-display: clamp(40px, 6vw, 56px);
 
   /* border-radius — rounded-{key} utility */
@@ -81,6 +83,7 @@
 
   /* container — max-w-{key} utility (예: max-w-page) */
   --container-page: 1100px;
+  --container-reader: 680px;
 }
 
 /* Dark mode variant — Tailwind v4 의 dark: prefix 활성.
