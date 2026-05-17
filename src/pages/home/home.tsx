@@ -40,7 +40,7 @@ export function HomePage() {
 
           <p className="m-0 text-sm">
             <Link to="/about"
-                  className="font-semibold border-b border-accent-ring pb-[2px] transition-[color,border-color] hover:border-accent-hover">H-eries
+                  className="font-semibold border-b border-accent-ring pb-0.5 transition-[color,border-color] hover:border-accent-hover">H-eries
               가 무엇인가요? →</Link>
           </p>
         </div>
