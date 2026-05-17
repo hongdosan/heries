@@ -14,25 +14,39 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 develop 안 누적 변경 (향후 release 후보 — 버전 미할당):
 
-### Added (dev tooling — develop 안 commit `be024d7`)
-- **React Compiler (babel-plugin-react-compiler)** 도입 — `compilationMode: 'all'` 모드. 자동 메모이제이션 → 수동 `React.memo / useCallback / useMemo` 부담 ↓
-- **ESLint 9** flat config (`eslint.config.js`) 신규 + `lint` / `lint:fix` script
-  - `@typescript-eslint/parser` + `eslint-plugin-react` + `eslint-plugin-react-hooks@5`
-  - 결과 = 0 error / 1 warning (의도된 missing dep)
-  - `eslint-plugin-react-compiler` (rc) 의 zod-validation-error 호환성 버그로 제외 (안정 버전 출시 시 재도입). babel plugin 은 정상 작동
-- **Tailwind v4** (`tailwindcss` + `@tailwindcss/vite`) 도입 — coexist 패턴
-  - `src/shared/styles/tailwind.css` 에 기존 디자인 토큰 (`tokens.css` 의 :root var) 을 `@theme` 으로 통합 (`bg-accent`, `text-fg-2`, `p-4` 등 utility 노출)
-  - 기존 슬라이스 CSS 모두 유지 — 신규 컴포넌트는 Tailwind 우선, 기존 컴포넌트는 점진 마이그레이션
-  - 전략 SSOT: `src/shared/styles/tailwind-migration.md` (5 Phase 로드맵)
+### Added (dev tooling)
+- **React Compiler (babel-plugin-react-compiler)** — `compilationMode: 'all'`. 자동 메모이제이션
+- **ESLint 9** flat config + plugins
+  - `@typescript-eslint/{parser, eslint-plugin}` + `eslint-plugin-react` + `eslint-plugin-react-hooks@5` + `eslint-plugin-jsx-a11y`
+  - FSD 격리 룰 (`no-restricted-imports` per-layer) — 정책 #4 자동화
+  - 코드 품질 룰 (`eqeqeq`, `no-var`, `prefer-const`, `no-console`, `react/jsx-key` 등)
+  - a11y 룰 (alt-text, aria-*, heading-has-content, tabindex-no-positive 등)
+  - `npm run validate` 단일 게이트 = lint + typecheck + build
+- **Tailwind v4** (`tailwindcss` + `@tailwindcss/vite`) — coexist 패턴
+  - `tailwind.css` 의 `@theme` 가 tokens.css :root var 직접 참조 (SSOT 단일). 다크 모드 자동 반영
+  - 전략 SSOT: `tailwind-migration.md` (토큰 매핑 + Phase 로드맵)
+- **`tsconfig.verbatimModuleSyntax: true`** — type-only import 명시 강제
 
-### Bundle (예상)
-- dist js: +10.2 KB gzip (React Compiler runtime)
-- dist css: +2.3 KB gzip (Tailwind preflight reset)
-- 빌드 시간: +1.4s (compiler 분석 + Tailwind purge)
+### Changed (CSS 점진 마이그레이션)
+- **not-found 페이지** — Tailwind utility 전환, `not-found.css` 폐기
+- **footer widget** — Tailwind utility 전환, `footer.css` 폐기
+- **storybook preview** — tailwind.css import 추가, 폐기된 .css import 제거
+
+### Changed (보안)
+- **`check-secrets.mjs`** 패턴 7종 추가 — GitHub fine-grained PAT / OAuth, Anthropic API, Stripe live/restricted, Slack token, PEM private key, JWT
+
+### Changed (CI)
+- **deploy.yml** = Lint step 추가 (typecheck 직전)
+
+### Bundle (현 상태)
+- dist js: 108.25 KB gzip (v0.2.7 = 97.62 → +10.6 KB, React Compiler runtime)
+- dist css: 14.59 KB gzip (v0.2.7 = 11.65 → +2.94 KB, Tailwind preflight + 첫 utility 사용분)
+- 빌드 시간: ~1.9s
 
 ### Notes
-- 이전 v0.3.0 첫 시도에서 사이트 장애 → 즉시 롤백 (main = v0.2.2 복귀). 본 작업은 develop 에 보존, *재검토·테스트* 후 별도 release 진입 예정
+- 이전 v0.3.0 첫 시도에서 사이트 장애 → 즉시 롤백. 본 작업은 develop 에 보존, *재검토·테스트* 후 별도 release 진입
 - 사용자-facing 변경 0 (시각·동작 동일 — dev tooling 만)
+- CSS 마이그레이션 = 점진 (footer / not-found 까지 진행). 게임 슬라이스·markdown 본문은 후순위
 
 ---
 
