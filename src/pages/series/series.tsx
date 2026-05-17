@@ -27,10 +27,9 @@ export function SeriesPage() {
     else setSearchParams({tab: next}, {replace: false})
   }
 
-  if (state.status === 'loading') return <main className="page-series"><p className="loading">불러오는
-    중…</p></main>
-  if (state.status === 'error') return <main className="page-series"><p
-    className="empty">오류: {state.error.message}</p></main>
+  const mainCls = 'flex-1 w-full max-w-page mx-auto pt-7 px-[clamp(16px,4vw,32px)] pb-9'
+  if (state.status === 'loading') return <main className={mainCls}><p className="loading">불러오는 중…</p></main>
+  if (state.status === 'error') return <main className={mainCls}><p className="empty">오류: {state.error.message}</p></main>
 
   const {manifest, bodyHtml} = state.data
   const chapterCount = manifest.chapters.length
@@ -41,23 +40,33 @@ export function SeriesPage() {
       ? PLACEHOLDER_THUMB
       : assetUrl(`content/series/${slug}/${manifest.thumbnail}`)
 
+  const tabBtnCls = (active: boolean) =>
+    'px-4 py-3 text-md font-medium border-b-2 border-transparent -mb-px transition-[color,border-color] hover:text-fg-2 ' +
+    (active ? 'text-accent border-b-accent font-semibold' : 'text-fg-3')
+
   return (
-    <main className="page-series">
+    <main className={mainCls}>
       <nav className="breadcrumb">
         <Link to="/">H-eries</Link><span className="sep">/</span>
         <span>{manifest.title}</span>
       </nav>
 
-      <header className={`series-hero${coverSrc ? ' has-cover' : ''}`}>
+      <header
+        className={
+          coverSrc
+            ? 'pt-2 pb-6 border-b border-rule mb-6 grid grid-cols-[clamp(220px,24vw,320px)_1fr] items-end gap-6 max-sm:grid-cols-1 max-sm:items-stretch'
+            : 'pt-2 pb-6 border-b border-rule mb-6 flex items-baseline gap-4 flex-wrap'
+        }
+      >
         {coverSrc && (
-          <div className="series-cover">
-            <img src={coverSrc} alt="" loading="eager" onError={cover.onError}/>
+          <div className="aspect-[16/9] rounded-md overflow-hidden bg-bg-soft border border-rule max-sm:max-w-full">
+            <img src={coverSrc} alt="" loading="eager" onError={cover.onError} className="w-full h-full object-cover block" />
           </div>
         )}
-        <div className="series-hero-text">
-          <h1>{manifest.title}</h1>
-          <div className="meta-row">
-            <span className="status-pill">{manifest.status}</span>
+        <div className="flex flex-col gap-3">
+          <h1 className="m-0">{manifest.title}</h1>
+          <div className="flex items-center gap-3 text-sm text-fg-3">
+            <span className="inline-block py-[3px] px-[10px] bg-accent-soft text-accent rounded-pill text-xs font-semibold tracking-[0.04em]">{manifest.status}</span>
             {manifest.started && /^\d{4}-\d{2}-\d{2}$/.test(manifest.started) && (
               <time dateTime={manifest.started}>시작 {manifest.started}</time>
             )}
@@ -65,20 +74,20 @@ export function SeriesPage() {
         </div>
       </header>
 
-      <div className="tabs" role="tablist" aria-label="시리즈 섹션">
-        <button role="tab" aria-selected={tab === 'overview'} className="tab-btn"
+      <div className="flex gap-2 border-b border-rule mb-6 relative flex-wrap" role="tablist" aria-label="시리즈 섹션">
+        <button role="tab" aria-selected={tab === 'overview'} className={tabBtnCls(tab === 'overview')}
                 onClick={() => setTab('overview')}>개요
         </button>
-        <button role="tab" aria-selected={tab === 'chapters'} className="tab-btn"
+        <button role="tab" aria-selected={tab === 'chapters'} className={tabBtnCls(tab === 'chapters')}
                 onClick={() => setTab('chapters')}>
-          챕터<span className="tab-count">{chapterCount}</span>
+          챕터<span className={'text-xs ml-2 tabular-nums ' + (tab === 'chapters' ? 'text-accent' : 'text-fg-4')}>{chapterCount}</span>
         </button>
-        <button role="tab" aria-selected={tab === 'characters'} className="tab-btn"
+        <button role="tab" aria-selected={tab === 'characters'} className={tabBtnCls(tab === 'characters')}
                 onClick={() => setTab('characters')}>
-          등장인물<span className="tab-count">{characterCount}</span>
+          등장인물<span className={'text-xs ml-2 tabular-nums ' + (tab === 'characters' ? 'text-accent' : 'text-fg-4')}>{characterCount}</span>
         </button>
         {isAuthor && (
-          <button role="tab" aria-selected={tab === 'author'} className="tab-btn"
+          <button role="tab" aria-selected={tab === 'author'} className={tabBtnCls(tab === 'author')}
                   onClick={() => setTab('author')}>
             작가 전용<span className="author-only-badge">AUTHOR</span>
           </button>
