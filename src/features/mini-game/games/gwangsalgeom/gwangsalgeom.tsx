@@ -141,10 +141,10 @@ const EFFECT_IMPACT_SIZE = 72
 const EFFECT_DEATH_SIZE = 100
 const EFFECT_CAP = 24             // 동시 이펙트 상한
 
-// 파티클 색상 — stickman-murim.css 의 --sm-* 토큰과 동일 hex 유지.
+// 파티클 색상 — gwangsalgeom.css 의 --sm-* 토큰과 동일 hex 유지 (sm prefix = stickman-murim 시절 잔존, 호환 보존).
 // string literal 은 CSS var 사용 불가 (inline style 의 background 에 직접 들어감).
 // CSS 토큰 변경 시 본 상수도 동기화 필수.
-const COLOR_HIT_NORMAL = '#67e8f9'   // see --sm-accent in stickman-murim.css
+const COLOR_HIT_NORMAL = '#67e8f9'   // see --sm-accent in gwangsalgeom.css
 const COLOR_HIT_QI = '#fcd34d'       // see --sm-amber
 const COLOR_KILL_NORMAL = '#fda4af'  // see --sm-danger
 const COLOR_KILL_ELITE = '#f0abfc'   // see --sm-elite-bright
