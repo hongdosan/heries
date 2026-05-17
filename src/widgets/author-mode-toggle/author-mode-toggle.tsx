@@ -135,6 +135,7 @@ export function AuthorModeToggle() {
               </p>
               <p className="m-0 text-xs text-fg-3 leading-[1.6]">
                 본 모드 진입으로 인한 스포일러 노출은 <strong className="text-fg-2">전적으로 본인의 책임</strong>입니다.
+                <br />
                 세션 한정 (탭 종료 시 자동 잠금).
               </p>
               <label htmlFor="author-mode-key" className="text-xs font-semibold uppercase tracking-[0.08em] text-fg-3 mt-1">작가 키</label>
