@@ -7,7 +7,7 @@
  * 검기생존록의 .mini-game --mg-* 와 동일 패턴 (자매 슬라이스 정합).
  *
  * TSX 의 COLOR_* 6 상수도 본 팔레트 값과 동일 hex (string literal 은 var 사용 불가).
- * 변경 시 stickman-murim.tsx COLOR_* 도 함께 동기화. */
+ * 변경 시 gwangsalgeom.tsx COLOR_* 도 함께 동기화. */
 
 .sm-frame {
   /* surface */

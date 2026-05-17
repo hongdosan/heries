@@ -1,5 +1,5 @@
 import {memo, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react'
-import './stickman-murim.css'
+import './gwangsalgeom.css'
 
 // 스프라이트 — vite ?url import. 빌드 시 자동 hash + dist/assets/ 통합.
 import SPRITE_HERO from '../../../../shared/images/mini-game/stickman-murim/hero.webp?url'
@@ -365,11 +365,11 @@ function actionOf(key: string, code: string): ActionKey | null {
 }
 
 // ─── 컴포넌트 ─────────────────────────────────────────────────
-interface StickmanMurimProps {
+interface GwangsalgeomProps {
   readonly autoFocus?: boolean
 }
 
-export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
+export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
   const [phase, setPhase] = useState<Phase>('idle')
   const [player, setPlayer] = useState<Player>(makePlayer)
   const [enemies, setEnemies] = useState<readonly Enemy[]>([])
