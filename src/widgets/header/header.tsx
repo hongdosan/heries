@@ -35,6 +35,18 @@ export function Header() {
           <p className="text-xs text-fg-3 m-0 font-normal max-sm:hidden">오리지널 웹 시리즈 컬렉션</p>
         </div>
         <div className="inline-flex items-center gap-4 sm:gap-2">
+          <AuthorModeToggle />
+
+          <button
+            type="button"
+            className="inline-flex items-baseline gap-2 px-2 py-1 text-fg-3 text-sm rounded-sm transition-[color,background] hover:text-accent hover:bg-accent-soft"
+            onClick={cycleTheme}
+            aria-label={`테마: ${THEME_LABEL[theme]} (눌러서 전환)`}
+            title={`테마 — 현재: ${THEME_LABEL[theme]}`}
+          >
+            <span className="text-base leading-none" aria-hidden="true">{THEME_GLYPH[theme]}</span>
+          </button>
+
           <a
             className="inline-flex flex-col items-end gap-px text-fg-2 leading-[1.2] transition-colors whitespace-nowrap py-1 hover:text-accent"
             href={mailto}
@@ -48,18 +60,6 @@ export function Header() {
               {CONTACT_USER}<span>@</span>{CONTACT_DOMAIN}
             </span>
           </a>
-
-          <AuthorModeToggle />
-
-          <button
-            type="button"
-            className="inline-flex items-baseline gap-2 px-2 py-1 text-fg-3 text-sm rounded-sm transition-[color,background] hover:text-accent hover:bg-accent-soft"
-            onClick={cycleTheme}
-            aria-label={`테마: ${THEME_LABEL[theme]} (눌러서 전환)`}
-            title={`테마 — 현재: ${THEME_LABEL[theme]}`}
-          >
-            <span className="text-base leading-none" aria-hidden="true">{THEME_GLYPH[theme]}</span>
-          </button>
         </div>
       </div>
     </header>
