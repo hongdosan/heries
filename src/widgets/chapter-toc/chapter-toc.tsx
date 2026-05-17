@@ -45,12 +45,18 @@ export function ChapterToc({ slug, chapters }: ChapterTocProps) {
   return (
     <>
       <div className="flex justify-end m-0 mb-3">
-        <div role="group" aria-label="챕터 정렬" className="inline-flex border border-rule rounded-pill overflow-hidden bg-bg-soft">
+        <div
+          role="group"
+          aria-label="챕터 정렬"
+          className="inline-flex p-1 border border-rule rounded-pill bg-bg-soft gap-1"
+        >
           <button
             type="button"
             className={cn(
-              'px-[14px] py-[6px] text-sm transition-[color,background]',
-              order === 'desc' ? 'bg-surface text-fg font-semibold' : 'text-fg-3 hover:text-fg-2',
+              'px-3 py-1 text-sm rounded-pill transition-[color,background,box-shadow]',
+              order === 'desc'
+                ? 'bg-accent text-white font-semibold shadow-soft'
+                : 'text-fg-3 hover:text-fg-2 hover:bg-bg-sunken',
             )}
             aria-pressed={order === 'desc'}
             onClick={() => setOrder('desc')}
@@ -58,8 +64,10 @@ export function ChapterToc({ slug, chapters }: ChapterTocProps) {
           <button
             type="button"
             className={cn(
-              'px-[14px] py-[6px] text-sm transition-[color,background]',
-              order === 'asc' ? 'bg-surface text-fg font-semibold' : 'text-fg-3 hover:text-fg-2',
+              'px-3 py-1 text-sm rounded-pill transition-[color,background,box-shadow]',
+              order === 'asc'
+                ? 'bg-accent text-white font-semibold shadow-soft'
+                : 'text-fg-3 hover:text-fg-2 hover:bg-bg-sunken',
             )}
             aria-pressed={order === 'asc'}
             onClick={() => setOrder('asc')}
