@@ -1,3 +1,4 @@
+import type {CSSProperties} from 'react'
 import {Link, useParams, useSearchParams} from 'react-router-dom'
 import {loadSeries} from '../../entities/series'
 import {assetUrl} from '../../shared/lib/env.js'
@@ -42,9 +43,12 @@ export function SeriesPage() {
       ? PLACEHOLDER_THUMB
       : assetUrl(`content/series/${slug}/${manifest.thumbnail}`)
 
-  const tabBtnCls = (active: boolean) =>
-    'px-4 py-3 text-md font-medium border-b-2 border-transparent -mb-px transition-[color,border-color] hover:text-fg-2 ' +
-    (active ? 'text-accent border-b-accent font-semibold' : 'text-fg-3')
+  const tabBtnCls = 'px-4 py-3 text-md font-medium -mb-px transition-[color,border-color] cursor-pointer hover:text-fg-2'
+  // active = inline style (CSS var 직접 참조 → 다크 모드 자동 + Tailwind purge/HMR 영향 0).
+  const tabBtnStyle = (active: boolean): CSSProperties =>
+    active
+      ? { color: 'var(--accent)', borderBottom: '2px solid var(--accent)', fontWeight: 600 }
+      : { color: 'var(--fg-3)', borderBottom: '2px solid transparent' }
 
   return (
     <main className={mainCls}>
@@ -77,19 +81,19 @@ export function SeriesPage() {
       </header>
 
       <div className="flex gap-2 border-b border-rule mb-6 relative flex-wrap" role="tablist" aria-label="시리즈 섹션">
-        <button role="tab" aria-selected={tab === 'overview'} className={tabBtnCls(tab === 'overview')}
+        <button role="tab" aria-selected={tab === 'overview'} className={tabBtnCls} style={tabBtnStyle(tab === 'overview')}
                 onClick={() => setTab('overview')}>개요
         </button>
-        <button role="tab" aria-selected={tab === 'chapters'} className={tabBtnCls(tab === 'chapters')}
+        <button role="tab" aria-selected={tab === 'chapters'} className={tabBtnCls} style={tabBtnStyle(tab === 'chapters')}
                 onClick={() => setTab('chapters')}>
-          챕터<span className={'text-xs ml-2 tabular-nums ' + (tab === 'chapters' ? 'text-accent' : 'text-fg-4')}>{chapterCount}</span>
+          챕터<span className="text-xs ml-2 tabular-nums" style={{ color: tab === 'chapters' ? 'var(--accent)' : 'var(--fg-4)' }}>{chapterCount}</span>
         </button>
-        <button role="tab" aria-selected={tab === 'characters'} className={tabBtnCls(tab === 'characters')}
+        <button role="tab" aria-selected={tab === 'characters'} className={tabBtnCls} style={tabBtnStyle(tab === 'characters')}
                 onClick={() => setTab('characters')}>
-          등장인물<span className={'text-xs ml-2 tabular-nums ' + (tab === 'characters' ? 'text-accent' : 'text-fg-4')}>{characterCount}</span>
+          등장인물<span className="text-xs ml-2 tabular-nums" style={{ color: tab === 'characters' ? 'var(--accent)' : 'var(--fg-4)' }}>{characterCount}</span>
         </button>
         {isAuthor && (
-          <button role="tab" aria-selected={tab === 'author'} className={tabBtnCls(tab === 'author')}
+          <button role="tab" aria-selected={tab === 'author'} className={tabBtnCls} style={tabBtnStyle(tab === 'author')}
                   onClick={() => setTab('author')}>
             작가 전용<span className="author-only-badge">AUTHOR</span>
           </button>
