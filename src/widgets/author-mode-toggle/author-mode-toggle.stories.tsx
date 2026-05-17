@@ -1,4 +1,5 @@
 import type {Meta, StoryObj} from '@storybook/react'
+import {expect, userEvent, within} from '@storybook/test'
 import {AuthorModeToggle} from './author-mode-toggle'
 import {setAuthorMode} from '../../shared/lib/env.js'
 
@@ -49,4 +50,26 @@ export const InDarkBackground: Story = {
       return <Story />
     },
   ],
+}
+
+export const OpenedDialog: Story = {
+  name: '다이얼로그 열림 (잠금 → 키 입력 폼)',
+  decorators: [
+    (Story) => {
+      setAuthorMode(false)
+      return <Story />
+    },
+  ],
+  play: async ({canvasElement}) => {
+    const canvas = within(canvasElement)
+    const button = canvas.getByRole('button', {name: /작가 모드 진입/i})
+    await userEvent.click(button)
+    // native <dialog> 는 body 직접 렌더 — document 에서 검색
+    const dialog = document.querySelector('dialog')
+    await expect(dialog).not.toBeNull()
+    const title = document.querySelector('#author-mode-dialog-title')
+    await expect(title?.textContent).toBe('작가 모드 진입')
+    const input = document.querySelector('#author-mode-key')
+    await expect(input).not.toBeNull()
+  },
 }
