@@ -35,7 +35,7 @@ export function HomePage() {
             · WEB SERIES</p>
 
           <h1 className="m-0 text-lg font-normal tracking-normal leading-[1.45] text-fg-3">
-            홍도산의 오리지널 웹 시리즈 컬렉션.
+            홍도산의 오리지널 웹 시리즈 컬렉션
           </h1>
 
           <p className="m-0 text-sm">
