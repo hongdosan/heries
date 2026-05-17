@@ -18,7 +18,7 @@ export function NoticePage() {
   }, [])
 
   return (
-    <main className="page-notice">
+    <main className="flex-1 w-full max-w-page mx-auto pt-7 px-[clamp(16px,4vw,32px)] pb-9">
       <nav className="breadcrumb">
         <Link to="/">H-eries</Link>
         <span className="sep">/</span>
@@ -30,7 +30,7 @@ export function NoticePage() {
       {state.status === 'success' && (
         <>
           {state.data.frontmatter.updated && (
-            <p className="about-meta">
+            <p className="m-0 mb-5 text-xs text-fg-4 font-mono">
               마지막 업데이트{' '}
               <time dateTime={state.data.frontmatter.updated}>{state.data.frontmatter.updated}</time>
             </p>
