@@ -10,7 +10,8 @@
     img-src self + data: (webp 디코딩 일부 환경 + base64 fallback).
     object-src 'none' / base-uri 'self' = clickjacking 보호.
   -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'" />
+  <!-- frame-ancestors 는 meta 태그에서 무시됨 (HTTP header 만 유효). GitHub Pages 는 custom header 미지원 → 본 directive 폐기. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <title>H-eries — hongdosan의 웹 시리즈</title>
   <meta name="description" content="홍도산 의 오리지널 웹 시리즈 컬렉션." />

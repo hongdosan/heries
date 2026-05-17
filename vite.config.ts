@@ -25,8 +25,12 @@ import tailwindcss from '@tailwindcss/vite'
 // 특정 컴포넌트 opt-out = 함수 앞 'use no memo' directive.
 // devDep 만 추가 — dist 의 react-compiler-runtime 은 매우 작음 (수 KB).
 const reactCompilerConfig = {
-  // 컴파일러 적용 범위. 'all' = 모든 파일. 'opt-in' = 'use memo' directive 있는 파일만.
-  compilationMode: 'all' as const,
+  // 컴파일러 적용 범위.
+  //   'all'        = 모든 함수 컴파일 → utility 함수 (theme.ts 등) 까지 컴파일됨 →
+  //                 module top-level 호출 시 useMemoCache hook 호출 fail.
+  //   'annotation' = 'use memo' directive 있는 함수만 컴파일. utility 안전 + 컴포넌트 명시 opt-in.
+  // 안정성 우선 — annotation 채택.
+  compilationMode: 'annotation' as const,
 }
 
 export default defineConfig(({ command }) => {
