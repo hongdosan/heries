@@ -1,4 +1,4 @@
-import {lazy, StrictMode, Suspense, type ReactNode} from 'react'
+import {lazy, type ReactNode, StrictMode, Suspense} from 'react'
 import {createRoot} from 'react-dom/client'
 import {BrowserRouter, Route, Routes, useLocation} from 'react-router-dom'
 import '../shared/styles/tokens.css'
@@ -13,7 +13,9 @@ import {Header} from '../widgets/header'
 import {Footer} from '../widgets/footer'
 // Home = 초기 진입 (eager). 그 외 page = route 별 chunk 분리 (lazy).
 import {HomePage} from '../pages/home'
-import {Loading} from '../shared/ui/loading'
+import {ErrorBoundary, Loading} from '../shared/ui'
+import {useScrollbarAutoHide} from '../shared/lib/use-scrollbar-autohide.js'
+
 const AboutPage = lazy(() => import('../pages/about').then((m) => ({default: m.AboutPage})))
 const NoticePage = lazy(() => import('../pages/notice').then((m) => ({default: m.NoticePage})))
 const SeriesPage = lazy(() => import('../pages/series').then((m) => ({default: m.SeriesPage})))
@@ -21,8 +23,6 @@ const ChapterPage = lazy(() => import('../pages/chapter').then((m) => ({default:
 const CharacterPage = lazy(() => import('../pages/character').then((m) => ({default: m.CharacterPage})))
 const UnlockPage = lazy(() => import('../pages/unlock').then((m) => ({default: m.UnlockPage})))
 const NotFoundPage = lazy(() => import('../pages/not-found').then((m) => ({default: m.NotFoundPage})))
-import {useScrollbarAutoHide} from '../shared/lib/use-scrollbar-autohide.js'
-import {ErrorBoundary} from '../shared/ui/error-boundary'
 
 // Theme 적용은 index.html 의 inline script 에서 first-paint 전 처리 (FOUC 차단).
 // React Compiler 'all' 모드 = 컴파일된 utility 함수 (applyTheme 등) 가 useMemoCache hook 호출 →
@@ -51,14 +51,14 @@ function App() {
     <BrowserRouter basename={BASENAME}>
       <a
         href="#main"
-        className="absolute top-0 left-0 py-2 px-4 text-sm font-semibold rounded-br-sm -translate-y-full z-[100] focus:translate-y-0 focus:outline focus:outline-2 focus:outline-accent-ring focus:outline-offset-2"
-        style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-fg)' }}
+        className="absolute top-0 left-0 py-2 px-4 text-sm font-semibold rounded-br-sm -translate-y-full z-100 focus:translate-y-0 focus:outline focus:outline-2 focus:outline-accent-ring focus:outline-offset-2"
+        style={{backgroundColor: 'var(--accent)', color: 'var(--accent-fg)'}}
       >본문으로 건너뛰기</a>
       <Header/>
       <ErrorBoundary>
         <div id="main"/>
         <RouteTransition>
-          <Suspense fallback={<Loading />}>
+          <Suspense fallback={<Loading/>}>
             <Routes>
               <Route path="/" element={<ErrorBoundary><HomePage/></ErrorBoundary>}/>
               <Route path="/about" element={<ErrorBoundary><AboutPage/></ErrorBoundary>}/>

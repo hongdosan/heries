@@ -31,7 +31,7 @@ export const MINI_GAMES: ReadonlyArray<MiniGameDefinition> = [
     component: SwordsmanSurvival,
   },
   {
-    id: 'stickman-murim',
+    id: 'gwangsalgeom',
     title: '광살검',
     description: '몰려오는 자객을 베어라.',
     emoji: '🗡️',

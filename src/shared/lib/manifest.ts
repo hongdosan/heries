@@ -22,7 +22,7 @@ export async function fetchSeriesManifest(slug: string): Promise<SeriesManifest>
 export async function fetchMarkdown(path: string): Promise<string> {
   const res = await fetch(assetUrl(path))
   if (!res.ok) throw new Error(`markdown fetch failed: ${path} ${res.status}`)
-  return await res.text()
+  return res.text()
 }
 
 const VALID_FOLDERS: ReadonlySet<CharacterFolder> = new Set([
