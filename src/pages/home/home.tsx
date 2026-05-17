@@ -1,9 +1,13 @@
+import {lazy, Suspense} from 'react'
 import {Link} from 'react-router-dom'
 import {fetchSeriesIndex} from '../../shared/lib/manifest.js'
 import {useAsync} from '../../shared/lib/use-async.js'
 import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
 import {SeriesList} from '../../widgets/series-list'
-import {MiniGameLauncher} from '../../features/mini-game'
+// 게임 슬라이스 = 80+ KB. 사용자가 메뉴를 안 누르면 fetch X (route-based split).
+const MiniGameLauncher = lazy(() =>
+  import('../../features/mini-game').then((m) => ({default: m.MiniGameLauncher})),
+)
 import {Empty} from '../../shared/ui/empty'
 import {Loading} from '../../shared/ui/loading'
 import HERO_IMAGE from '../../shared/images/thumbnail-placeholder.webp?url'
@@ -35,7 +39,9 @@ export function HomePage() {
         </div>
       </header>
 
-      <MiniGameLauncher/>
+      <Suspense fallback={null}>
+        <MiniGameLauncher/>
+      </Suspense>
 
       <h2>작품 목록</h2>
       {state.status === 'loading' && <Loading />}

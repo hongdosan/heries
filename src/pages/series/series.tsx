@@ -10,7 +10,11 @@ import {Loading} from '../../shared/ui/loading'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
 import {ChapterToc} from '../../widgets/chapter-toc'
 import {CharacterList} from '../../widgets/character-list'
-import {MiniGameLauncher} from '../../features/mini-game'
+import {lazy, Suspense} from 'react'
+// 게임 슬라이스 = 80+ KB. 사용자가 메뉴를 안 누르면 fetch X.
+const MiniGameLauncher = lazy(() =>
+  import('../../features/mini-game').then((m) => ({default: m.MiniGameLauncher})),
+)
 
 type Tab = 'overview' | 'chapters' | 'characters' | 'author'
 const TABS: ReadonlyArray<Tab> = ['overview', 'chapters', 'characters', 'author']
@@ -124,7 +128,9 @@ export function SeriesPage() {
           </ul>
         </section>
       )}
-      <MiniGameLauncher/>
+      <Suspense fallback={null}>
+        <MiniGameLauncher/>
+      </Suspense>
     </main>
   )
 }
