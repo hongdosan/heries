@@ -54,7 +54,7 @@ src/
 - **Public API**: 슬라이스 외부에서는 `index.ts` (Public API) 만 import.
 - **css 분산**: 슬라이스 옆 `{slice}.css` + `index.ts` 의 `import './{slice}.css'`. shared 전역 = `shared/styles/` (tokens / base / typography / layout / utilities / author-mode / responsive).
 
-## 4. CLAUDE.md 핵심 원칙 11 항 (강제)
+## 4. CLAUDE.md 핵심 원칙 13 항 (강제)
 
 1. 모든 `.md` 첫 줄 (또는 frontmatter 직후) HTML 주석 1줄 저작권 고지 부착
 2. 모든 캐릭터 카드 `origin: original` + 카드 절 구조 (독자 절 / 작가 절 분리, reader 빌드 마스킹)

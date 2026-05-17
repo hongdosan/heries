@@ -135,6 +135,6 @@ critical 발견 시:
 ## 10. 참고
 
 - 에이전트 정의: `.claude/agents/H-eries-{lorekeeper,worldsmith,author,continuity-reviewer,frontend-engineer,publisher}.md`
-- 핵심 원칙: `.claude/CLAUDE.md` §핵심 원칙 (9 항)
+- 핵심 원칙: `.claude/CLAUDE.md` §핵심 원칙 (13 항)
 - 변경 이력 SSOT: `.claude/harness/harness-state.md`
 - 핸드오프: `.claude/handoff/CURRENT.md`

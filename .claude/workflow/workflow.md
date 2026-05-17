@@ -128,7 +128,7 @@ H-eries 의 모든 작업 산출물은 **문서 ↔ 코드 동기** 원칙. 사�
 ## 5. 참고
 
 - [`template/prompt-reference.md`](./template/prompt-reference.md) — H-eries SSOT (필수 정독)
-- [`../CLAUDE.md`](../CLAUDE.md) — 핵심 원칙 11 항 + 도구 우선순위
+- [`../CLAUDE.md`](../CLAUDE.md) — 핵심 원칙 13 항 + 도구 우선순위
 - [`../harness/harness-state.md`](../harness/harness-state.md) — 현 상태 + 변경 이력
 - [`../handoff/CURRENT.md`](../handoff/CURRENT.md) — 세션 핸드오프
 - [`../agents/`](../agents/) — 6 에이전트 정의 (lorekeeper / worldsmith / author / continuity-reviewer / frontend-engineer / publisher)
