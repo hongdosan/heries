@@ -4,7 +4,7 @@ import {CharacterList} from './character-list'
 import type {CharacterIndex} from '../../shared/lib/types'
 
 const meta: Meta<typeof CharacterList> = {
-  title: 'widgets/CharacterList',
+  title: 'widgets/등장인물 목록 (CharacterList)',
   component: CharacterList,
   decorators: [
     (Story) => (

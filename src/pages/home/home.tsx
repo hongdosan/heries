@@ -8,8 +8,7 @@ import {SeriesList} from '../../widgets/series-list'
 const MiniGameLauncher = lazy(() =>
   import('../../features/mini-game').then((m) => ({default: m.MiniGameLauncher})),
 )
-import {Empty} from '../../shared/ui/empty'
-import {Loading} from '../../shared/ui/loading'
+import {Empty, Loading} from '../../shared/ui'
 import HERO_IMAGE from '../../shared/images/thumbnail-placeholder.webp?url'
 const HERO_ALT = 'H-eries — 작가(홍도산) 의 오리지널 웹 시리즈 컬렉션'
 

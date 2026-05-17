@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { assetUrl } from '../../shared/lib/env.js'
 import type { ChapterIndex } from '../../shared/lib/types.js'
 import { useImgFallback, PLACEHOLDER_THUMB } from '../../shared/lib/use-img-fallback.js'
-import { Empty } from '../../shared/ui/empty'
+import { Empty } from '../../shared/ui'
 
 export interface ChapterTocProps {
   slug: string
@@ -45,14 +45,11 @@ export function ChapterToc({ slug, chapters }: ChapterTocProps) {
   return (
     <>
       <div className="flex justify-end m-0 mb-3">
-        <div
-          role="group"
-          aria-label="챕터 정렬"
-          className="inline-flex p-1 border border-rule rounded-pill bg-bg-soft gap-1"
-        >
+        <fieldset className="inline-flex p-1 border border-rule rounded-pill bg-bg-soft gap-1 m-0 [&>legend]:sr-only">
+          <legend>챕터 정렬</legend>
           <SortBtn label="최신순" active={order === 'desc'} onClick={() => setOrder('desc')} />
           <SortBtn label="연재순" active={order === 'asc'} onClick={() => setOrder('asc')} />
-        </div>
+        </fieldset>
       </div>
       <ul className="list-none p-0 m-0">
         {sorted.map((ch) => (

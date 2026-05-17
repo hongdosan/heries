@@ -7,7 +7,7 @@ import {StickmanMurim} from './stickman-murim'
 // (2) 가상 패드는 터치 환경에서만 자연스러움 — 데스크탑 마우스로도 동작은 함
 // (3) Default 스토리는 idle 상태로 시작. AutoStart 스토리는 마운트 직후 자동 focus.
 const meta: Meta<typeof StickmanMurim> = {
-  title: 'features/mini-game/StickmanMurim',
+  title: 'features/mini-game/광살검',
   component: StickmanMurim,
   parameters: {
     layout: 'centered',

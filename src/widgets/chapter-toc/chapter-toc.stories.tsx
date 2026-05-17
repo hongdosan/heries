@@ -4,7 +4,7 @@ import { ChapterToc } from './chapter-toc'
 import type { ChapterIndex } from '../../shared/lib/types'
 
 const meta: Meta<typeof ChapterToc> = {
-  title: 'widgets/ChapterToc',
+  title: 'widgets/챕터 목차 (ChapterToc)',
   component: ChapterToc,
   decorators: [
     (Story) => (

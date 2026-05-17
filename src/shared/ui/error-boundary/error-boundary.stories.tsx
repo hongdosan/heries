@@ -15,7 +15,7 @@ import { ErrorBoundary } from './error-boundary'
  * 동기화 유지).
  */
 const meta: Meta<typeof ErrorBoundary> = {
-  title: 'shared/ui/ErrorBoundary',
+  title: 'shared/ui/에러 경계 (ErrorBoundary)',
   component: ErrorBoundary,
   parameters: {
     layout: 'fullscreen',

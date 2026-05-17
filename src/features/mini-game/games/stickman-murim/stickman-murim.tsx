@@ -1245,7 +1245,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
           {phase !== 'playing' && (
             <div className="sm-overlay">
               <div className="sm-overlay-card">
-                <div className="sm-overlay-emoji" aria-hidden="true">🥋</div>
+                <div className="sm-overlay-emoji" aria-hidden="true">🥷</div>
                 <h1 className="sm-overlay-title">광살검</h1>
                 <p className="sm-overlay-desc">
                   {phase === 'over'

@@ -5,9 +5,7 @@ import { renderInline } from '../../shared/lib/markdown.js'
 import { useAsync } from '../../shared/lib/use-async.js'
 import { useAuthorMode } from '../../shared/lib/use-author-mode.js'
 import { useDocumentTitle } from '../../shared/lib/use-document-title.js'
-import { Empty } from '../../shared/ui/empty'
-import { Loading } from '../../shared/ui/loading'
-import { Button } from '../../shared/ui/button'
+import { Button, Empty, Loading } from '../../shared/ui'
 
 const FOLDER_LABEL: Record<string, string> = {
   '1-protagonist': '주인공',

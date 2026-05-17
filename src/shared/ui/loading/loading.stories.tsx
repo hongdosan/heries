@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { Loading } from './loading'
 
 const meta: Meta<typeof Loading> = {
-  title: 'shared/ui/Loading',
+  title: 'shared/ui/로딩 (Loading)',
   component: Loading,
 }
 export default meta
