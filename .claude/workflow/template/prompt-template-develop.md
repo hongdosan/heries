@@ -38,11 +38,11 @@
 
 > 다음 모두 충족 시 완료. 누락 = 미완료.
 
-- [ ] `npm run typecheck` 0 에러
-- [ ] `npm run build` 0 에러 + 마스킹 누수 0
+- [ ] `npm run validate` (lint + typecheck + build 단일 게이트) 0 에러
 - [ ] `npm run build-storybook` 0 에러 (`shared/ui/` 또는 storybook 영향 변경 시)
-- [ ] FSD 단방향 import 위반 0
-- [ ] CLAUDE.md 11 원칙 위반 0
+- [ ] check-secrets + check-manifest + check-images 통과 (build 안 자동)
+- [ ] FSD 단방향 import 위반 0 (eslint-plugin no-restricted-imports 자동)
+- [ ] CLAUDE.md 13 원칙 위반 0
 - [ ] 외부 의존 추가 = 사용자 확인 완료 (해당 시)
 - [ ] `shared/ui/` 신규 컴포넌트 = `.stories.tsx` 동반 (정책 #11)
 - [ ] 변경 이력 1행 (`.claude/harness/harness-state.md`)

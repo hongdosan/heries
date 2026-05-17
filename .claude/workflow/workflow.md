@@ -55,7 +55,7 @@ H-eries 의 모든 작업 산출물은 **문서 ↔ 코드 동기** 원칙. 사�
 ### Step 04 — Technical Review (계획 승인)
 
 - 계획서가 있는 경우 본인 검토:
-  - CLAUDE.md 11 원칙 위반 0?
+  - CLAUDE.md 13 원칙 위반 0?
   - 의존성 0 정책 위반 0? (런타임 의존 추가 X / dev 도구는 OK)
   - FSD 단방향 import 위반 0?
   - TypeScript strict 위반 0?
