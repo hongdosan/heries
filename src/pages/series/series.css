@@ -84,84 +84,7 @@
 }
 .tab-btn[aria-selected="true"] .tab-count { color: var(--accent); }
 
-/* Chapter list sort toolbar */
-.chapter-toc-toolbar {
-  display: flex;
-  justify-content: flex-end;
-  margin: 0 0 var(--s-3);
-}
-.sort-toggle {
-  display: inline-flex;
-  border: 1px solid var(--rule);
-  border-radius: var(--r-pill);
-  overflow: hidden;
-  background: var(--bg-soft);
-}
-.sort-toggle button {
-  padding: 6px 14px;
-  font-size: var(--fs-sm);
-  color: var(--fg-3);
-  background: transparent;
-  transition: color var(--t-fast), background var(--t-fast);
-}
-.sort-toggle button:hover { color: var(--fg-2); }
-.sort-toggle button.is-active {
-  background: var(--surface);
-  color: var(--fg);
-  font-weight: 600;
-}
-
-/* Chapter list (table style with thumbnail) */
-.chapter-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.chapter-list li {
-  border-bottom: 1px solid var(--rule);
-}
-.chapter-list li:first-child { border-top: 1px solid var(--rule); }
-.chapter-row {
-  display: grid;
-  grid-template-columns: 96px 56px 1fr auto;
-  align-items: center;
-  gap: var(--s-4);
-  padding: var(--s-3);
-  transition: background var(--t-fast);
-  color: inherit;
-}
-.chapter-row:hover { background: var(--bg-soft); color: inherit; }
-.chapter-thumb {
-  width: 96px;
-  height: 54px;
-  object-fit: cover;
-  border-radius: var(--r-sm);
-  background: var(--bg-soft);
-  display: block;
-}
-.chapter-thumb-empty {
-  background: linear-gradient(135deg, var(--bg-soft), var(--bg-sunken));
-  border: 1px solid var(--rule);
-}
-.chapter-list .ep {
-  font-family: var(--font-mono);
-  font-size: var(--fs-sm);
-  color: var(--fg-4);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.04em;
-}
-.chapter-list .chapter-title {
-  font-size: var(--fs-md);
-  font-weight: 500;
-  color: var(--fg);
-}
-.chapter-row:hover .chapter-title { color: var(--accent); }
-.chapter-list .pub {
-  font-size: var(--fs-xs);
-  color: var(--fg-3);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
+/* chapter-toc widget = Tailwind utility 전환 완료 (src/widgets/chapter-toc/chapter-toc.tsx). */
 
 /* Character grid (within tab). 정책: 주인공 카드만 Link, 나머지는 정적 카드. */
 .character-group { margin: 0 0 var(--s-6); }
@@ -224,12 +147,5 @@
     align-items: stretch;
   }
   .series-cover { max-width: 100%; }
-  .chapter-row {
-    grid-template-columns: 80px 1fr;
-    gap: var(--s-3);
-  }
-  .chapter-row .ep { grid-column: 2; align-self: end; }
-  .chapter-row .chapter-title { grid-column: 2; }
-  .chapter-row .pub { grid-column: 2; }
-  .chapter-thumb { grid-row: 1 / span 3; width: 80px; height: 45px; }
+  /* chapter-row 모바일 그리드 = Tailwind utility (max-sm:grid-cols-[96px_1fr] 등) 로 컴포넌트 안 처리. */
 }

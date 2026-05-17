@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { assetUrl } from '../../shared/lib/env.js'
 import type { ChapterIndex } from '../../shared/lib/types.js'
 import { useImgFallback, PLACEHOLDER_THUMB } from '../../shared/lib/use-img-fallback.js'
+import { cn } from '../../shared/lib/cn.js'
 
 export interface ChapterTocProps {
   slug: string
@@ -43,27 +44,29 @@ export function ChapterToc({ slug, chapters }: ChapterTocProps) {
 
   return (
     <>
-      <div className="chapter-toc-toolbar">
-        <div role="group" aria-label="챕터 정렬" className="sort-toggle">
+      <div className="flex justify-end m-0 mb-3">
+        <div role="group" aria-label="챕터 정렬" className="inline-flex border border-rule rounded-pill overflow-hidden bg-bg-soft">
           <button
             type="button"
-            className={order === 'desc' ? 'is-active' : ''}
+            className={cn(
+              'px-[14px] py-[6px] text-sm transition-[color,background]',
+              order === 'desc' ? 'bg-surface text-fg font-semibold' : 'text-fg-3 hover:text-fg-2',
+            )}
             aria-pressed={order === 'desc'}
             onClick={() => setOrder('desc')}
-          >
-            최신순
-          </button>
+          >최신순</button>
           <button
             type="button"
-            className={order === 'asc' ? 'is-active' : ''}
+            className={cn(
+              'px-[14px] py-[6px] text-sm transition-[color,background]',
+              order === 'asc' ? 'bg-surface text-fg font-semibold' : 'text-fg-3 hover:text-fg-2',
+            )}
             aria-pressed={order === 'asc'}
             onClick={() => setOrder('asc')}
-          >
-            연재순
-          </button>
+          >연재순</button>
         </div>
       </div>
-      <ul className="chapter-list">
+      <ul className="list-none p-0 m-0">
         {sorted.map((ch) => (
           <ChapterRow key={ch.episode} slug={slug} ch={ch} />
         ))}
@@ -81,16 +84,28 @@ function ChapterRow({ slug, ch }: { slug: string; ch: ChapterIndex }) {
       : assetUrl(`content/series/${slug}/${ch.thumbnail}`)
 
   return (
-    <li>
-      <Link to={`/series/${slug}/chapter/${ch.episode}`} className="chapter-row">
+    <li className="border-b border-rule first:border-t">
+      <Link
+        to={`/series/${slug}/chapter/${ch.episode}`}
+        className="grid grid-cols-[96px_56px_1fr_auto] items-center gap-4 p-3 transition-colors hover:bg-bg-soft group max-sm:grid-cols-[96px_1fr]"
+      >
         {src ? (
-          <img className="chapter-thumb" src={src} alt="" loading="lazy" onError={onError} />
+          <img
+            className="w-24 h-[54px] object-cover rounded-sm bg-bg-soft block max-sm:row-span-3 max-sm:w-20 max-sm:h-[45px]"
+            src={src}
+            alt=""
+            loading="lazy"
+            onError={onError}
+          />
         ) : (
-          <span className="chapter-thumb chapter-thumb-empty" aria-hidden />
+          <span
+            className="w-24 h-[54px] rounded-sm bg-[linear-gradient(135deg,var(--bg-soft),var(--bg-sunken))] border border-rule block max-sm:row-span-3 max-sm:w-20 max-sm:h-[45px]"
+            aria-hidden
+          />
         )}
-        <span className="ep">EP {String(ch.episode).padStart(2, '0')}</span>
-        <span className="chapter-title">{ch.title}</span>
-        <time className="pub" dateTime={ch.published}>{ch.published}</time>
+        <span className="font-mono text-sm text-fg-4 tabular-nums tracking-[0.04em] max-sm:col-start-2 max-sm:self-end">EP {String(ch.episode).padStart(2, '0')}</span>
+        <span className="text-md font-medium text-fg transition-colors group-hover:text-accent max-sm:col-start-2">{ch.title}</span>
+        <time className="text-xs text-fg-3 tabular-nums whitespace-nowrap max-sm:col-start-2" dateTime={ch.published}>{ch.published}</time>
       </Link>
     </li>
   )
