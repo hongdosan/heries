@@ -18,7 +18,13 @@ develop 안 누적 변경 (향후 release 후보 — 버전 미할당):
 - **ITCSS 7 layer** (Inverted Triangle CSS, Harry Roberts) 차용 + 명시 — Settings / Tools / Generic / Elements / Objects / Components / Utilities. 본 프로젝트 매핑: tokens.css = Settings, base.css reset = Generic, base.css 의 a/button/img + typography.css h1~h6 = Elements, layout.css + utilities.css = Objects, 슬라이스 .css = Components, Tailwind class = Utilities
 - **`src/shared/lib/cn.ts`** 신규 — shadcn/ui 패턴의 `cn()` class composition helper (런타임 의존 0 자체 구현, 0.2 KB)
 - **`scripts/check-manifest.mjs`** 신규 — manifest.json vs filesystem 정합 자동 검증 (누락=error, 고아=warning). build 게이트 추가
-- **`tailwind.css @theme` 토큰 보강** — `--text-2xl/3xl`, `--container-page/reader`, `--shadow-soft`, `--radius-*`, `--accent-soft/ring`
+- **`tailwind.css @theme` 토큰 보강** — `--text-2xl/3xl`, `--container-page/reader`, `--shadow-soft`, `--radius-*`, `--accent-soft/ring`, `--accent-fg` (accent 배경 위 텍스트 색, 다크 모드 자동)
+
+### Added (shared/ui 컴포넌트 — 정책 #11 stories)
+- **`shared/ui/empty`** — 빈/오류 상태 안내 (`<Empty>오류: ...</Empty>`). 8 곳 사용
+- **`shared/ui/loading`** — 로딩 안내 (`<Loading />` default = "불러오는 중…"). 6 곳 사용 + Suspense fallback
+- **`shared/ui/button`** — variants (primary/secondary/ghost) + sizes (sm/md). shadcn 패턴 + cn() helper + disabled 시각. Button primary = inline style var(--accent) + var(--accent-fg)
+- **`shared/ui/index.ts`** barrel — 단일 import 옵션 (개별 슬라이스 index.ts 도 그대로 유효)
 
 ### Added (dev tooling)
 - **React Compiler (babel-plugin-react-compiler)** — `compilationMode: 'all'`. 자동 메모이제이션
@@ -58,9 +64,18 @@ develop 안 누적 변경 (향후 release 후보 — 버전 미할당):
 - **deploy.yml** = Lint step 추가 (typecheck 직전)
 
 ### Bundle (현 상태)
-- dist js: 107.22 KB gzip (v0.2.7 = 97.62 → +9.6 KB, React Compiler runtime)
-- dist css: 14.96 KB gzip (v0.2.7 = 11.65 → +3.3 KB, Tailwind preflight + utility 사용분)
+- 메인 js: 81.88 KB gzip (v0.2.7 = 97.62 → **-15.7 KB** route-based code-split + mini-game lazy)
+- 메인 css: 8.71 KB gzip (v0.2.7 = 11.65 → **-2.9 KB**)
+- 각 page chunk: 0.4~6 KB (lazy fetch)
+- mini-game chunk: 16.39 KB js + 6.06 KB css (사용자가 게임 메뉴 클릭 시만 fetch)
 - 빌드 시간: ~1.5s
+
+### Performance (route-based code-split — React.lazy + Suspense)
+- Home = eager (초기 진입 = 메인 + home chunk)
+- About / Notice / Series / Chapter / Character / Unlock / NotFound = lazy
+- MiniGameLauncher (home + series page) = lazy
+- Suspense fallback = `<Loading />` (shared/ui/loading 컴포넌트)
+- 사용자 첫 진입 = ~90 KB gzip (vs 이전 110 KB)
 
 ### Fixed (자율 사이클 진행 중)
 - **React Compiler `compilationMode 'all'` → `'infer'`** — `'all'` 모드가 plain utility 함수 (theme.ts / makePlayer 등) 도 컴파일 → `useMemoCache` hook 호출 → module top-level 또는 React tree 밖 호출 시 "Invalid hook call" fail. `'infer'` (React default) = 컴포넌트 (PascalCase + JSX 반환) + hook (`use` prefix) 자동 감지·컴파일 = 안전 + 자동 메모이제이션 효과 유지
