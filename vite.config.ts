@@ -52,6 +52,9 @@ export default defineConfig(({ command }) => {
       outDir: 'dist',
       emptyOutDir: true,
       target: 'es2022',
+      // chunk size warning 임계 = 300 KB (default 500). 큰 chunk = mini-game (게임 sprite + 로직).
+      // 본 임계 미달 = code-split + lazy 정합 / 초과 = budget 위반 알림.
+      chunkSizeWarningLimit: 300,
       rollupOptions: {
         output: {
           // vendor chunk 분리 — react/react-dom/react-router 가 별도 chunk 로 cache 친화적.
