@@ -33,14 +33,23 @@ develop 안 누적 변경 (향후 release 후보 — 버전 미할당):
   - 전략 SSOT: `tailwind-migration.md` (토큰 매핑 + Phase 로드맵)
 - **`tsconfig.verbatimModuleSyntax: true`** — type-only import 명시 강제
 
-### Changed (CSS Tailwind 전면 전환 — 점진)
-- **not-found 페이지** — Tailwind utility 전환, `not-found.css` 폐기
-- **footer widget** — Tailwind utility 전환, `footer.css` 폐기
-- **header widget** — Tailwind utility 전환 (backdrop-blur + responsive max-sm:hidden 등), `header.css` 폐기
-- **error-boundary** — Tailwind utility 전환 (시각 + dev stack trace details 모두), `error-boundary.css` 폐기
-- **about / notice 페이지 wrapper** — Tailwind utility 전환 (`page-about/notice/about-meta` 폐기). breadcrumb / loading / empty / article-prose 는 ITCSS layer 4-5 (전역 element/object) 보존
+### Changed (CSS Tailwind 전면 전환 — 6 페이지 + 5 widget + 1 ui 슬라이스 완료)
+- **pages/not-found** — Tailwind utility 전환, `not-found.css` 폐기
+- **pages/about / pages/notice** — wrapper Tailwind 전환 (page-about/notice/about-meta 폐기). breadcrumb / loading / empty / article-prose 는 ITCSS layer 4-5 보존
+- **pages/home** — hero grid + figure aspect-[16/9] + cta 모두 Tailwind, `home.css` 폐기
+- **pages/series** — hero (grid clamp 220-320px) + tabs + status-pill 모두 Tailwind, `series.css` 폐기
+- **pages/character** — hero + meta-aside (sticky + grid 2col + child selector [&>dt]/[&>dd]) + locked card 모두 Tailwind, `character.css` 폐기
+- **widgets/footer** — Tailwind utility 전환, `footer.css` 폐기
+- **widgets/header** — Tailwind utility 전환 (backdrop-blur + responsive max-sm:hidden 등), `header.css` 폐기
+- **widgets/series-list** — grid auto-fill 320px + aspect-[16/9] + group-hover scale 등, CSS 가 home.css 안 정의됐던 룰 폐기
+- **widgets/chapter-toc** — sort toggle + chapter-row grid 96px_56px_1fr_auto + cn() helper 첫 사용, CSS 가 series.css 안 정의됐던 룰 폐기
+- **widgets/character-list** — 그룹별 grid auto-fill 240px + has-[a]:hover 변형, CSS 가 series.css 안 정의됐던 룰 폐기
+- **shared/ui/error-boundary** — Tailwind utility 전환 (시각 + dev stack trace details 모두), `error-boundary.css` 폐기
 - **storybook preview** — tailwind.css import 추가, 폐기된 .css import 모두 제거
-- **마이그레이션 보류** — 게임 슬라이스 (mini-game / stickman-murim / swordsman-survival — 좌표계 / keyframe / scale var Tailwind 표현 어려움), 큰 페이지 (home / series / chapter / character — 시각 회귀 위험 + 사용자 시연 필요)
+- **마이그레이션 보류** (각자 정합 이유):
+  - **pages/chapter** — `.article` / `.article-wiki` / `.article-prose` body typography 룰 40+ (h2/h3/p/ol/ul/blockquote/hr 등 markdown 결과). 시각 회귀 위험 매우 큼.
+  - **pages/unlock** — `author-mode.css` 안 정의 (작가 모드 전용)
+  - **features/mini-game/** — 게임 좌표계 (px) / `@keyframes` / `transform: scale(var(--mg-scale))` / `::-webkit-scrollbar-thumb` 등 Tailwind 가 표현 안 함
 
 ### Changed (보안)
 - **`check-secrets.mjs`** 패턴 7종 추가 — GitHub fine-grained PAT / OAuth, Anthropic API, Stripe live/restricted, Slack token, PEM private key, JWT
