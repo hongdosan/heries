@@ -84,20 +84,28 @@ Tailwind v4 의 기본:
 
 **모바일 hidden / desktop visible** = `max-sm:hidden` (mobile 미만 hidden) 또는 `hidden sm:block` (default hidden, sm 이상 block).
 
-## 5. 마이그레이션 진행 상태
+## 5. 마이그레이션 진행 상태 (2026-05-17 PM 갱신)
 
 | 슬라이스 | 상태 |
 |---|---|
 | `widgets/footer` | ✅ Tailwind 전환 (footer.css 폐기) |
 | `widgets/header` | ✅ Tailwind 전환 (header.css 폐기) |
-| `widgets/chapter-toc` | 진행 예정 |
-| `widgets/character-list` | 진행 예정 |
-| `widgets/series-list` | 진행 예정 |
+| `widgets/series-list` | ✅ Tailwind 전환 (home.css 안 룰 폐기) |
+| `widgets/chapter-toc` | ✅ Tailwind 전환 (series.css 안 룰 폐기) + cn() helper 첫 사용 |
+| `widgets/character-list` | ✅ Tailwind 전환 (series.css 안 룰 폐기) |
 | `pages/not-found` | ✅ Tailwind 전환 (not-found.css 폐기) |
-| `pages/{home, series, chapter, character, unlock, about, notice}` | 진행 예정 |
-| `shared/ui/error-boundary` | 진행 예정 |
-| `features/mini-game/**` | 보류 (게임 좌표계·keyframe·scale var — Tailwind 가치 작음) |
-| `shared/styles/{tokens, base, typography, layout, utilities, author-mode, responsive}.css` | **보존** — 전역 reset / 디자인 토큰 / scrollbar / a11y. Tailwind 가 표현 안 하는 패턴. |
+| `pages/about` | ✅ wrapper Tailwind |
+| `pages/notice` | ✅ wrapper Tailwind |
+| `pages/home` | ✅ Tailwind 전환 (home.css 폐기) |
+| `pages/series` | ✅ Tailwind 전환 (series.css 폐기) |
+| `pages/character` | ✅ Tailwind 전환 (character.css 폐기, sticky aside + dl child selector) |
+| `pages/chapter` | ⚠️ 보류 — `.article` / `.article-prose` body typography 룰 40+ (h2/h3/p/ol/ul/blockquote/hr 등 markdown 결과) |
+| `pages/unlock` | ⚠️ 보류 — `author-mode.css` 안 정의 (작가 모드 전용) |
+| `shared/ui/error-boundary` | ✅ Tailwind 전환 (error-boundary.css 폐기) |
+| `shared/ui/empty` (신규) | ✅ Tailwind utility 컴포넌트 (정책 #11 stories 포함) |
+| `shared/ui/loading` (신규) | ✅ Tailwind utility 컴포넌트 (정책 #11 stories 포함) |
+| `features/mini-game/**` | ⚠️ 보류 — 게임 좌표계·keyframe·scale var Tailwind 가치 작음 |
+| `shared/styles/{tokens, base, typography, layout, utilities, author-mode, responsive}.css` | **보존** — ITCSS layer 1-5 (Settings/Generic/Elements/Objects). Tailwind 가 표현 안 하는 패턴 (scrollbar autohide / a11y focus-visible / keyframe / typography for markdown). |
 
 ## 6. 빌드·번들 영향
 
