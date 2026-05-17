@@ -1,4 +1,4 @@
-import {StrictMode, type ReactNode} from 'react'
+import {lazy, StrictMode, Suspense, type ReactNode} from 'react'
 import {createRoot} from 'react-dom/client'
 import {BrowserRouter, Route, Routes, useLocation} from 'react-router-dom'
 import '../shared/styles/tokens.css'
@@ -11,14 +11,16 @@ import '../shared/styles/author-mode.css'
 import '../shared/styles/responsive.css'
 import {Header} from '../widgets/header'
 import {Footer} from '../widgets/footer'
+// Home = 초기 진입 (eager). 그 외 page = route 별 chunk 분리 (lazy).
 import {HomePage} from '../pages/home'
-import {AboutPage} from '../pages/about'
-import {NoticePage} from '../pages/notice'
-import {SeriesPage} from '../pages/series'
-import {ChapterPage} from '../pages/chapter'
-import {CharacterPage} from '../pages/character'
-import {UnlockPage} from '../pages/unlock'
-import {NotFoundPage} from '../pages/not-found'
+import {Loading} from '../shared/ui/loading'
+const AboutPage = lazy(() => import('../pages/about').then((m) => ({default: m.AboutPage})))
+const NoticePage = lazy(() => import('../pages/notice').then((m) => ({default: m.NoticePage})))
+const SeriesPage = lazy(() => import('../pages/series').then((m) => ({default: m.SeriesPage})))
+const ChapterPage = lazy(() => import('../pages/chapter').then((m) => ({default: m.ChapterPage})))
+const CharacterPage = lazy(() => import('../pages/character').then((m) => ({default: m.CharacterPage})))
+const UnlockPage = lazy(() => import('../pages/unlock').then((m) => ({default: m.UnlockPage})))
+const NotFoundPage = lazy(() => import('../pages/not-found').then((m) => ({default: m.NotFoundPage})))
 import {useScrollbarAutoHide} from '../shared/lib/use-scrollbar-autohide.js'
 import {ErrorBoundary} from '../shared/ui/error-boundary'
 
@@ -56,18 +58,20 @@ function App() {
       <ErrorBoundary>
         <div id="main"/>
         <RouteTransition>
-          <Routes>
-            <Route path="/" element={<ErrorBoundary><HomePage/></ErrorBoundary>}/>
-            <Route path="/about" element={<ErrorBoundary><AboutPage/></ErrorBoundary>}/>
-            <Route path="/notice" element={<ErrorBoundary><NoticePage/></ErrorBoundary>}/>
-            <Route path="/unlock" element={<ErrorBoundary><UnlockPage/></ErrorBoundary>}/>
-            <Route path="/series/:slug" element={<ErrorBoundary><SeriesPage/></ErrorBoundary>}/>
-            <Route path="/series/:slug/chapter/:episode"
-                   element={<ErrorBoundary><ChapterPage/></ErrorBoundary>}/>
-            <Route path="/series/:slug/character/:id"
-                   element={<ErrorBoundary><CharacterPage/></ErrorBoundary>}/>
-            <Route path="*" element={<NotFoundPage/>}/>
-          </Routes>
+          <Suspense fallback={<Loading />}>
+            <Routes>
+              <Route path="/" element={<ErrorBoundary><HomePage/></ErrorBoundary>}/>
+              <Route path="/about" element={<ErrorBoundary><AboutPage/></ErrorBoundary>}/>
+              <Route path="/notice" element={<ErrorBoundary><NoticePage/></ErrorBoundary>}/>
+              <Route path="/unlock" element={<ErrorBoundary><UnlockPage/></ErrorBoundary>}/>
+              <Route path="/series/:slug" element={<ErrorBoundary><SeriesPage/></ErrorBoundary>}/>
+              <Route path="/series/:slug/chapter/:episode"
+                     element={<ErrorBoundary><ChapterPage/></ErrorBoundary>}/>
+              <Route path="/series/:slug/character/:id"
+                     element={<ErrorBoundary><CharacterPage/></ErrorBoundary>}/>
+              <Route path="*" element={<NotFoundPage/>}/>
+            </Routes>
+          </Suspense>
         </RouteTransition>
       </ErrorBoundary>
       <Footer/>
