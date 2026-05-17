@@ -1,49 +1,46 @@
 /* Tailwind v4 entry — CSS-first config (별도 tailwind.config.js 폐기).
  *
- * @theme 블록 = Tailwind 가 인식할 디자인 토큰. 기존 tokens.css / mini-game.css /
- * stickman-murim.css 의 var 들을 시맨틱 utility 로 노출 (예: bg-accent / text-fg).
+ * @theme 의 *색 토큰* = tokens.css :root var 를 직접 참조 → 다크 모드 자동 반영.
+ *   - tokens.css 의 [data-theme="dark"] 가 :root --bg/--fg 등 override
+ *   - Tailwind utility (bg-bg, text-fg) = var(--color-bg) = var(--bg) = 자동 다크
+ *   - SSOT 단일 (tokens.css 가 색 정의의 진실)
  *
- * SSOT 운영 — @theme 의 값은 tokens.css :root var 와 *동일한 정적 값* 으로 유지
- * (var() 참조 X — Tailwind v4 가 @theme 안에서 var() 참조를 안정 지원하지 X 일부 케이스
- * runtime resolution 실패. 두 정의의 값 동기화는 작가가 정합 갱신).
+ * @theme 의 *비-색 토큰* (spacing/font/radius/shadow/container) = 정적 값. 다크 모드 무관.
  *
- * 기존 CSS (tokens.css / 슬라이스별 .css) 는 coexist 유지 — 본 파일은 *Tailwind 사용
- * 컴포넌트* 가 var 를 utility class 로도 쓸 수 있게 노출하는 역할.
- *
- * 마이그레이션 = 점진. 새 컴포넌트는 Tailwind class 권장, 기존 컴포넌트는 그대로.
+ * 마이그레이션 = 점진. 신규 컴포넌트 = Tailwind class 우선.
  * 전략 SSOT: src/shared/styles/tailwind-migration.md
  */
 
 @import 'tailwindcss';
 
 @theme {
-  /* surface — 기존 tokens.css 의 :root var 와 일치 */
-  --color-bg: #ffffff;
-  --color-bg-soft: #f7f7f5;
-  --color-bg-sunken: #efefec;
-  --color-surface: #ffffff;
+  /* surface — tokens.css :root var 직접 참조 (다크 모드 자동 반영) */
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-bg-sunken: var(--bg-sunken);
+  --color-surface: var(--surface);
 
   /* text */
-  --color-fg: #16161a;
-  --color-fg-2: #3a3a40;
-  --color-fg-3: #6e6e76;
-  --color-fg-4: #9e9ea6;
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-fg-4: var(--fg-4);
 
-  /* accent — ink blue */
-  --color-accent: #3050a0;
-  --color-accent-hover: #1f3878;
-  --color-accent-soft: rgba(48, 80, 160, 0.08);
-  --color-accent-ring: rgba(48, 80, 160, 0.28);
+  /* accent */
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ring: var(--accent-ring);
 
   /* rules */
-  --color-rule: #e6e6e2;
-  --color-rule-strong: #cfcfcb;
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
 
   /* warn / code */
-  --color-warn-bg: #fff7df;
-  --color-warn-rule: #c89417;
-  --color-warn-fg: #745812;
-  --color-code-bg: #f0efea;
+  --color-warn-bg: var(--warn-bg);
+  --color-warn-rule: var(--warn-rule);
+  --color-warn-fg: var(--warn-fg);
+  --color-code-bg: var(--code-bg);
 
   /* spacing — 기존 --s-* 와 일치 */
   --spacing-1: 4px;
