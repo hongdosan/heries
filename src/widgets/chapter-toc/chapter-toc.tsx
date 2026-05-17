@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { assetUrl } from '../../shared/lib/env.js'
 import type { ChapterIndex } from '../../shared/lib/types.js'
 import { useImgFallback, PLACEHOLDER_THUMB } from '../../shared/lib/use-img-fallback.js'
-import { cn } from '../../shared/lib/cn.js'
 import { Empty } from '../../shared/ui/empty'
 
 export interface ChapterTocProps {
@@ -51,28 +50,8 @@ export function ChapterToc({ slug, chapters }: ChapterTocProps) {
           aria-label="챕터 정렬"
           className="inline-flex p-1 border border-rule rounded-pill bg-bg-soft gap-1"
         >
-          <button
-            type="button"
-            className={cn(
-              'px-3 py-1 text-sm rounded-pill transition-[color,background,box-shadow]',
-              order === 'desc'
-                ? 'bg-accent text-white font-semibold shadow-soft'
-                : 'text-fg-3 hover:text-fg-2 hover:bg-bg-sunken',
-            )}
-            aria-pressed={order === 'desc'}
-            onClick={() => setOrder('desc')}
-          >최신순</button>
-          <button
-            type="button"
-            className={cn(
-              'px-3 py-1 text-sm rounded-pill transition-[color,background,box-shadow]',
-              order === 'asc'
-                ? 'bg-accent text-white font-semibold shadow-soft'
-                : 'text-fg-3 hover:text-fg-2 hover:bg-bg-sunken',
-            )}
-            aria-pressed={order === 'asc'}
-            onClick={() => setOrder('asc')}
-          >연재순</button>
+          <SortBtn label="최신순" active={order === 'desc'} onClick={() => setOrder('desc')} />
+          <SortBtn label="연재순" active={order === 'asc'} onClick={() => setOrder('asc')} />
         </div>
       </div>
       <ul className="list-none p-0 m-0">
@@ -81,6 +60,28 @@ export function ChapterToc({ slug, chapters }: ChapterTocProps) {
         ))}
       </ul>
     </>
+  )
+}
+
+// active = inline style 로 강제 (Tailwind utility 가 일부 cache/HMR 케이스에서 미적용되는 안전망).
+function SortBtn({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className="px-3 py-1 text-sm rounded-pill font-medium transition-[color,background-color,box-shadow] cursor-pointer"
+      style={
+        active
+          ? {
+              backgroundColor: 'var(--accent)',
+              color: '#ffffff',
+              fontWeight: 600,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08)',
+            }
+          : { backgroundColor: 'transparent', color: 'var(--fg-3)' }
+      }
+    >{label}</button>
   )
 }
 
