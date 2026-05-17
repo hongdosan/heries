@@ -7,13 +7,46 @@ import {getTheme, nextTheme, setTheme, type Theme} from '../../shared/lib/theme.
  * 클릭 시 `auto → light → dark → auto` 순환. localStorage 영속 + DOM
  * `<html data-theme="...">` 즉시 반영 (theme.ts 의 setTheme 책임).
  *
- * **글리프**: ◐ (auto) / ○ (light) / ● (dark) — 현재 상태 시각 표시.
- * aria-label / title 은 한글 라벨 ("시스템" / "라이트" / "다크").
+ * **아이콘** (Lucide-style SVG, 의존 0 정합):
+ * - auto: monitor (시스템)
+ * - light: sun (라이트)
+ * - dark: moon (다크)
+ *
+ * unicode 글리프 (◐○●) 사용 시 폰트 metric 으로 박스 안 위쪽에 떠 보이는 이슈 발생 →
+ * SVG 로 교체해 다른 헤더 액션 (Lock/Mail) 과 정렬·크기 모두 통일.
  */
-const THEME_GLYPH: Record<Theme, string> = {
-  auto: '◐',
-  light: '○',
-  dark: '●',
+const MonitorIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <rect x="2" y="3" width="20" height="14" rx="2" />
+    <line x1="8" x2="16" y1="21" y2="21" />
+    <line x1="12" x2="12" y1="17" y2="21" />
+  </svg>
+)
+
+const SunIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2" />
+    <path d="M12 20v2" />
+    <path d="m4.93 4.93 1.41 1.41" />
+    <path d="m17.66 17.66 1.41 1.41" />
+    <path d="M2 12h2" />
+    <path d="M20 12h2" />
+    <path d="m6.34 17.66-1.41 1.41" />
+    <path d="m19.07 4.93-1.41 1.41" />
+  </svg>
+)
+
+const MoonIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+  </svg>
+)
+
+const THEME_ICON: Record<Theme, () => React.JSX.Element> = {
+  auto: MonitorIcon,
+  light: SunIcon,
+  dark: MoonIcon,
 }
 
 const THEME_LABEL: Record<Theme, string> = {
@@ -31,6 +64,8 @@ export function ThemeToggle() {
     setThemeState(next)
   }
 
+  const Icon = THEME_ICON[theme]
+
   return (
     <button
       type="button"
@@ -39,7 +74,7 @@ export function ThemeToggle() {
       aria-label={`테마: ${THEME_LABEL[theme]} (눌러서 전환)`}
       title={`테마 — 현재: ${THEME_LABEL[theme]}`}
     >
-      <span className="text-lg leading-none" aria-hidden="true">{THEME_GLYPH[theme]}</span>
+      <Icon />
     </button>
   )
 }
