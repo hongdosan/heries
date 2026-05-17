@@ -9,7 +9,7 @@ export interface SeriesListProps {
 
 export function SeriesList({ items }: SeriesListProps) {
   return (
-    <ul className="grid gap-5 m-0 p-0 list-none [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))]">
+    <ul className="grid gap-5 m-0 p-0 list-none grid-cols-[repeat(auto-fill,minmax(320px,1fr))]">
       {items.map((item) => (
         <SeriesCard key={item.slug} item={item} />
       ))}
