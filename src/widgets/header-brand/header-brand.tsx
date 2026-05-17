@@ -8,7 +8,7 @@ import {Link} from 'react-router-dom'
  */
 export function HeaderBrand() {
   return (
-    <div className="flex flex-col gap-0.1 leading-[1.1]">
+    <div className="flex flex-row gap-1 leading-[1.1]">
       <Link to="/" className="text-xl font-bold tracking-[-0.02em] text-fg">H-eries</Link>
       <p className="text-xs text-fg-3 m-0 font-normal max-sm:hidden">오리지널 웹 시리즈 컬렉션</p>
     </div>
