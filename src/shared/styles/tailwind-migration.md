@@ -44,17 +44,26 @@ H-eries 의 CSS 운영은 *coexist* 패턴 — 기존 디자인 토큰 + 슬라�
 
 ## 4. 토큰 매핑 (기존 → Tailwind utility)
 
+`tailwind.css` 의 `@theme` 은 tokens.css 의 :root var 를 **직접 참조** (SSOT 단일). 다크 모드도 tokens.css 의 `[data-theme="dark"]` 가 var override → Tailwind utility 자동 반영.
+
 | 기존 var | Tailwind utility |
 |---|---|
-| `var(--bg)` | `bg-bg` |
-| `var(--fg)` | `text-fg` |
-| `var(--fg-2)` | `text-fg-2` |
+| `var(--bg)` / `var(--bg-soft)` / `var(--bg-sunken)` / `var(--surface)` | `bg-bg` / `bg-bg-soft` / `bg-bg-sunken` / `bg-surface` |
+| `var(--fg)` / `var(--fg-2)` / `var(--fg-3)` / `var(--fg-4)` | `text-fg` / `text-fg-2` / `text-fg-3` / `text-fg-4` |
 | `var(--accent)` | `bg-accent` / `text-accent` / `border-accent` |
-| `var(--rule)` | `border-rule` |
-| `var(--s-4)` (16px) | `p-4` / `m-4` / `gap-4` (spacing-4) |
-| `var(--font)` | `font-sans` |
+| `var(--accent-soft)` / `var(--accent-ring)` | `bg-accent-soft` / `ring-accent-ring` |
+| `var(--rule)` / `var(--rule-strong)` | `border-rule` / `border-rule-strong` |
+| `var(--warn-bg)` / `var(--warn-fg)` / `var(--warn-rule)` | `bg-warn-bg` / `text-warn-fg` / `border-warn-rule` |
+| `var(--code-bg)` | `bg-code-bg` |
+| `var(--s-1)` ~ `var(--s-9)` (4~96px) | `p-1` / `m-2` / `gap-4` 등 (spacing-N) |
+| `var(--font)` / `var(--font-mono)` | `font-sans` / `font-mono` |
+| `var(--fs-xs)` ~ `var(--fs-display)` | `text-xs` / `text-sm` / `text-md` / `text-lg` / `text-xl` / `text-display` |
+| `var(--r-sm)` ~ `var(--r-pill)` | `rounded-sm` / `rounded-md` / `rounded-lg` / `rounded-pill` |
+| `var(--shadow)` | `shadow-soft` |
 
-mini-game (`--mg-*`) 와 광살검 (`--sm-*`) 토큰 = Tailwind `@theme` 미통합. 게임 슬라이스 안에서는 기존 var 그대로 사용 (게임 = 점진 마이그레이션 후순위).
+**다크 모드** = `dark:` prefix (예: `dark:bg-bg-soft`). 또는 자동 — bg-bg utility 가 tokens.css 의 다크 override 자동 반영이라 *대부분 prefix 불필요*.
+
+mini-game (`--mg-*`) 와 광살검 (`--sm-*`) 토큰 = Tailwind `@theme` 미통합 (게임 자체 어두운 톤 고정, 사이트 테마 무관). 게임 슬라이스 안에서는 기존 var 그대로 사용 (게임 = 점진 마이그레이션 후순위).
 
 ## 5. 마이그레이션 제외 항목
 
