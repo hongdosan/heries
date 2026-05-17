@@ -89,9 +89,10 @@ export function AuthorModeToggle() {
     if (e.target === dialogRef.current) close()
   }
 
+  // 테마 버튼과 동일 패턴 — 아이콘만 노출 + 색으로 상태 구분 (잠금 = fg-3, 활성 = warn-fg).
   const buttonCls = isAuthor
-    ? 'inline-flex items-center gap-1.5 px-2.5 py-1 text-sm rounded-sm bg-warn-bg text-warn-fg font-semibold tracking-[0.02em] transition-[background-color,color] hover:bg-warn-rule cursor-pointer'
-    : 'inline-flex items-center gap-1.5 px-2 py-1 text-sm rounded-sm text-fg-3 font-medium transition-[color,background-color] hover:text-accent hover:bg-accent-soft cursor-pointer'
+    ? 'inline-flex items-center justify-center px-2 py-1 text-warn-fg rounded-sm transition-[color,background] hover:bg-warn-bg cursor-pointer'
+    : 'inline-flex items-center justify-center px-2 py-1 text-fg-3 rounded-sm transition-[color,background] hover:text-accent hover:bg-accent-soft cursor-pointer'
 
   return (
     <>
@@ -103,7 +104,6 @@ export function AuthorModeToggle() {
         title={isAuthor ? '작가 모드 활성 — 클릭하여 관리' : '작가 모드'}
       >
         {isAuthor ? <UnlockIcon /> : <LockIcon />}
-        <span className="max-sm:hidden">{isAuthor ? 'AUTHOR' : '작가 모드'}</span>
       </button>
 
       <dialog
