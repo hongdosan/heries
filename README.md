@@ -4,9 +4,9 @@
 
 **H-eries** = `홍도산` + `(s)eries`. 단일 작가(`홍도산`)가 운영하는 **오리지널 웹 시리즈 컬렉션**.
 
-**최소 의존 — 런타임은 React 19 + React Router + Vite + TypeScript.** dev 도구 (Storybook 등) 는
-devDependencies. 외부 UI/상태 라이브러리 미사용. *코드만 있으면 어디서든 실행 가능* 한 이식성을 우선한다. GitHub Pages 로 발행 (
-BrowserRouter, `.nojekyll`).
+**최소 의존 — 런타임은 React 19 + React Router 7 + Vite 6 + TypeScript strict.** dev 도구 (Storybook, ESLint 9 flat config,
+babel-plugin-react-compiler, Tailwind v4 + @tailwindcss/vite) 는 devDependencies — dist 산출물에 0~수 KB 영향. 외부 UI/상태
+라이브러리 미사용. *코드만 있으면 어디서든 실행 가능* 한 이식성을 우선한다. GitHub Pages 로 발행 (BrowserRouter, `.nojekyll`).
 
 ---
 

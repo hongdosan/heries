@@ -9,6 +9,7 @@ import tsParser from '@typescript-eslint/parser'
 import tsPlugin from '@typescript-eslint/eslint-plugin'
 import reactPlugin from 'eslint-plugin-react'
 import reactHooksPlugin from 'eslint-plugin-react-hooks'
+import jsxA11yPlugin from 'eslint-plugin-jsx-a11y'
 
 // NOTE: eslint-plugin-react-compiler (rc) = 2026-05 시점에 zod-validation-error
 // 호환성 버그로 ESLint 실행 자체 실패. 안정 버전 출시 시 재도입.
@@ -52,6 +53,7 @@ export default [
       '@typescript-eslint': tsPlugin,
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
+      'jsx-a11y': jsxA11yPlugin,
     },
     rules: {
       // React Hooks 규칙 (RC 와 별개로 hooks 호출 순서·deps array 검증).
@@ -79,6 +81,22 @@ export default [
       'prefer-const': 'warn',
       'no-unused-expressions': 'warn',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
+
+      // jsx-a11y — 핵심 룰 활성. game stage (role="application") / decorative img alt="" 등 false positive 는 component 별 disable.
+      'jsx-a11y/alt-text': 'warn',
+      'jsx-a11y/anchor-has-content': 'warn',
+      'jsx-a11y/aria-props': 'error',
+      'jsx-a11y/aria-role': 'error',
+      'jsx-a11y/aria-unsupported-elements': 'error',
+      'jsx-a11y/click-events-have-key-events': 'off',  // game stage 의 pointer 입력은 키보드와 별개 (의도)
+      'jsx-a11y/no-static-element-interactions': 'off',  // 동일 사유
+      'jsx-a11y/heading-has-content': 'warn',
+      'jsx-a11y/img-redundant-alt': 'warn',
+      'jsx-a11y/label-has-associated-control': 'warn',
+      'jsx-a11y/no-autofocus': 'off',  // dialog open 시 autoFocus 의도 사용
+      'jsx-a11y/role-has-required-aria-props': 'error',
+      'jsx-a11y/role-supports-aria-props': 'warn',
+      'jsx-a11y/tabindex-no-positive': 'error',
     },
     settings: {
       react: { version: '19' },
