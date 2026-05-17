@@ -34,7 +34,7 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      className="inline-flex items-baseline gap-2 px-2 py-1 text-fg-3 text-sm rounded-sm transition-[color,background] hover:text-accent hover:bg-accent-soft cursor-pointer"
+      className="inline-flex items-center justify-center px-2 py-1 text-fg-3 rounded-sm transition-[color,background] hover:text-accent hover:bg-accent-soft cursor-pointer"
       onClick={cycle}
       aria-label={`테마: ${THEME_LABEL[theme]} (눌러서 전환)`}
       title={`테마 — 현재: ${THEME_LABEL[theme]}`}
