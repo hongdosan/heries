@@ -1,117 +1,7 @@
-/* H-eries — Chapter page (reader) + prev/next */
-/* ─── Chapter page (reader) ─────────────────────────────── */
-.chapter-outline {
-  margin: 0 0 var(--s-5);
-  padding: var(--s-3) var(--s-4);
-  background: var(--bg-soft);
-  border: 1px solid var(--rule);
-  border-radius: var(--r-md);
-}
-.chapter-outline summary {
-  cursor: pointer;
-  font-weight: 600;
-  font-size: var(--fs-sm);
-  color: var(--fg-2);
-  letter-spacing: 0.02em;
-  list-style: none;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s-2);
-}
-.chapter-outline summary::-webkit-details-marker { display: none; }
-.chapter-outline summary::before {
-  content: '▸';
-  font-size: var(--fs-xs);
-  color: var(--fg-3);
-  transition: transform var(--t-fast);
-}
-.chapter-outline[open] summary::before {
-  transform: rotate(90deg);
-}
-.chapter-outline ol {
-  margin: var(--s-3) 0 0;
-  padding-left: var(--s-5);
-  font-size: var(--fs-sm);
-  color: var(--fg-3);
-}
-.chapter-outline ol li {
-  margin: var(--s-2) 0;
-}
-.chapter-outline ol li a {
-  color: var(--fg-2);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: color var(--t-fast), border-color var(--t-fast);
-}
-.chapter-outline ol li a:hover {
-  color: var(--accent);
-  border-color: var(--accent-ring);
-}
-
-.scroll-nav {
-  /*
-   * 챕터 페이지 본문 (max-width = var(--w-reader) = 680px) 의 우측 가장자리에
-   * 가까이 붙도록 배치. 화면이 본문보다 넓을 때는 *본문 + gutter* 직후에
-   * 떠 있고, 화면이 좁아지면 viewport 우측에 붙는다.
-   *
-   * --scroll-nav-btn-size = scroll-nav-btn 의 width/height (clamp).
-   * right 오프셋 계산에서 동일 토큰을 사용해 일관 정렬.
-   */
-  --scroll-nav-btn-size: clamp(36px, 4vw, 48px);
-  position: fixed;
-  bottom: var(--s-5);
-  right: max(
-    var(--s-5),
-    calc((100vw - var(--w-reader)) / 2 - var(--scroll-nav-btn-size) - var(--s-2))
-  );
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-2);
-  z-index: 30;
-}
-.scroll-nav-btn {
-  width: var(--scroll-nav-btn-size);
-  height: var(--scroll-nav-btn-size);
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  color: var(--fg-2);
-  border: 1px solid var(--rule);
-  box-shadow: var(--shadow);
-  font-size: var(--fs-lg);
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  transition: color var(--t-fast), background var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
-}
-.scroll-nav-btn:hover {
-  color: var(--accent);
-  border-color: var(--accent-ring);
-  transform: translateY(-1px);
-}
-@media (max-width: 640px) {
-  .scroll-nav {
-    right: var(--s-3);
-    bottom: var(--s-3);
-  }
-}
-
-.chapter-cover {
-  margin: 0 0 var(--s-5);
-  aspect-ratio: 16 / 9;
-  border-radius: var(--r-md);
-  overflow: hidden;
-  background: var(--bg-soft);
-  border: 1px solid var(--rule);
-}
-.chapter-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
+/* H-eries — Chapter page article body typography (보존)
+ * chapter-outline / scroll-nav / chapter-cover / chapter-hero / ep-tag / chapter-meta /
+ * chapter-nav* / chapter-back = src/pages/chapter/chapter.tsx 의 Tailwind utility 인라인으로 전환.
+ * 본문 typography (.article, .article-prose, .article-wiki) 만 보존 — markdown body rendering 정합. */
 
 /* 챕터 본문 안 inline 이미지 (소제목별 컷). markdown ![](...) → <p><img></p>.
    16:9 webp 1600x900 원본을 컨테이너 폭에 맞춰 자동 축소. */
@@ -126,30 +16,6 @@
 }
 .page-chapter .article p:has(> img) {
   margin: 0;
-}
-.chapter-hero {
-  margin: 0 0 var(--s-6);
-  padding-bottom: var(--s-5);
-  border-bottom: 1px solid var(--rule);
-}
-.ep-tag {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: var(--fs-xs);
-  letter-spacing: 0.18em;
-  color: var(--fg-3);
-  margin: 0 0 var(--s-3);
-  text-transform: uppercase;
-}
-.chapter-hero h1 {
-  font-size: var(--fs-2xl);
-  margin: 0 0 var(--s-3);
-}
-.chapter-meta {
-  margin: 0;
-  font-size: var(--fs-sm);
-  color: var(--fg-3);
-  font-variant-numeric: tabular-nums;
 }
 
 .article {
@@ -266,57 +132,8 @@
   border-bottom: 0;
 }
 
-/* ─── Chapter prev / next ───────────────────────────────── */
-.chapter-nav {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--s-3);
-  margin-top: var(--s-8);
-  padding-top: var(--s-5);
-  border-top: 1px solid var(--rule);
-}
-.chapter-nav-link {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-1);
-  padding: var(--s-4) var(--s-5);
-  background: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--r-md);
-  color: var(--fg-2);
-  transition: transform var(--t-fast), border-color var(--t-fast),
-              box-shadow var(--t-fast);
-}
-.chapter-nav-link:hover {
-  transform: translateY(-1px);
-  border-color: var(--accent-ring);
-  box-shadow: var(--shadow);
-  color: var(--fg-2);
-}
-.chapter-nav-link.next { text-align: right; }
-.chapter-nav-link .dir {
-  font-size: var(--fs-xs);
-  color: var(--accent);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.chapter-nav-link .title {
-  font-size: var(--fs-md);
-  color: var(--fg);
-  font-weight: 500;
-}
-.chapter-nav-spacer { display: block; }
-
-.chapter-back {
-  text-align: center;
-  margin-top: var(--s-5);
-  font-size: var(--fs-sm);
-}
-.chapter-back a { color: var(--fg-3); }
-.chapter-back a:hover { color: var(--accent); }
+/* chapter-nav / chapter-back = Tailwind 인라인 (chapter.tsx). */
 
 @media (max-width: 640px) {
   .article { font-size: var(--fs-base); line-height: 1.85; }
-  .chapter-nav { grid-template-columns: 1fr; }
 }
