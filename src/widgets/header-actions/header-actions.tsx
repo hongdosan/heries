@@ -19,9 +19,9 @@ import {ThemeToggle} from '../theme-toggle'
 export function HeaderActions() {
   return (
     <div className="inline-flex items-center gap-1">
+      <ThemeToggle/>
       <AuthorModeToggle/>
       <HeaderContact/>
-      <ThemeToggle/>
     </div>
   )
 }

@@ -39,7 +39,7 @@ export function ThemeToggle() {
       aria-label={`테마: ${THEME_LABEL[theme]} (눌러서 전환)`}
       title={`테마 — 현재: ${THEME_LABEL[theme]}`}
     >
-      <span className="text-base leading-none" aria-hidden="true">{THEME_GLYPH[theme]}</span>
+      <span className="text-lg leading-none" aria-hidden="true">{THEME_GLYPH[theme]}</span>
     </button>
   )
 }
