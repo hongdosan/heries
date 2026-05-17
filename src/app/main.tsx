@@ -51,8 +51,8 @@ function App() {
     <BrowserRouter basename={BASENAME}>
       <a
         href="#main"
-        className="absolute top-0 left-0 py-2 px-4 text-white text-sm font-semibold rounded-br-sm -translate-y-full z-[100] focus:translate-y-0 focus:outline focus:outline-2 focus:outline-accent-ring focus:outline-offset-2"
-        style={{ backgroundColor: 'var(--accent)', color: '#fff' }}
+        className="absolute top-0 left-0 py-2 px-4 text-sm font-semibold rounded-br-sm -translate-y-full z-[100] focus:translate-y-0 focus:outline focus:outline-2 focus:outline-accent-ring focus:outline-offset-2"
+        style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-fg)' }}
       >본문으로 건너뛰기</a>
       <Header/>
       <ErrorBoundary>

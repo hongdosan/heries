@@ -75,7 +75,7 @@ function SortBtn({ label, active, onClick }: { label: string; active: boolean; o
         active
           ? {
               backgroundColor: 'var(--accent)',
-              color: '#ffffff',
+              color: 'var(--accent-fg)',
               fontWeight: 600,
               boxShadow: '0 1px 3px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08)',
             }

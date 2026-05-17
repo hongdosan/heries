@@ -76,8 +76,8 @@ export function MiniGameLauncher() {
     <>
       <button
         type="button"
-        className="fixed right-[clamp(12px,3vw,32px)] bottom-[clamp(12px,4vw,32px)] z-[80] inline-flex items-center gap-2 py-2 pr-4 pl-3 rounded-pill text-sm font-bold tracking-[0.02em] border-0 shadow-soft transition-[transform,box-shadow,background-color] cursor-pointer text-white hover:-translate-y-0.5 max-sm:p-3"
-        style={{ backgroundColor: 'var(--accent)' }}
+        className="fixed right-[clamp(12px,3vw,32px)] bottom-[clamp(12px,4vw,32px)] z-[80] inline-flex items-center gap-2 py-2 pr-4 pl-3 rounded-pill text-sm font-bold tracking-[0.02em] border-0 shadow-soft transition-[transform,box-shadow,background-color] cursor-pointer hover:-translate-y-0.5 max-sm:p-3"
+        style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-fg)' }}
         aria-label="미니 게임 열기"
         onClick={openDialog}
         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--accent-hover)')}

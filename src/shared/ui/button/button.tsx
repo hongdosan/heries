@@ -21,7 +21,7 @@ const SIZE: Record<ButtonSize, string> = {
 // active 시각 = inline style 로 강제 (Tailwind utility 가 HMR/purge 케이스에서 미적용되는 안전망).
 // var(--accent) 직접 참조 → 다크 모드 자동 (tokens.css [data-theme=dark] var override).
 const VARIANT: Record<ButtonVariant, string> = {
-  primary: 'text-white border-transparent hover:opacity-90',
+  primary: 'border-transparent hover:opacity-90',  // bg / color = inline style (var(--accent) / var(--accent-fg))
   secondary: 'bg-surface text-fg-2 border-rule hover:text-accent hover:border-accent',
   ghost: 'bg-transparent text-fg-2 border-transparent hover:bg-bg-soft hover:text-accent',
 }
@@ -40,7 +40,7 @@ export function Button({ children, variant = 'secondary', size = 'md', className
     <button
       type="button"
       className={cn(BASE, SIZE[size], VARIANT[variant], className)}
-      style={isPrimary ? { backgroundColor: 'var(--accent)', ...style } : style}
+      style={isPrimary ? { backgroundColor: 'var(--accent)', color: 'var(--accent-fg)', ...style } : style}
       {...rest}
     >
       {children}
