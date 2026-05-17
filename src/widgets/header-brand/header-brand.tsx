@@ -14,7 +14,7 @@ import markUrl from '../../shared/images/heries-mark.webp?url'
 export function HeaderBrand() {
   return (
     <div className="flex flex-col items-start gap-0 leading-[1.05]">
-      <Link to="/" className="inline-flex items-baseline gap-0.5 text-fg no-underline group"
+      <Link to="/" className="inline-flex items-center gap-0.5 text-fg no-underline group"
             aria-label="H-eries 홈">
         <img
           src={markUrl}
