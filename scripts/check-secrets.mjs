@@ -23,10 +23,22 @@ const SECRET_PATTERNS = [
   /(?:api[_-]?key|api[_-]?secret|access[_-]?token|refresh[_-]?token|client[_-]?secret|secret[_-]?key)\s*[:=]\s*['"]([A-Za-z0-9_\-]{16,})['"]/i,
   // AWS / GCP
   /AKIA[0-9A-Z]{16}/,
-  // GitHub PAT
+  // GitHub PAT (classic / fine-grained / OAuth)
   /ghp_[A-Za-z0-9]{36,}/,
-  // OpenAI
+  /github_pat_[A-Za-z0-9_]{82,}/,
+  /gho_[A-Za-z0-9]{36,}/,
+  // OpenAI / Anthropic
   /sk-[A-Za-z0-9]{20,}/,
+  /sk-ant-[A-Za-z0-9-_]{20,}/,
+  // Stripe
+  /sk_live_[A-Za-z0-9]{24,}/,
+  /rk_live_[A-Za-z0-9]{24,}/,
+  // Slack token
+  /xox[bpoa]-[A-Za-z0-9-]{10,}/,
+  // Private key marker (PEM)
+  /-----BEGIN (?:RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY-----/,
+  // JWT (header.payload.signature — base64url)
+  /eyJ[A-Za-z0-9_-]{10,}\.eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/,
   // 일반 password 할당 (코드 내)
   /(?:password|passwd|pwd)\s*[:=]\s*['"]([^'"]{6,})['"]/i,
   // 작가 모드 키 — 환경변수 외 hardcoded 절대 금지
