@@ -12,7 +12,13 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 ## [Unreleased]
 
-develop 안 누적 변경 (향후 release 후보 — 버전 미할당):
+(다음 release 후보 — develop 안 누적 변경)
+
+---
+
+## [v0.3.0] — 2026-05-17
+
+dev tooling 대규모 도입 + CSS Tailwind 전면 전환 + bundle 최적화. **사용자-facing 시각 변경 최소 (디자인 토큰 동일)**, 다만 dev 환경 + 빌드 산출물 구조 변경 큼.
 
 ### Added (CSS 아키텍처)
 - **ITCSS 7 layer** (Inverted Triangle CSS, Harry Roberts) 차용 + 명시 — Settings / Tools / Generic / Elements / Objects / Components / Utilities. 본 프로젝트 매핑: tokens.css = Settings, base.css reset = Generic, base.css 의 a/button/img + typography.css h1~h6 = Elements, layout.css + utilities.css = Objects, 슬라이스 .css = Components, Tailwind class = Utilities
