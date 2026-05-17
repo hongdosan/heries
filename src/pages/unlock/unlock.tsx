@@ -1,4 +1,4 @@
-import {useEffect, useState, type FormEvent} from 'react'
+import {type FormEvent, useEffect, useState} from 'react'
 import {Link, useNavigate, useSearchParams} from 'react-router-dom'
 import {isAuthorMode, setAuthorMode, verifyAuthorKey} from '../../shared/lib/env.js'
 import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
@@ -68,19 +68,23 @@ export function UnlockPage() {
 
       {authored ? (
         <section className="flex flex-col gap-4 p-4 bg-bg-soft border border-rule rounded-md">
-          <p className="m-0 text-fg-2">현재 <span className="author-only-badge">AUTHOR</span> 모드 활성 상태. 탭을 닫으면 자동 잠금.</p>
+          <p className="m-0 text-fg-2">현재 <span className="author-only-badge">AUTHOR</span> 모드 활성
+            상태. 탭을 닫으면 자동 잠금.</p>
           <div className="flex gap-2 flex-wrap mt-2">
             <Button variant="primary" onClick={() => navigate('/')}>홈으로</Button>
             <Button variant="secondary" onClick={onLock}>잠그기</Button>
           </div>
         </section>
       ) : (
-        <form className="flex flex-col gap-3 p-4 bg-bg-soft border border-rule rounded-md" onSubmit={onSubmit} noValidate>
+        <form className="flex flex-col gap-3 p-4 bg-bg-soft border border-rule rounded-md"
+              onSubmit={onSubmit} noValidate>
           <p className="m-0 text-sm text-fg-3 leading-[1.6]">
             작가 키를 입력하면 시놉시스·세계관·연표·캐릭터 분기 등 스포일러 영역이 노출됩니다.
             세션 한정 (탭 종료 시 자동 잠금).
           </p>
-          <label htmlFor="unlock-key" className="text-xs font-semibold uppercase tracking-[0.08em] text-fg-3">작가 키</label>
+          <label htmlFor="unlock-key"
+                 className="text-xs font-semibold uppercase tracking-[0.08em] text-fg-3">작가
+            키</label>
           <input
             id="unlock-key"
             type="password"
