@@ -56,11 +56,10 @@ export function ChapterPage() {
   const idx = sorted.findIndex((c) => c.episode === Number(episode))
   const prev: ChapterIndex | undefined = idx > 0 ? sorted[idx - 1] : undefined
   const next: ChapterIndex | undefined = idx >= 0 && idx < sorted.length - 1 ? sorted[idx + 1] : undefined
-  const heroSrc = !data.index.thumbnail || cover.fatal
-    ? null
-    : cover.error
-      ? PLACEHOLDER_THUMB
-      : assetUrl(`content/series/${slug}/${data.index.thumbnail}`)
+  let heroSrc: string | null
+  if (!data.index.thumbnail || cover.fatal) heroSrc = null
+  else if (cover.error) heroSrc = PLACEHOLDER_THUMB
+  else heroSrc = assetUrl(`content/series/${slug}/${data.index.thumbnail}`)
 
   return (
     <main className="page-chapter">

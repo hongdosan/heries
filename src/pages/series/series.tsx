@@ -40,11 +40,10 @@ export function SeriesPage() {
   const {manifest, bodyHtml} = state.data
   const chapterCount = manifest.chapters.length
   const characterCount = manifest.characters.length
-  const coverSrc = !manifest.thumbnail || cover.fatal
-    ? null
-    : cover.error
-      ? PLACEHOLDER_THUMB
-      : assetUrl(`content/series/${slug}/${manifest.thumbnail}`)
+  let coverSrc: string | null
+  if (!manifest.thumbnail || cover.fatal) coverSrc = null
+  else if (cover.error) coverSrc = PLACEHOLDER_THUMB
+  else coverSrc = assetUrl(`content/series/${slug}/${manifest.thumbnail}`)
 
   const tabBtnCls = 'px-4 py-3 text-md font-medium -mb-px transition-[color,border-color] cursor-pointer hover:text-fg-2'
   // active = inline style (CSS var 직접 참조 → 다크 모드 자동 + Tailwind purge/HMR 영향 0).

@@ -19,11 +19,10 @@ export function SeriesList({ items }: SeriesListProps) {
 
 function SeriesCard({ item }: { item: SeriesIndex }) {
   const { error, fatal, onError } = useImgFallback()
-  const src = fatal
-    ? null
-    : !item.thumbnail || error
-      ? PLACEHOLDER_THUMB
-      : assetUrl(`content/${item.thumbnail}`)
+  let src: string | null
+  if (fatal) src = null
+  else if (!item.thumbnail || error) src = PLACEHOLDER_THUMB
+  else src = assetUrl(`content/${item.thumbnail}`)
 
   return (
     <li className="list-none">

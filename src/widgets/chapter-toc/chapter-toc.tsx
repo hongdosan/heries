@@ -87,11 +87,10 @@ function SortBtn({ label, active, onClick }: { label: string; active: boolean; o
 
 function ChapterRow({ slug, ch }: { slug: string; ch: ChapterIndex }) {
   const { error, fatal, onError } = useImgFallback()
-  const src = !ch.thumbnail || fatal
-    ? null
-    : error
-      ? PLACEHOLDER_THUMB
-      : assetUrl(`content/series/${slug}/${ch.thumbnail}`)
+  let src: string | null
+  if (!ch.thumbnail || fatal) src = null
+  else if (error) src = PLACEHOLDER_THUMB
+  else src = assetUrl(`content/series/${slug}/${ch.thumbnail}`)
 
   return (
     <li className="border-b border-rule first:border-t">
