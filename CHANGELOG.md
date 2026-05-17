@@ -14,6 +14,38 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 (다음 release 후보 — develop 안 누적 변경)
 
+### Added (콘텐츠 — ep-04 발행)
+- **`chapters/ep-04.md` *자대*** — 4 절 (수료 / 자대 도착 / 동기 / 첫 출동 명령), 3824 자. 진혁이 수료 평가 양호로 본인 희망 자대 (서울 북부 비각성자 부대) 배치, 4 인 1 조 편성 (조성훈 + 전직 119 / 대학 휴학 2 명), 첫 출동 직전 학생증 사진을 한 박자 보는 행동으로 컷
+- **자대 동기 조성훈** 첫 등장 (ep-04 §3 — 윤곽만, 미래 정보 백엔드 전용)
+
+### Added (캐릭터 카드 — SSOT)
+- **`characters/2-major-supporting/woo-seon-a.md`** 신규 (우선아) — 진혁의 동생, 고등학생, 공개 절 5 + 백엔드 절 5. ep-04 §4 학생증 사진 정서적 앵커 정합. 거주지 = 구리 (백엔드 SSOT, 본문 노출 X)
+- **`characters/2-major-supporting/jo-seong-hun.md`** 신규 (조성훈, 자대 동기) — 공개 절 5 + 백엔드 절 5. **각성 트리거 인물** (백엔드 전용, 미래 정보)
+
+### Changed (캐릭터 카드 — 우진혁 ep-04 정합)
+- `frontmatter.reader_snapshot: ep-03 → ep-04`
+- §외형 손 백엔드: 손등 옅은 흉터 1줄 (졸업식 강당 ep-02 정합 — continuity-reviewer M1)
+- §군 §훈련 종합: 수료 평가 양호 + 본인 희망 자대 배치
+- §군 §부대 위치 (신규): 서울 북부 비각성자 부대 + 4 인 1 조 + 분대장 상사 + 동기 3 명
+- §가족 §남매 거주지 (백엔드): 구리
+- §각성 트리거: 입대 동기 = 조성훈 매핑
+- §주변 호칭 사전: 5 행 추가 (수료 동기 / 자대 분대장 / 조성훈 / 119 / 휴학)
+
+### Changed (발행 메타)
+- `manifest.json`: ep-04 chapter + 우선아 / 조성훈 character 등록
+- `_series.md` updated: 2026-05-18
+- `thumbnails/ep-04/` 디렉토리 + `PROMPT.md` ep-04 5장 영문 cinematic (대표 + §1~§4)
+
+### Added (시각 검증 — Storybook)
+- **5 신규 widget storybook stories**: `author-mode-toggle / theme-toggle / header-contact / header-actions / header-brand` 각 3 variant (잠금/활성/다크 또는 sun/moon/monitor 등). 정책 #11 (shared/ui 강제) 외 widgets 도 권장 적용. build-storybook 통과
+
+### Added (audit 보고서 — 사용자 결정 대기)
+- **`.claude/workflow/audit/2026-05-18-gwangsalgeom-complexity.md`** — 1369 줄 광살검 컴포넌트 5 파일 분할 권장 (Phase 1 적용 시 메인 920→480 줄 60% 감소). 게임 메커닉 변경 risk 0 — 순수 추출만 (상수/타입/순수 함수). **자동 적용 X**
+- **`.claude/workflow/audit/2026-05-18-gwangsalgeom-css.md`** — 795 줄 60 selector cross-check. 진짜 dead 0 건 (false positive 12 건 분석). 실제 issue 1 건: `sm-hud-title` className CSS 정의 누락 (unstyled). **자동 적용 X**
+
+### Fixed (사소)
+- `pages/home/home.tsx`: `<h1>` 마침표 제거 (브랜드 톤 정합)
+
 ---
 
 ## [v0.3.0] — 2026-05-17
