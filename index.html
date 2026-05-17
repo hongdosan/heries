@@ -53,6 +53,22 @@
     })(window.location)
   </script>
   <!--
+    Theme 적용 — first paint 전 inline 처리 (FOUC 차단).
+    localStorage 의 'heries:theme' 값을 읽어 <html data-theme> 부착.
+    React Compiler 'all' 모드는 utility 함수도 컴파일 → module top-level 호출 시 useMemoCache hook fail.
+    → React 진입 전 처리는 본 inline script 가 SSOT (theme.ts 의 getTheme/applyTheme 로직과 동치 유지).
+  -->
+  <script type="text/javascript">
+    (function () {
+      try {
+        var v = localStorage.getItem('heries:theme')
+        if (v === 'light' || v === 'dark') {
+          document.documentElement.setAttribute('data-theme', v)
+        }
+      } catch (e) { /* localStorage 미사용 환경 (private mode 등) — auto fallback */ }
+    })()
+  </script>
+  <!--
     CSS module 이 import 되기 전 0~수십 ms 동안 사용자에게 보이는 첫 paint 톤.
     base.css 가 로드되면 body { background: var(--bg) } 가 우선 적용되어 본 inline 룰이 덮인다.
     다크 모드 prefers-color-scheme = 사용자 OS 설정 자동 반영 (theme.ts 의 manual override 보다 먼저).

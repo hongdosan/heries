@@ -19,12 +19,12 @@ import {ChapterPage} from '../pages/chapter'
 import {CharacterPage} from '../pages/character'
 import {UnlockPage} from '../pages/unlock'
 import {NotFoundPage} from '../pages/not-found'
-import {applyTheme, getTheme} from '../shared/lib/theme.js'
 import {useScrollbarAutoHide} from '../shared/lib/use-scrollbar-autohide.js'
 import {ErrorBoundary} from '../shared/ui/error-boundary'
 
-// Apply saved theme override before first paint to avoid flicker.
-applyTheme(getTheme())
+// Theme 적용은 index.html 의 inline script 에서 first-paint 전 처리 (FOUC 차단).
+// React Compiler 'all' 모드 = 컴파일된 utility 함수 (applyTheme 등) 가 useMemoCache hook 호출 →
+// module top-level 호출 시 React tree 밖이라 fail. 따라서 React 진입 전 호출은 inline script.
 
 // `import.meta.env.BASE_URL` 은 vite.config.ts 의 `base` 값을 그대로 노출
 // (reader production = '/heries/' — GitHub repo prefix / author build = '/' /
