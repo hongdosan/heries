@@ -1,5 +1,4 @@
-import type {CSSProperties, KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent,} from 'react'
-import {memo, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react'
+import {memo, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react'
 import './stickman-murim.css'
 
 // 스프라이트 — vite ?url import. 빌드 시 자동 hash + dist/assets/ 통합.
@@ -1053,7 +1052,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
     <div className="mini-game-frame mini-game-frame--landscape sm-frame">
       <div
         ref={stageRef}
-        className={'sm-stage' + (shake ? ' sm-shake' : '')}
+        className={`sm-stage${  shake ? ' sm-shake' : ''}`}
         tabIndex={0}
         role="application"
         aria-label="광살검"
@@ -1221,7 +1220,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
                 </button>
                 <button
                   type="button"
-                  className={'sm-pad-btn sm-pad-qi' + (qiReady ? '' : ' is-disabled')}
+                  className={`sm-pad-btn sm-pad-qi${  qiReady ? '' : ' is-disabled'}`}
                   aria-label="장풍"
                   aria-disabled={!qiReady}
                   disabled={!qiReady}
@@ -1230,7 +1229,7 @@ export function StickmanMurim({autoFocus = true}: StickmanMurimProps) {
                 </button>
                 <button
                   type="button"
-                  className={'sm-pad-btn sm-pad-dash' + (dashReady ? '' : ' sm-pad-cd is-disabled')}
+                  className={`sm-pad-btn sm-pad-dash${  dashReady ? '' : ' sm-pad-cd is-disabled'}`}
                   aria-label="이형환위"
                   aria-disabled={!dashReady}
                   disabled={!dashReady}
@@ -1346,7 +1345,7 @@ const EnemyView = memo(function EnemyView({enemy}: EnemyViewProps) {
   const eliteClass = enemy.elite ? ' sm-enemy-elite' : ''
   return (
     <div
-      className={'sm-enemy' + stunClass + eliteClass}
+      className={`sm-enemy${  stunClass  }${eliteClass}`}
       style={{
         transform: `translate(${enemy.x}px, ${enemy.y}px)${isRight ? '' : ' scaleX(-1)'}`,
         width: ENEMY_W,

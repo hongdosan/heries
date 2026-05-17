@@ -1,4 +1,4 @@
-import type {CSSProperties} from 'react'
+import {type CSSProperties, lazy, Suspense} from 'react'
 import {Link, useParams, useSearchParams} from 'react-router-dom'
 import {loadSeries} from '../../entities/series'
 import {assetUrl} from '../../shared/lib/env.js'
@@ -10,7 +10,6 @@ import {Loading} from '../../shared/ui/loading'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
 import {ChapterToc} from '../../widgets/chapter-toc'
 import {CharacterList} from '../../widgets/character-list'
-import {lazy, Suspense} from 'react'
 // 게임 슬라이스 = 80+ KB. 사용자가 메뉴를 안 누르면 fetch X.
 const MiniGameLauncher = lazy(() =>
   import('../../features/mini-game').then((m) => ({default: m.MiniGameLauncher})),

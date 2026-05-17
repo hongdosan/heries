@@ -78,6 +78,10 @@ export default [
       // 코드 품질 — 정책 #5 strict 정합.
       'eqeqeq': ['error', 'smart'],
       'no-var': 'error',
+      'no-duplicate-imports': 'warn',
+      'no-useless-rename': 'warn',
+      'prefer-template': 'warn',
+      'object-shorthand': 'warn',
       'prefer-const': 'warn',
       'no-unused-expressions': 'warn',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
