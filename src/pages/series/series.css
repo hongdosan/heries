@@ -86,60 +86,7 @@
 
 /* chapter-toc widget = Tailwind utility 전환 완료 (src/widgets/chapter-toc/chapter-toc.tsx). */
 
-/* Character grid (within tab). 정책: 주인공 카드만 Link, 나머지는 정적 카드. */
-.character-group { margin: 0 0 var(--s-6); }
-.character-group h3 {
-  font-size: var(--fs-sm);
-  font-weight: 500;
-  color: var(--fg-3);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin: 0 0 var(--s-3);
-}
-.character-card-grid {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: var(--s-3);
-}
-.character-card {
-  background: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--r-md);
-  padding: 0;
-  transition: transform var(--t-fast), border-color var(--t-fast),
-              box-shadow var(--t-fast);
-}
-.character-card:has(.character-card-link):hover {
-  transform: translateY(-2px);
-  border-color: var(--accent-ring);
-  box-shadow: var(--shadow);
-}
-.character-card-link,
-.character-card-static {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-1);
-  padding: var(--s-3) var(--s-4);
-  border-radius: var(--r-md);
-  color: var(--fg);
-  text-decoration: none;
-}
-.character-card-link:hover .character-card-name { color: var(--accent); }
-.character-card-static { color: var(--fg-2); }
-.character-card-name {
-  font-size: var(--fs-md);
-  font-weight: 500;
-  color: var(--fg);
-}
-.character-card-static .character-card-name { color: var(--fg-2); }
-.character-card-summary {
-  font-size: var(--fs-xs);
-  color: var(--fg-3);
-  line-height: 1.5;
-}
+/* character-list widget = Tailwind utility 전환 완료 (src/widgets/character-list/character-list.tsx). */
 
 @media (max-width: 640px) {
   .series-hero.has-cover {

@@ -19,28 +19,37 @@ export interface CharacterListProps {
 export function CharacterList({slug, characters}: Readonly<CharacterListProps>) {
   const isAuthor = useAuthorMode()
   return (
-    <section className="character-list-section">
+    <section>
       {GROUP_ORDER.map(({folder, label}) => {
         const members = characters.filter((c) => c.folder === folder)
         if (members.length === 0) return null
         return (
-          <div key={folder} className="character-group">
-            <h3>{label}</h3>
-            <ul className="character-card-grid">
+          <div key={folder} className="m-0 mb-6">
+            <h3 className="text-sm font-medium text-fg-3 uppercase tracking-[0.08em] m-0 mb-3">{label}</h3>
+            <ul className="list-none p-0 m-0 grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(240px,1fr))]">
               {members.map((ch) => {
                 const linkable = isAuthor || ch.folder === '1-protagonist'
                 const summary = ch.summary ?? (linkable ? '' : '— 본 캐릭터의 상세는 작가 모드에서 열람.')
                 return (
-                  <li key={ch.id} className="character-card">
+                  <li
+                    key={ch.id}
+                    className="bg-surface border border-rule rounded-md p-0 transition-[transform,border-color,box-shadow] has-[a]:hover:-translate-y-0.5 has-[a]:hover:border-accent-ring has-[a]:hover:shadow-soft group"
+                  >
                     {linkable ? (
-                      <Link to={`/series/${slug}/character/${ch.id}`} className="character-card-link">
-                        <span className="character-card-name">{ch.name}</span>
-                        {summary && <span className="character-card-summary">{summary}</span>}
+                      <Link
+                        to={`/series/${slug}/character/${ch.id}`}
+                        className="flex flex-col gap-1 p-3 px-4 rounded-md text-fg no-underline"
+                      >
+                        <span className="text-md font-medium text-fg transition-colors group-hover:text-accent">{ch.name}</span>
+                        {summary && <span className="text-xs text-fg-3 leading-[1.5]">{summary}</span>}
                       </Link>
                     ) : (
-                      <div className="character-card-static" aria-label={`${ch.name} — 작가 모드에서 상세 열람`}>
-                        <span className="character-card-name">{ch.name}</span>
-                        {summary && <span className="character-card-summary">{summary}</span>}
+                      <div
+                        className="flex flex-col gap-1 p-3 px-4 rounded-md text-fg-2"
+                        aria-label={`${ch.name} — 작가 모드에서 상세 열람`}
+                      >
+                        <span className="text-md font-medium text-fg-2">{ch.name}</span>
+                        {summary && <span className="text-xs text-fg-3 leading-[1.5]">{summary}</span>}
                       </div>
                     )}
                   </li>

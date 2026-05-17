@@ -13,10 +13,7 @@ import '../src/shared/styles/responsive.css'
 // `./{slice}` (파일 직접) 패턴이면 index 우회 → preview 에서 보강.
 // 마이그레이션 완료된 슬라이스 (Tailwind only) 는 본 import 에서 제외.
 import '../src/features/mini-game/mini-game.css'
-// chapter-toc / character-list / series-list 의 룰은 page 슬라이스 css
-// 에 정의돼있어 storybook 시연 시 함께 import.
-import '../src/pages/home/home.css'
-import '../src/pages/series/series.css'
+// chapter-toc / character-list / series-list = Tailwind 전환 완료 — page css 의존 X.
 
 const preview: Preview = {
   parameters: {

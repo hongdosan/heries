@@ -12,23 +12,23 @@ export function HomePage() {
   const state = useAsync(() => fetchSeriesIndex(), [])
 
   return (
-    <main className="page-home">
-      <header className="home-hero">
-        <div className="home-hero-figure-col">
-          <figure className="home-hero-figure">
-            <img src={HERO_IMAGE} alt={HERO_ALT} loading="eager"/>
+    <main className="flex-1 w-full max-w-page mx-auto pt-7 px-[clamp(16px,4vw,32px)] pb-9">
+      <header className="grid grid-cols-[1fr_3fr] gap-5 items-stretch pt-6 pb-7 max-sm:grid-cols-1 max-sm:gap-4">
+        <div className="flex flex-col gap-2">
+          <figure className="m-0 w-full aspect-[16/9] rounded-lg overflow-hidden bg-bg-soft shadow-soft">
+            <img src={HERO_IMAGE} alt={HERO_ALT} loading="eager" className="block w-full h-full object-cover" />
           </figure>
         </div>
 
-        <div className="home-hero-text">
-          <p className="home-hero-eyebrow">ORIGINAL · WEB SERIES</p>
+        <div className="flex flex-col justify-center gap-2 min-h-0 overflow-hidden">
+          <p className="m-0 w-full text-xs font-semibold tracking-[0.16em] uppercase text-fg-3 whitespace-nowrap overflow-hidden text-ellipsis">ORIGINAL · WEB SERIES</p>
 
-          <h1 className="home-hero-title">
+          <h1 className="m-0 text-lg font-normal tracking-normal leading-[1.45] text-fg-3">
             작가(홍도산) 의 오리지널 웹 시리즈 컬렉션.
           </h1>
 
-          <p className="home-hero-cta">
-            <Link to="/about">H-eries 가 무엇인가요? →</Link>
+          <p className="m-0 text-sm">
+            <Link to="/about" className="font-semibold border-b border-accent-ring pb-[2px] transition-[color,border-color] hover:border-accent-hover">H-eries 가 무엇인가요? →</Link>
           </p>
         </div>
       </header>
