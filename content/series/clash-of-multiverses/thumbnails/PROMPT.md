@@ -10,6 +10,7 @@ thumbnails/
   ep-01/  (ep-01.webp + ep-01-1.webp ~ ep-01-4.webp)
   ep-02/  (ep-02.webp + ep-02-1.webp ~ ep-02-4.webp)
   ep-03/  (ep-03.webp + ep-03-1.webp ~ ep-03-4.webp)
+  ep-04/  (ep-04.webp + ep-04-1.webp ~ ep-04-5.webp)
 ```
 
 ## ep-03 — 입소
@@ -140,99 +141,194 @@ Aspect ratio 16:9, 1600x900.
 
 ## ep-04 — 자대
 
-5 컷 (대표 + §1~§4). 톤 = 사실적·차분·낮음 채도·dramatic light, ep-01·02·03 톤 정합. 외부 이미지 생성 후 `ep-04/ep-04.webp` / `ep-04/ep-04-1.webp` ~ `-4.webp` 5 파일 저장.
+6 컷 (대표 + §1~§5). 톤 = **액션·판타지 웹소설 시네마틱** — 인물 부딪힘·긴장·동작이 보이는 컷. ep-01~03 의 잔잔한 정적 톤보다 한 단계 *드라마틱*.
+야간 사이렌·차폐 진입·어둠 속 마수 윤곽·동료 사망 직전 등 cinematic action lighting. 외부 이미지 생성 후 `ep-04/ep-04.webp` /
+`ep-04/ep-04-1.webp` ~ `-5.webp` 6 파일 저장.
 
-### 대표 (`ep-04.webp`) — 차에 오르기 직전, 사진을 꺼내 보는 손
+### 대표 (`ep-04.webp`) — §5 비극 컷: 분대장이 진혁 앞으로 몸을 던지는 순간
+
 ```
-A cinematic 16:9 close-up illustration in modern minimalist editorial style.
-A 19-year-old Korean male soldier's right hand, seen from his own
-shoulder angle, gloved fingers holding a small student ID photograph
-of a Korean high-school girl in winter school uniform. The girl in
-the photo looks straight at the camera, expression neutral, hair tied
-back. Background: open rear door of a dark olive military truck at
-night, parking-lot lamp light spilling onto the asphalt. The soldier
-is in full field combat fatigues with night gear, helmet held loosely
-in his other hand at his side. He pauses for a beat looking at the
-photo before tucking it back into his inner chest pocket.
-Tone: muted asphalt, deep olive-drab fatigues, warm sodium-lamp
-amber on the photo edge, cool night blue on the truck body. Mood:
-an older brother carries the smallest reminder of his sister into
-his first deployment. No text overlays. Strictly avoid any
-recognizable character, brand, military insignia, or franchise reference.
+A cinematic 16:9 action illustration in modern minimalist editorial
+style, web-novel cover energy, peak-tension framing. Night exterior,
+the entrance road of a Korean outer-suburb apartment complex, a
+lowered vehicle barrier across mid-ground. The lamps lining the
+driveway are all in the final flicker before going dark — one last
+sodium-amber pulse strobing across cracked asphalt. Foreground
+center-left: a Korean man in his mid-20s with broad shoulders, in
+full dark-olive field combat gear (the squad's senior, Choi Gi-jun),
+mid-air in a desperate forward dive, his torso fully extended across
+the path of a young soldier behind him, arms thrown wide, mouth
+clenched. Behind him, half a step back, a Korean male in his early
+20s in full combat gear (the protagonist) is frozen in a shocked
+sidestep, his rifle lowering from his shoulder, eyes wide on the
+mass beyond. 7 meters past the barrier, looming out of the
+collapsing lamplight: a non-human creature one-and-a-half times a
+man's height, two legs, broad chitin-plated shoulders, three eyes
+set across the head plate, the leading shoulder-plate edge angled
+toward the diving senior's flank — contact imminent but not yet
+landed, no blood, no impact wound rendered. Far mid-ground right:
+another young soldier (Kim Seong-hun) further back behind a guard
+post, mouth open in a shout, free hand thrown forward.
+Tone: deep night blue base, sharp sodium-amber strobe from the dying
+lamp behind the creature, cold streetlight blue rim on the
+protagonist's helmet and the senior's airborne shoulders, olive-drab
+fatigues near-black, no awakener blue-light glow yet on scene. Mood:
+the single second a squadmate throws himself across a junior's line
+of contact — the hinge of the chapter. No text overlays. Strictly avoid any
+recognizable character, brand, military insignia, or franchise
+reference. No graphic injury rendered.
 Aspect ratio 16:9, 1600x900.
 ```
 
-### §1 (`ep-04-1.webp`) — 수료식 정복 도열
+### §1 (`ep-04-1.webp`) — 수료식 후 게시판 앞 동기 잡담
+
 ```
-A cinematic 16:9 illustration in modern minimalist editorial style.
-Mid-morning on a flat parade ground. A formation of newly-trained
-Korean soldiers in dress uniforms stands at attention in straight
-rows, viewed from a slight three-quarter angle. Foreground: one
-19-year-old Korean male, calm expression, eyes forward, the morning
-sun coming in at a low oblique angle from camera left, casting a
-long sharp shadow across his cheek. No civilian crowd. A single
-unfurled regimental banner on a flagpole stands in the background.
-Tone: pale dawn blue sky, dress-uniform olive and dark green, sharp
-oblique sunlight, no warm fill. Mood: completion of training,
-the day quietly turning forward. No text overlays. Strictly avoid
-any recognizable character, brand, military insignia, or franchise
-reference.
+A cinematic 16:9 illustration in modern minimalist editorial style,
+warm group-energy framing. Mid-morning on a Korean military
+training-camp parade ground, immediately after a 4-week graduation
+ceremony. Foreground: a small cluster of three freshly shorn Korean
+males in their early 20s, in plain training fatigues, standing in
+front of a pinboard mounted on a steel frame freshly papered with
+unit-assignment rosters. Center: the protagonist (Korean male,
+early 20s, tall and lean), mid-nod, eyes on a friend beside him.
+Left of him: a fellow recruit just finishing a clap on the
+protagonist's shoulder, mouth open in a short laugh, body leaning
+in. Right of him: a third recruit slightly turned aside, smiling.
+Mid-ground: more recruits scattered across the parade ground,
+duffel bags at their feet, a few drifting toward parked olive
+troop trucks in the deep background. The pinboard's rosters are
+slightly blurred — readable as printed lists, no legible names.
+Tone: pale morning blue sky, muted asphalt-gray concrete ground,
+olive-drab fatigues, warm low sun catching the recruits' shoulders
+from the right. Mood: the short cheerful beat of conscripts
+scattering across the country, a shoulder-clap, a quiet *take care*.
+No text overlays. Strictly avoid any recognizable character, brand,
+military insignia, or franchise reference.
 Aspect ratio 16:9, 1600x900.
 ```
 
-### §2 (`ep-04-2.webp`) — 분대장 브리핑
+### §2 (`ep-04-2.webp`) — 자대 막사 인계: 신참 2 명 + 분대장 + 기존 분대원
+
 ```
-A cinematic 16:9 illustration in modern minimalist editorial style.
-Interior of a small unit briefing room at a non-awakener military
-base in northern Seoul. Foreground: a Korean staff sergeant in
-fatigues, mid-30s, standing beside a wall-mounted map of the city,
-speaking calmly with one hand resting at his side. Mid-ground:
-four newly assigned soldiers seated in two rows of folding chairs,
-listening. The 19-year-old protagonist sits second from the left,
-spine straight, hands on his knees. A small ceiling fluorescent
-fixture overhead. No combat gear yet — clean fatigues only.
-Tone: pale fluorescent white, olive-drab fatigues, neutral wall
-gray. Mood: measured, restrained, the line between awakeners and
-non-awakeners being drawn calmly. No text overlays. Strictly avoid
-any recognizable character, brand, military insignia, or franchise
-reference.
+A cinematic 16:9 illustration in modern minimalist editorial style,
+slight low-angle dramatic framing. Interior of a small squad
+barracks at a Korean non-awakener military base — single-file
+military bunks along both walls, gray metal lockers behind, dry
+concrete floor. Foreground at slight low angle: a Korean staff
+sergeant in his late 30s with broad shoulders, hard composed
+expression, hands clasped behind his back, standing center between
+the two recruits and the existing squad, mouth set mid-sentence,
+his weight forward — the heaviness of a casualty-warning briefing.
+Mid-ground left: only two newly assigned Korean male soldiers in
+their early 20s standing at attention shoulder-to-shoulder, plain
+fatigues, duffel bags resting at the foot of their bunks behind
+them. The protagonist on the left, posture quiet and grounded; Kim
+Seong-hun on his right, slightly stiffer. Mid-ground right: four
+existing squad members in fatigues seated or leaning on their bunk
+edges further back, watching the briefing, expressions flat —
+including one senior with broad shoulders (Choi Gi-jun) seated
+nearest, one hand resting on his knee. Overhead a single ceiling
+fluorescent strip.
+Tone: cold fluorescent white from above, muted olive-drab fatigues
+deepened by overhead shadow, dry concrete floor, muted asphalt-gray
+locker face. Mood: a first-day inheritance where the weight of two
+dead juniors from last year is named plainly. No text overlays.
+Strictly avoid any recognizable character, brand, military insignia,
+or franchise reference.
 Aspect ratio 16:9, 1600x900.
 ```
 
-### §3 (`ep-04-3.webp`) — 식판 위 첫 식사
+### §3 (`ep-04-3.webp`) — 식당 1:1 식판 대화 (말 편하게 해도 될까)
+
 ```
-A cinematic 16:9 illustration in modern minimalist editorial style.
-Interior of a base mess hall, evening. Foreground: two 19-year-old
-Korean male soldiers seated across a long stainless steel table,
-plain fatigues, identical aluminum food trays in front of them with
-rice, soup, side dishes. The one on the left is the protagonist —
-spoon held, mid-bite, listening. The one on the right has just
-finished saying something and is looking up from his tray with a
-gentle expression. Background: other soldiers at adjacent tables,
-softly out of focus. Overhead fluorescent strip lights.
-Tone: pale fluorescent fill, warm tray-amber food, olive fatigues.
-Mood: first meal together, polite distance still in place. No text
-overlays. Strictly avoid any recognizable character, brand, military
-insignia, or franchise reference.
+A cinematic 16:9 illustration in modern minimalist editorial style,
+intimate over-the-shoulder conversational framing. Interior of a
+Korean military base mess hall, evening. A stainless steel table
+seen at a three-quarter angle, only two Korean male soldiers in
+their early 20s in plain fatigues seated across from each other at
+its end — the rest of the long table empty, other tables softly out
+of focus in the background. Near side: the protagonist, mid-nod, a
+short single nod of agreement, spoon resting on the edge of his
+tray, expression composed but warmer than before. Far side: Kim
+Seong-hun, turned slightly forward, the corner of his mouth caught
+in a small, just-starting smile — the moment immediately after
+asking *can I drop the formal speech with you*. Trays in front of
+each man — rice bowl, steel side dishes — half eaten. Mid-ground
+and background softly out of focus: a few other soldiers at
+adjacent tables, overhead fluorescent strips, the steel serving
+line further back.
+Tone: pale fluorescent fill, warm tray-amber food, muted olive-drab
+fatigues, soft skin tones. Mood: the first one-to-one moment in
+which two strangers become squadmates — small, quiet, sincere. No
+text overlays. Strictly avoid any recognizable character, brand,
+military insignia, or franchise reference.
 Aspect ratio 16:9, 1600x900.
 ```
 
-### §4 (`ep-04-4.webp`) — 야간 사이렌 + 군용 차량 + 도시 야경
+### §4 (`ep-04-4.webp`) — 야간 사이렌 + 군장 + 단검집 매듭 확인
+
 ```
-A cinematic 16:9 illustration in modern minimalist editorial style.
-Outdoor military base courtyard at night. Foreground center: a
-single dark olive military truck with rear door open, idling with
-red brake lights on. Soldiers in full field gear are stepping up
-into the back. Mid-ground left: a rotating emergency siren atop a
-guard post throws a red sweep of light across the asphalt. Mid-
-ground right: the silhouette of the 19-year-old protagonist walking
-toward the truck, helmet on, kitbag in hand. Background: distant
-northern Seoul skyline — apartment blocks with scattered window
-lights, low cloud cover catching the city glow.
-Tone: deep night blue base, red siren sweep across foreground,
-warm sodium amber on distant city, olive fatigues nearly black.
-Mood: first dispatch, the city waiting beyond the gate. No text
-overlays. Strictly avoid any recognizable character, brand, military
-insignia, or franchise reference.
+A cinematic 16:9 illustration in modern minimalist editorial style,
+kinetic mid-action framing. Interior of a darkened Korean squad
+barracks at night, the instant the dispatch siren has begun to
+sound. Overhead red rotating-siren light sweeps across the room
+from upper-left to lower-right, casting hard bands of red across
+bunks and soldiers mid-motion. Foreground center: the protagonist
+(Korean male, early 20s) on his feet beside his bunk, combat
+field-pack already on his shoulders, his right hand at his hip
+checking the knot of his sheathed dagger's flank-strap — a clear
+double-knot — fingers in mid-pull. His expression is focused, no
+panic. Just left of him: Kim Seong-hun shouldering his own pack,
+hand mid-tighten on a shoulder strap, fingers visibly trembling.
+Mid-ground right, nearer the squad-room door: Choi Gi-jun, the
+broad-shouldered senior in his late 30s, already in full kit, one
+hand raised in a short directional signal toward the two recruits,
+mouth open giving a short order. Behind them: another squad
+member buckling gear mid-motion. The barracks doorway stands open
+onto a darker corridor where the red siren wash deepens.
+Tone: deep night-blue base interior, sharp rotating red siren
+sweep across foreground faces and gear, olive-drab fatigues nearly
+black except where the red band crosses them, cool fluorescent
+remnant near the ceiling. Mood: the first dispatch — controlled
+hurry, the squad already moving as one, the small private ritual
+of a strap-knot inside the larger rush. No text overlays. Strictly
+avoid any recognizable character, brand, military insignia, or
+franchise reference.
+Aspect ratio 16:9, 1600x900.
+```
+
+### §5 (`ep-04-5.webp`) — 분대장 사망 직전: 마수 갑각 모서리 + 진혁 시야
+
+```
+A cinematic 16:9 illustration in modern minimalist editorial style,
+tragic peak-action framing. Night exterior, the entrance road of a
+Korean outer-suburb apartment complex. A lowered vehicle barrier
+across mid-ground, cracked asphalt underfoot. The driveway's
+overhead lamps are all flickering in their last pulse before going
+out — one final amber strobe. Foreground center: a Korean man in
+his late 30s with broad shoulders, in full dark-olive field combat
+gear (Choi Gi-jun, the squad senior), mid-air in a desperate
+forward dive in front of the protagonist, arms wide, torso
+extended across the line of contact. Behind him, half a step back
+and slightly right: the protagonist (Korean male, early 20s) in
+full combat gear, frozen in a shocked sidestep, rifle drifting
+down from his shoulder, eyes wide and locked on the mass ahead —
+the viewer reads the shock through his face. Far mid-ground right,
+behind a guard post: Kim Seong-hun, mouth open mid-shout, free
+arm thrown forward in alarm. 7 meters past the barrier, looming
+out of the dying lamplight: a non-human creature one-and-a-half
+times a man's height, two legs, broad chitin-plated shoulders,
+three eyes set across the head plate, the leading shoulder-plate
+edge angled toward the diving senior's flank — contact imminent
+but not yet landed, no blood, no wound rendered. The deeper
+complex driveway behind it remains pitch dark — no awakener-blue
+glow on scene yet.
+Tone: deep night-blue base, sharp sodium-amber strobe from the
+last lamp behind the creature, cold streetlight blue rim on the
+protagonist's helmet, olive-drab fatigues near-black. Mood: the
+single second a squadmate throws himself across a junior's line of
+contact — the hinge of the chapter, just before the awakener squad arrives. No text overlays.
+Strictly avoid any recognizable character, brand, military
+insignia, or franchise reference. No graphic injury rendered.
 Aspect ratio 16:9, 1600x900.
 ```
