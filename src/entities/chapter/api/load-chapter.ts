@@ -1,18 +1,9 @@
-import type {
-  ChapterFrontmatter,
-  ChapterIndex,
-  DocFile,
-  SeriesManifest,
-} from '../../shared/lib/types.js'
-import { parseFrontmatter } from '../../shared/lib/frontmatter.js'
-import { renderMarkdown } from '../../shared/lib/markdown.js'
-import { fetchMarkdown } from '../../shared/lib/manifest.js'
-
-export interface ChapterPageData {
-  frontmatter: ChapterFrontmatter
-  bodyHtml: string
-  index: ChapterIndex
-}
+import type {DocFile} from '../../../shared/lib/types.js'
+import {parseFrontmatter} from '../../../shared/lib/frontmatter.js'
+import {renderMarkdown} from '../../../shared/lib/markdown.js'
+import {fetchMarkdown} from '../../../shared/api/markdown.js'
+import type {SeriesManifest} from '../../series/model/types.js'
+import type {ChapterFrontmatter, ChapterPageData} from '../model/types.js'
 
 /**
  * 챕터 (에피소드) 페이지 데이터 로더.
@@ -41,7 +32,7 @@ export async function loadChapter(
   const raw = await fetchMarkdown(path)
   const doc: DocFile<ChapterFrontmatter> = parseFrontmatter<ChapterFrontmatter>(raw)
   const bodyHtml = renderMarkdown(doc.body)
-  return { frontmatter: doc.frontmatter, bodyHtml, index }
+  return {frontmatter: doc.frontmatter, bodyHtml, index}
 }
 
 /** 1 자리수 → `0N`. URL 의 ep-01 / ep-02 형식 유지. */

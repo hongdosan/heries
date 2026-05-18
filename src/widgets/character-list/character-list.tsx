@@ -1,6 +1,6 @@
 import {Link} from 'react-router-dom'
 import {useAuthorMode} from '../../shared/lib/use-author-mode.js'
-import type {CharacterFolder, CharacterIndex} from '../../shared/lib/types.js'
+import type {CharacterFolder, CharacterIndex} from '../../entities/character'
 
 /**
  * 등장인물 카드 그룹 순서 — 4 폴더 (worldbuilding/character-doctrine 정합).

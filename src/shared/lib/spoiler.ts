@@ -1,5 +1,5 @@
 import { isAuthorMode } from './env.js'
-import patterns from './spoiler-patterns.json'
+import patterns from '../config/spoiler-patterns.json'
 
 /**
  * 작가 모드 마스킹 (Spoiler Masking) — 정책 #9 v2.

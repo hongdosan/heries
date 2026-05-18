@@ -1,2 +1,2 @@
-export { loadChapter } from './chapter.js'
-export type { ChapterPageData } from './chapter.js'
+export {loadChapter} from './api/load-chapter.js'
+export type {ChapterFrontmatter, ChapterIndex, ChapterPageData} from './model/types.js'

@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MemoryRouter } from 'react-router-dom'
 import { SeriesList } from './series-list'
-import type { SeriesIndex } from '../../shared/lib/types'
+import type {SeriesIndex} from '../../entities/series'
 
 const meta: Meta<typeof SeriesList> = {
   title: 'widgets/시리즈 목록 (SeriesList)',

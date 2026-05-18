@@ -30,12 +30,12 @@ export function useScrollbarAutoHide(idleMs: number = 1200): void {
     }
 
     // passive: true = 스크롤 차단 X (모바일 성능 보장).
-    window.addEventListener('scroll', show, { passive: true })
-    window.addEventListener('wheel', show, { passive: true })
-    window.addEventListener('touchmove', show, { passive: true })
+    globalThis.addEventListener('scroll', show, { passive: true })
+    globalThis.addEventListener('wheel', show, { passive: true })
+    globalThis.addEventListener('touchmove', show, { passive: true })
 
     // 키보드 스크롤 키 (PageUp/Down, Space, Arrow, Home/End) 도 감지.
-    window.addEventListener('keydown', (e) => {
+    globalThis.addEventListener('keydown', (e) => {
       if (
         e.key === 'PageUp' || e.key === 'PageDown' ||
         e.key === 'Home' || e.key === 'End' ||
@@ -48,9 +48,9 @@ export function useScrollbarAutoHide(idleMs: number = 1200): void {
 
     return () => {
       if (timer != null) globalThis.clearTimeout(timer)
-      window.removeEventListener('scroll', show)
-      window.removeEventListener('wheel', show)
-      window.removeEventListener('touchmove', show)
+      globalThis.removeEventListener('scroll', show)
+      globalThis.removeEventListener('wheel', show)
+      globalThis.removeEventListener('touchmove', show)
       // keydown 핸들러는 inline arrow function 이라 별도 ref 없이 정확 remove 어려움.
       // 본 hook 은 app 진입점에서만 호출 (unmount = 페이지 새로고침) 이라 leak 영향 작음.
       body.classList.remove('is-scrolling')

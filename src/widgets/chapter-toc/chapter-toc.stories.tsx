@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MemoryRouter } from 'react-router-dom'
 import { ChapterToc } from './chapter-toc'
-import type { ChapterIndex } from '../../shared/lib/types'
+import type {ChapterIndex} from '../../entities/chapter'
 
 const meta: Meta<typeof ChapterToc> = {
   title: 'widgets/챕터 목차 (ChapterToc)',

@@ -1,7 +1,7 @@
-import type {Meta, StoryObj} from '@storybook/react'
+import type {Meta, StoryObj} from '@storybook/react-vite'
 import {MemoryRouter} from 'react-router-dom'
 import {CharacterList} from './character-list'
-import type {CharacterIndex} from '../../shared/lib/types'
+import type {CharacterIndex} from '../../entities/character'
 
 const meta: Meta<typeof CharacterList> = {
   title: 'widgets/등장인물 목록 (CharacterList)',
