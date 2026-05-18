@@ -4,25 +4,38 @@ import HERO_IMAGE from '../../shared/images/thumbnail-placeholder.webp?url'
 const HERO_ALT = 'H-eries — 홍도산의 오리지널 웹 시리즈 컬렉션'
 
 /**
- * 홈 페이지 히어로 영역 — 큰 헤드라인 + 부제 + CTA + 컬렉션 hero 이미지.
+ * 홈 페이지 히어로 영역 — 큰 헤드라인 + 부제 + CTA + 컬렉션 hero 이미지 (배경).
  *
- * **디자인 정합** (2026-05-19 시안 img.png + 사용자 명시 이미지 회복):
- * - 좌측 = 캡션 + 큰 헤드라인 + 부제 + CTA + 보조 링크
- * - 우측 = `thumbnail-placeholder.webp` (= H-eries 컬렉션 hero 이미지) — desktop only.
- *   모바일 (`< md`) = 텍스트 stack (이미지 헤드라인 위로).
+ * **디자인 정합** (2026-05-19 시안 img.png + 사용자 명시 배경 이미지):
+ * - `thumbnail-placeholder.webp` (= H-eries 컬렉션 hero) = section 배경 (우측 mask gradient, 가독성)
+ * - 텍스트 = 좌측 (relative z-10) — 큰 헤드라인 + 부제 + CTA
  *
- * **여백 강조** — 헤드라인 ~6vw 큰 글씨, 모바일은 축소.
+ * **여백 강조** — 헤드라인 ~5.5vw 큰 글씨, 모바일은 축소.
  */
 export function HomeHero() {
   return (
-    <section className="grid grid-cols-[1fr_auto] gap-12 items-center py-[clamp(48px,10vh,128px)] max-md:grid-cols-1 max-md:gap-8">
-      <div className="min-w-0 order-2 max-md:order-2">
-        <p className="m-0 mb-6 text-xs sm:text-sm font-medium tracking-[0.24em] uppercase text-fg-3">
+    <section className="relative py-[clamp(48px,10vh,128px)] overflow-hidden">
+      {/* 배경 이미지 — 우측 절반 fade-in, 좌측은 bg 색 (텍스트 가독성).
+          mask-image gradient 로 우측 → 좌측 fade.
+          aria-hidden 장식 이미지 (alt 무관). */}
+      <img
+        src={HERO_IMAGE}
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        className="absolute inset-y-0 right-0 h-full w-[min(60vw,720px)] object-cover object-center opacity-25 pointer-events-none mask-[linear-gradient(to_left,black,transparent_85%)] [-webkit-mask-image:linear-gradient(to_left,black,transparent_85%)]"
+      />
+      {/* sr-only 본 이미지 의미 (screen reader) */}
+      <span className="sr-only">{HERO_ALT}</span>
+
+      <div className="relative z-10 max-w-[min(100%,720px)]">
+        <p
+          className="m-0 mb-6 text-xs sm:text-sm font-medium tracking-[0.24em] uppercase text-fg-3">
           H-eries · Multi-verse Collection
         </p>
 
         <h1
-          className="m-0 mb-8 text-[clamp(36px,5.5vw,64px)] font-bold leading-[1.2] tracking-[-0.02em] text-fg break-keep">
+          className="m-0 mb-8 text-[clamp(36px,5.5vw,68px)] font-bold leading-[1.2] tracking-[-0.02em] text-fg break-keep">
           서로 다른 세계가<br/>
           하나의 상상으로 연결됩니다.
         </h1>
@@ -51,16 +64,6 @@ export function HomeHero() {
           </Link>
         </div>
       </div>
-
-      <figure
-        className="m-0 w-[clamp(220px,28vw,360px)] aspect-square rounded-lg overflow-hidden bg-bg-soft border border-rule shadow-soft order-1 max-md:order-1 max-md:w-full max-md:max-w-[400px] max-md:aspect-video max-md:mx-auto">
-        <img
-          src={HERO_IMAGE}
-          alt={HERO_ALT}
-          loading="eager"
-          className="block w-full h-full object-cover"
-        />
-      </figure>
     </section>
   )
 }

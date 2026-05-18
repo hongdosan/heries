@@ -5,6 +5,7 @@ import {useAsync} from '../../shared/lib/use-async.js'
 import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
 import {Empty, Loading} from '../../shared/ui'
+import PLACEHOLDER_IMG from '../../shared/images/thumbnail-placeholder.webp?url'
 
 /**
  * 시리즈 목록 페이지 (`/series`).
@@ -234,9 +235,17 @@ function SeriesCard({item, index}: Readonly<{item: SeriesIndex; index: number}>)
 function ComingSoonCard({index}: Readonly<{index: number}>) {
   return (
     <li>
-      <div className="grid grid-cols-[minmax(0,1fr)_2fr] gap-7 p-2 -m-2 rounded-lg opacity-60 max-md:grid-cols-1 max-md:gap-4">
-        <div className="aspect-[4/3] bg-[linear-gradient(135deg,var(--bg-soft),var(--bg-sunken))] border border-rule rounded-md relative">
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-fg-4 text-xs font-mono tracking-[0.16em]">
+      <div className="grid grid-cols-[minmax(0,1fr)_2fr] gap-7 p-2 -m-2 rounded-lg opacity-70 max-md:grid-cols-1 max-md:gap-4">
+        <div className="aspect-[4/3] bg-bg-soft border border-rule rounded-md relative overflow-hidden">
+          {/* 임시 = thumbnail-placeholder (H-eries 컬렉션 hero). 실제 시리즈 cover 결정 후 교체. */}
+          <img
+            src={PLACEHOLDER_IMG}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover opacity-40"
+          />
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-fg-3 text-xs font-mono tracking-[0.16em] bg-bg-soft/40">
             <span aria-hidden>⊟</span>
             <span>Vol. 0{index}</span>
           </div>
