@@ -25,8 +25,12 @@ static (`.nojekyll`) 로 발행.
    babel-plugin-react-compiler, Tailwind v4 (`tailwindcss` + `@tailwindcss/vite`), TypeScript 등 *dist 산출물에 0~수 KB 영향* 인 devDependencies 는 허용
    (단, package.json `dependencies` vs `devDependencies` 구분 엄수). React Compiler 는 `compilationMode: 'infer'` 권장 — `'all'` 모드는 plain utility 함수까지 컴파일해 `useMemoCache` hook fail 야기.
 4. **FSD 아키텍처** — 프론트엔드 코드는 `src/` 6 레이어 (`app/pages/widgets/features/entities/shared`). 상위 레이어 → 하위
-   레이어만 import (격리). 슬라이스 외부에서는 `index.ts` (Public API) 만 import. 가이드: [
+   레이어만 import (격리). 슬라이스 외부에서는 `index.ts` (Public API) 만 import. ESLint `no-restricted-imports` per-layer 자동 강제. 가이드: [
    `../src/README.md`](../src/README.md)
+    - **Bottom-Up 작업 흐름** — 신규 코드 = pages 부터 시작. 다른 page 재사용 발견 시 features → entities → shared 순으로 위 레이어 이동. 처음부터 entities/shared 에 두지 X (premature abstraction 회피).
+    - **Segment 네이밍** = 기술적 *목적* (`ui` / `api` / `model` / `lib` / `config`). 성격 (`components` / `hooks`) X.
+    - **widgets/ 활용** — H-eries 는 헤더 SoC 분리 + 페이지 조각 (12 widget) 으로 widgets 적극 활용 (재사용 가치 명확).
+    - **Slice grouping** 미사용 — 단일 작품 도메인 (*차원 격돌*) 단계. 신규 시리즈 추가 시 `pages/{slice-group}/{slice}` 그룹 검토.
 5. **TypeScript strict + JSX** — `tsconfig.json` 의 `strict: true` 유지. `.tsx` 소스만 git 커밋, 빌드 산출물 (
    `dist/`) 은 `.gitignore`. 빌드 = `npm run build` (Vite). 개발 = `npm run dev`.
 6. **단일 작가 가정** — 다인 협업·코드 리뷰 분기 미적용.
