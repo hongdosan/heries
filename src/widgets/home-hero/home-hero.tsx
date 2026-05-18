@@ -19,12 +19,14 @@ export function HomeHero() {
         H-eries · Multi-verse Collection
       </p>
 
-      <h1 className="m-0 mb-8 text-[clamp(36px,6vw,72px)] font-bold leading-[1.2] tracking-[-0.02em] text-fg break-keep">
+      <h1
+        className="m-0 mb-8 text-[clamp(36px,6vw,72px)] font-bold leading-[1.2] tracking-[-0.02em] text-fg break-keep">
         서로 다른 세계가<br/>
         하나의 상상으로 연결됩니다.
       </h1>
 
-      <div className="flex flex-col gap-1 mb-10 text-fg-2 text-base sm:text-md leading-[1.6] break-keep">
+      <div
+        className="flex flex-col gap-1 mb-10 text-fg-2 text-base sm:text-md leading-[1.6] break-keep">
         <p className="m-0">홍도산이 직접 빚어낸 오리지널 웹 시리즈 컬렉션.</p>
         <p className="m-0">등장인물·세계관·능력 체계 모두 작가 본인의 창작입니다.</p>
       </div>
@@ -32,10 +34,10 @@ export function HomeHero() {
       <div className="flex items-center gap-6 flex-wrap">
         <Link
           to="/series"
-          style={{color: 'var(--accent-fg)'}}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-accent rounded-full font-semibold text-sm transition-[transform,background] hover:-translate-y-0.5 hover:bg-accent-hover"
+          style={{background: 'var(--cta-bg)', color: 'var(--cta-fg)'}}
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm transition-[transform,background] hover:-translate-y-0.5 hover:[background:var(--cta-bg-hover)]"
         >
-          시리즈 보러 가기
+          <span>H-eries 보러 가기</span>
           <span aria-hidden="true">→</span>
         </Link>
 
