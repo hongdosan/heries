@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MemoryRouter } from 'react-router-dom'
 import { Footer } from './footer'
 
@@ -23,13 +23,17 @@ type Story = StoryObj<typeof Footer>
 export const Default: Story = {}
 
 export const InDarkBackground: Story = {
-  parameters: {
-    backgrounds: { default: 'dark' },
+  globals: {
+    backgrounds: {
+      value: "dark"
+    }
   },
 }
 
 export const InSunkenBackground: Story = {
-  parameters: {
-    backgrounds: { default: 'sunken' },
+  globals: {
+    backgrounds: {
+      value: "sunken"
+    }
   },
 }

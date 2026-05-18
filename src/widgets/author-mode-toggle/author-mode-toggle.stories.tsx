@@ -1,5 +1,5 @@
-import type {Meta, StoryObj} from '@storybook/react'
-import {expect, userEvent, within} from '@storybook/test'
+import type {Meta, StoryObj} from '@storybook/react-vite'
+import {expect, userEvent, within} from 'storybook/test'
 import {AuthorModeToggle} from './author-mode-toggle'
 import {setAuthorMode} from '../../shared/lib/env.js'
 
@@ -41,15 +41,17 @@ export const Unlocked: Story = {
 
 export const InDarkBackground: Story = {
   name: '다크 배경',
-  parameters: {
-    backgrounds: {default: 'dark'},
-  },
   decorators: [
     (Story) => {
       setAuthorMode(false)
       return <Story />
     },
   ],
+  globals: {
+    backgrounds: {
+      value: "dark"
+    }
+  },
 }
 
 export const OpenedDialog: Story = {

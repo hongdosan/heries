@@ -1,6 +1,6 @@
 {
   "slug": "clash-of-multiverses",
-  "title": "차원의 격돌",
+  "title": "차원 격돌",
   "status": "연재 중",
   "thumbnail": "thumbnails/cover.webp",
   "characters": [
@@ -14,13 +14,13 @@
       "id": "woo-seon-a",
       "folder": "2-major-supporting",
       "name": "우선아",
-      "summary": "주인공 우진혁의 동생. 부모 사망 후 형과 둘이 사는 고등학생."
+      "summary": "주인공 우진혁의 동생."
     },
     {
-      "id": "jo-seong-hun",
+      "id": "kim-seong-hun",
       "folder": "2-major-supporting",
-      "name": "조성훈",
-      "summary": "우진혁의 자대 동기. 서울 출신, 다정한 결."
+      "name": "김성훈",
+      "summary": "우진혁의 자대 동기. 서울 출신, 다정한 성격."
     }
   ],
   "chapters": [

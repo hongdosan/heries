@@ -1,4 +1,4 @@
-import type {Meta, StoryObj} from '@storybook/react'
+import type {Meta, StoryObj} from '@storybook/react-vite'
 import {HeaderActions} from './header-actions'
 import {setAuthorMode} from '../../shared/lib/env.js'
 
@@ -40,13 +40,15 @@ export const AuthorMode: Story = {
 
 export const InDarkBackground: Story = {
   name: '다크 배경',
-  parameters: {
-    backgrounds: {default: 'dark'},
-  },
   decorators: [
     (Story) => {
       setAuthorMode(false)
       return <Story />
     },
   ],
+  globals: {
+    backgrounds: {
+      value: "dark"
+    }
+  },
 }

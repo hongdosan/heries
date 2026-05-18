@@ -1,4 +1,4 @@
-import type { Preview } from '@storybook/react'
+import type { Preview } from '@storybook/react-vite'
 // 사이트 전역 토큰·base·typography·layout·utilities·author-mode·responsive
 import '../src/shared/styles/tokens.css'
 import '../src/shared/styles/tailwind.css'
@@ -24,14 +24,19 @@ const preview: Preview = {
       },
     },
     backgrounds: {
-      default: 'surface',
-      values: [
-        { name: 'surface', value: '#ffffff' },
-        { name: 'sunken', value: '#efefec' },
-        { name: 'dark', value: '#111114' },
-      ],
+      options: {
+        surface: { name: 'surface', value: '#ffffff' },
+        sunken: { name: 'sunken', value: '#efefec' },
+        dark: { name: 'dark', value: '#111114' }
+      }
     },
   },
+
+  initialGlobals: {
+    backgrounds: {
+      value: 'surface'
+    }
+  }
 }
 
 export default preview

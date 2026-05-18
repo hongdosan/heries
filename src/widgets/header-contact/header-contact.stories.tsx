@@ -1,5 +1,5 @@
-import type {Meta, StoryObj} from '@storybook/react'
-import {expect, userEvent, within} from '@storybook/test'
+import type {Meta, StoryObj} from '@storybook/react-vite'
+import {expect, userEvent, within} from 'storybook/test'
 import {HeaderContact} from './header-contact'
 
 const meta: Meta<typeof HeaderContact> = {
@@ -24,15 +24,19 @@ export const Default: Story = {
 
 export const InDarkBackground: Story = {
   name: '다크 배경',
-  parameters: {
-    backgrounds: {default: 'dark'},
+  globals: {
+    backgrounds: {
+      value: "dark"
+    }
   },
 }
 
 export const InSunkenBackground: Story = {
   name: 'sunken 배경',
-  parameters: {
-    backgrounds: {default: 'sunken'},
+  globals: {
+    backgrounds: {
+      value: "sunken"
+    }
   },
 }
 
