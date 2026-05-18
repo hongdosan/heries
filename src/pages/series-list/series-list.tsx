@@ -204,23 +204,23 @@ function SeriesCard({item, index}: Readonly<{item: SeriesIndex; index: number}>)
             </p>
           )}
 
-          <div className="flex items-center gap-4 text-xs text-fg-3 flex-wrap mt-1 tabular-nums">
+          <div className="flex items-center gap-x-4 gap-y-1 text-xs text-fg-3 flex-wrap mt-1 tabular-nums">
             {typeof chapterCount === 'number' && (
-              <span className="inline-flex items-center gap-1.5">
-                <span aria-hidden>📖</span>
-                <span>{chapterCount}화</span>
+              <span className="inline-flex items-baseline gap-1">
+                <span className="text-fg-4">화</span>
+                <span className="text-fg-2 font-medium">{chapterCount}</span>
               </span>
             )}
             {item.started && /^\d{4}-\d{2}-\d{2}$/.test(item.started) && (
-              <span className="inline-flex items-center gap-1.5">
-                <span aria-hidden>📅</span>
-                <time dateTime={item.started}>{item.started} 시작</time>
+              <span className="inline-flex items-baseline gap-1">
+                <span className="text-fg-4">시작</span>
+                <time dateTime={item.started} className="text-fg-2 font-medium">{item.started}</time>
               </span>
             )}
             {recent && (
-              <span className="inline-flex items-center gap-1.5">
-                <span aria-hidden>⏱</span>
-                <span>최근 {recent.slice(5)}</span>
+              <span className="inline-flex items-baseline gap-1">
+                <span className="text-fg-4">최근</span>
+                <span className="text-fg-2 font-medium">{recent.slice(5)}</span>
               </span>
             )}
           </div>
