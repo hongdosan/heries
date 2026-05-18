@@ -59,8 +59,9 @@ export function CharacterPage() {
 
   return (
     <main className={MAIN_CLS}>
-      <nav className="breadcrumb">
+      <nav className="breadcrumb" aria-label="경로">
         <Link to="/">H-eries</Link><span className="sep">/</span>
+        <Link to="/series">시리즈</Link><span className="sep">/</span>
         <Link to={`/series/${slug}`}>{manifest.title}</Link><span className="sep">/</span>
         <span>{fm.name || data.index.name}</span>
       </nav>

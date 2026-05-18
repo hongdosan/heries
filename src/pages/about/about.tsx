@@ -21,7 +21,7 @@ export function AboutPage() {
 
   return (
     <main className="flex-1 w-full max-w-reader mx-auto pt-6 px-[clamp(16px,4vw,32px)] pb-9">
-      <nav className="breadcrumb">
+      <nav className="breadcrumb" aria-label="경로">
         <Link to="/">H-eries</Link>
         <span className="sep">/</span>
         <span>소개</span>

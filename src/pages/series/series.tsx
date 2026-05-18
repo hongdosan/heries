@@ -55,8 +55,9 @@ export function SeriesPage() {
 
   return (
     <main className={mainCls}>
-      <nav className="breadcrumb">
+      <nav className="breadcrumb" aria-label="경로">
         <Link to="/">H-eries</Link><span className="sep">/</span>
+        <Link to="/series">시리즈</Link><span className="sep">/</span>
         <span>{manifest.title}</span>
       </nav>
 

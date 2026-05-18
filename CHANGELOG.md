@@ -10,6 +10,23 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 ---
 
+## [Unreleased]
+
+### Added (홈/시리즈 디자인 개선 — 2026-05-19 시안 정합)
+- **홈 페이지 Hero 재작성** (`widgets/home-hero/home-hero.tsx`) — *H-eries · Multi-verse Collection* 캡션 + 큰 헤드라인 *서로 다른 세계가 / 하나의 상상으로 연결됩니다.* + 부제 2줄 + *시리즈 보러 가기* CTA (검정 둥근 버튼) + *H-eries 소개* 보조 링크. 헤드라인 = clamp(36px, 6vw, 72px). 시안 img.png 정합.
+- **시리즈 목록 페이지 신규** (`/series`) — Breadcrumb + 페이지 헤더 + 통계 (전체/연재 중/완결) + 필터 탭 (URL ?filter=ongoing|done) + 가로형 카드 (썸네일 + 메타 + 자세히 CTA) + Coming soon placeholder. 시안 img_1.png 정합.
+- **헤더 nav 신규** (`widgets/header-nav/`) — *시리즈* / *소개* 텍스트 링크 + 활성 라우트 강조. sm 미만 hidden.
+- **Storybook stories** — home-hero (기본 + 다크) / header-nav (기본 + 시리즈 활성 + 소개 활성)
+- **sitemap** — `/series` 추가 (priority 0.95)
+
+### Changed
+- **홈 페이지** = 작품 목록 섹션 제거 (`/series` 페이지로 분리). Hero CTA 중심 단순화.
+
+### Internal
+- bundle gzip 68.48 → 66.71 KB (-1.77 KB, home chunk 축소)
+
+---
+
 ## [v0.3.1] — 2026-05-18
 
 콘텐츠 (ep-04 + 우선아·김성훈 카드) + 헤더 SoC + FSD segment + dependency major. 상세 = git log 12e65d0.

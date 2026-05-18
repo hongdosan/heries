@@ -10,7 +10,8 @@ static (`.nojekyll`) 로 발행.
 
 1. **모든 `.md` 산출물에 저작권 고지 1줄 부착** — frontmatter 가 없으면 첫 줄, 있으면 frontmatter 직후 줄에 다음 HTML 주석 1줄:
    `<!-- © 2026 홍도산. All rights reserved. Original creator work. -->`
-2. **등장인물 카드 `origin` 필드는 모두 `original`** — 본 프로젝트는 *작가(홍도산) 의 100% 오리지널 창작*. 모든 등장인물·세계관·고유명사·능력·진영은 작가 본인 자작.
+2. **등장인물 카드 `origin` 필드는 모두 `original`** — 본 프로젝트는 *작가의 100% 오리지널 창작*. 모든 등장인물·세계관·고유명사·능력·진영은 작가
+   본인 자작.
     - **카드 구조 (SSOT)** — 카드는 *공개 절* (`## 핵심 정체성` · `## 능력` · `## 인간관계` 등 — reader 빌드 노출) 과 *작가 분기
       절* (`## H-eries 분기 — {작품명} 변형` 이하 — 본 작품 변형 + 스포일러) 을 **분리 작성한다**. 분기 절은 reader 빌드에서 마스킹 (원칙
       #9).
@@ -18,44 +19,78 @@ static (`.nojekyll`) 로 발행.
       기록. 본 필드와 *H-eries 분기 절* 은 모두 reader 빌드에서 마스킹 (원칙 #9).
     - **운영 디테일 미노출** — 위 두 항목은 SSOT 운영 규약으로, `_series.md` 등 reader 노출 문서의 본문에서는 *구현 디테일 (
       필드명·placeholder·절 구조)* 을 노출하지 않는다 (서사 사실만 기술).
-    - **자작 명명 SSOT** — 신규 캐릭터·세계관 도입 시: (a) *닌자·무협 (정파·사파·혈교·천마신교 등)·각성자·회귀자·환생자·판타지* 등 *장르 원형·일반 명사* 는 사용 가능 (b) 고유 호칭·기술명·진영명은 작가 자작 명명을 lorekeeper / worldsmith SSOT 에 등록 후 사용 (c) 본문은 SSOT 등록 명명만 사용. NOTICE.md 의 모든 정책은 운영 SSOT.
-3. **최소 의존 — 런타임은 React 19 + React Router 7 + Vite 6 만** (2026-05-14 정책 v3). 본 의존 외 *런타임* 외부 라이브러리·UI
+    - **자작 명명 SSOT** — 신규 캐릭터·세계관 도입 시: (a) *닌자·무협 (정파·사파·혈교·천마신교 등)·각성자·회귀자·환생자·판타지* 등 *장르 원형·일반
+      명사* 는 사용 가능 (b) 고유 호칭·기술명·진영명은 작가 자작 명명을 lorekeeper / worldsmith SSOT 에 등록 후 사용 (c) 본문은 SSOT
+      등록 명명만 사용. NOTICE.md 의 모든 정책은 운영 SSOT.
+3. **최소 의존 — 런타임은 React 19 + React Router 7 + Vite 6 만** (2026-05-14 정책 v3). 본 의존 외 *런타임* 외부
+   라이브러리·UI
    키트·상태 관리 라이브러리 도입 시 사용자 확인 필수. *의존 추가의 정신* = "코드만 있으면 어디서든 실행 가능" — 특정 빌드 시스템·SaaS·플랫폼에 묶이는 *런타임*
-   의존 금지. **dev 도구는 별도** — Storybook, ESLint 9 + plugins (typescript / react / react-hooks / jsx-a11y),
-   babel-plugin-react-compiler, Tailwind v4 (`tailwindcss` + `@tailwindcss/vite`), TypeScript 등 *dist 산출물에 0~수 KB 영향* 인 devDependencies 는 허용
-   (단, package.json `dependencies` vs `devDependencies` 구분 엄수). React Compiler 는 `compilationMode: 'infer'` 권장 — `'all'` 모드는 plain utility 함수까지 컴파일해 `useMemoCache` hook fail 야기.
+   의존 금지. **dev 도구는 별도** — Storybook, ESLint 9 + plugins (typescript / react / react-hooks /
+   jsx-a11y),
+   babel-plugin-react-compiler, Tailwind v4 (`tailwindcss` + `@tailwindcss/vite`), TypeScript 등
+   *dist 산출물에 0~수 KB 영향* 인 devDependencies 는 허용
+   (단, package.json `dependencies` vs `devDependencies` 구분 엄수). React Compiler 는
+   `compilationMode: 'infer'` 권장 — `'all'` 모드는 plain utility 함수까지 컴파일해 `useMemoCache` hook fail 야기.
 4. **FSD 아키텍처** — 프론트엔드 코드는 `src/` 6 레이어 (`app/pages/widgets/features/entities/shared`). 상위 레이어 → 하위
-   레이어만 import (격리). 슬라이스 외부에서는 `index.ts` (Public API) 만 import. ESLint `no-restricted-imports` per-layer 자동 강제. 가이드: [
+   레이어만 import (격리). 슬라이스 외부에서는 `index.ts` (Public API) 만 import. ESLint `no-restricted-imports`
+   per-layer 자동 강제. 가이드: [
    `../src/README.md`](../src/README.md)
-    - **Bottom-Up 작업 흐름** — 신규 코드 = pages 부터 시작. 다른 page 재사용 발견 시 features → entities → shared 순으로 위 레이어 이동. 처음부터 entities/shared 에 두지 X (premature abstraction 회피).
-    - **Segment 네이밍** = 기술적 *목적* (`ui` / `api` / `model` / `lib` / `config`). 성격 (`components` / `hooks`) X.
+    - **Bottom-Up 작업 흐름** — 신규 코드 = pages 부터 시작. 다른 page 재사용 발견 시 features → entities → shared 순으로 위
+      레이어 이동. 처음부터 entities/shared 에 두지 X (premature abstraction 회피).
+    - **Segment 네이밍** = 기술적 *목적* (`ui` / `api` / `model` / `lib` / `config`). 성격 (`components` /
+      `hooks`) X.
     - **widgets/ 활용** — H-eries 는 헤더 SoC 분리 + 페이지 조각 (12 widget) 으로 widgets 적극 활용 (재사용 가치 명확).
-    - **Slice grouping** 미사용 — 단일 작품 도메인 (*차원 격돌*) 단계. 신규 시리즈 추가 시 `pages/{slice-group}/{slice}` 그룹 검토.
+    - **Slice grouping** 미사용 — 단일 작품 도메인 (*차원 격돌*) 단계. 신규 시리즈 추가 시 `pages/{slice-group}/{slice}` 그룹
+      검토.
 5. **TypeScript strict + JSX** — `tsconfig.json` 의 `strict: true` 유지. `.tsx` 소스만 git 커밋, 빌드 산출물 (
    `dist/`) 은 `.gitignore`. 빌드 = `npm run build` (Vite). 개발 = `npm run dev`.
 6. **단일 작가 가정** — 다인 협업·코드 리뷰 분기 미적용.
 7. **GitHub 공개 저장소** — 비공개 토큰·시크릿·개인 식별 정보(이메일·주소 등) 산출물 포함 금지.
 8. **누적 산출물 최적화 강제** — append-only 구조는 임계 초과 시 압축 의무. 변경 이력 hot **20행** / 핸드오프 = 단일 파일 `CURRENT.md`
    덮어쓰기 (정책 v3). 점검 시점 = *세션 시작 직후* + *세션 종료 직전*. 절차: §누적 산출물.
-9. **스포일러 분리 (작가 모드 unlock)** *(2026-05-14 정책 v2)* — 라이브 사이트는 **단일 빌드**. 작가 콘텐츠도 dist 에 평문 포함되나 *기본 화면에서는 마스킹*. 작가 모드 진입 = `/unlock` 페이지에서 **암호 입력** (또는 `?unlock=KEY` 쿼리). 검증 통과 시 sessionStorage `heries:author=1` set → 마스킹 해제 + AUTHOR 배지. 탭 닫으면 자동 잠금. 마스킹 대상 = (a) `_series.md` 의 `## 시놉시스` 절 (b) 캐릭터 카드의 `## H-eries 분기 ~` 이하 모든 절 (c) frontmatter `heries_arc` (d) `worldbuilding/timeline/glossary/` 페이지·라우트 진입 차단 (e) 등장인물 상세 페이지 — 주인공 (`1-protagonist`) 외 차단. **보안 수준**: devtools 우회 가능 (능동 우회는 *독자 자기 책임* — 본인이 스포 보면 자기 손해). 키 = `VITE_AUTHOR_KEY` 빌드 환경변수 (`.env.local` gitignore + GitHub Secret), 코드/git 노출 0.
-10. **작가 원칙 SSOT — 강제 적용** *(2026-05-18 활성화)*. 모든 챕터 작성 / 카드 정정 / 본문 개선 작업 전 [`../content/series/clash-of-multiverses/worldbuilding/writing-principles.md`](../content/series/clash-of-multiverses/worldbuilding/writing-principles.md) **Read 필수**. 핵심 강제 사항:
-    - **비각성자 부대 = 자율 입대 정예 특수부대** (일반 한국 군대 X). 입대 동기 = (a) 돈 (b) 자부심 (c) 멋있어서 (d) 할게 없어서 (e) 지켜야 할 무언가·마수 증오 중 하나. *때 됐다 / 부모님 권유* 류 절대 X.
-    - **각성 = 단순 운 (심사 X)**. 각성자는 **헌터** (군인 X, 군 산하 X). 비각성자 부대 (특수부대, 군) ↔ 각성자 헌터 (별도 조직). 본문 표현 = *각성자 헌터* / *헌터*. *한 번뿐인 각성 심사* / *각성자 분대* / *각성자 부대* 표현 절대 X — 올바른 표현 = *각성하지 못한 자* / *각성자 헌터*. 각성자 등급 측정 (각성 후 헌터 랭킹) 은 별개 시스템 (*등급 심사* X → *등급 측정*).
-    - **각성자 = 길드 + 각성자 협회 (각성자 정부)**. 현 세상은 각성자가 *길드* 라는 단체로 이끌고, *각성자 협회* 가 길드를 관할하는 최상위 *각성자 자치 정부*. 일반 (비각성자) 정부와는 별개. 마수 출몰 신고·헌터 팀 출동·등급 측정 모두 협회 주관. 군 본부 ↔ 협회 간 협의 채널로 작전 동기화.
+9. **스포일러 분리 (작가 모드 unlock)** *(2026-05-14 정책 v2)* — 라이브 사이트는 **단일 빌드**. 작가 콘텐츠도 dist 에 평문 포함되나 *기본
+   화면에서는 마스킹*. 작가 모드 진입 = `/unlock` 페이지에서 **암호 입력** (또는 `?unlock=KEY` 쿼리). 검증 통과 시 sessionStorage
+   `heries:author=1` set → 마스킹 해제 + AUTHOR 배지. 탭 닫으면 자동 잠금. 마스킹 대상 = (a) `_series.md` 의 `## 시놉시스`
+   절 (b) 캐릭터 카드의 `## H-eries 분기 ~` 이하 모든 절 (c) frontmatter `heries_arc` (d)
+   `worldbuilding/timeline/glossary/` 페이지·라우트 진입 차단 (e) 등장인물 상세 페이지 — 주인공 (`1-protagonist`) 외 차단. *
+   *보안 수준**: devtools 우회 가능 (능동 우회는 *독자 자기 책임* — 본인이 스포 보면 자기 손해). 키 = `VITE_AUTHOR_KEY` 빌드 환경변수 (
+   `.env.local` gitignore + GitHub Secret), 코드/git 노출 0.
+10. **작가 원칙 SSOT — 강제 적용** *(2026-05-18 활성화)*. 모든 챕터 작성 / 카드 정정 / 본문 개선 작업 전 [
+    `../content/series/clash-of-multiverses/worldbuilding/writing-principles.md`](../content/series/clash-of-multiverses/worldbuilding/writing-principles.md)
+    **Read 필수**. 핵심 강제 사항:
+    - **비각성자 부대 = 자율 입대 정예 특수부대** (일반 한국 군대 X). 입대 동기 = (a) 돈 (b) 자부심 (c) 멋있어서 (d) 할게 없어서 (e) 지켜야 할
+      무언가·마수 증오 중 하나. *때 됐다 / 부모님 권유* 류 절대 X.
+    - **각성 = 단순 운 (심사 X)**. 각성자는 **헌터** (군인 X, 군 산하 X). 비각성자 부대 (특수부대, 군) ↔ 각성자 헌터 (별도 조직). 본문 표현 =
+      *각성자 헌터* / *헌터*. *한 번뿐인 각성 심사* / *각성자 분대* / *각성자 부대* 표현 절대 X — 올바른 표현 = *각성하지 못한 자* / *각성자
+      헌터*. 각성자 등급 측정 (각성 후 헌터 랭킹) 은 별개 시스템 (*등급 심사* X → *등급 측정*).
+    - **각성자 = 길드 + 각성자 협회 (각성자 정부)**. 현 세상은 각성자가 *길드* 라는 단체로 이끌고, *각성자 협회* 가 길드를 관할하는 최상위 *각성자 자치
+      정부*. 일반 (비각성자) 정부와는 별개. 마수 출몰 신고·헌터 팀 출동·등급 측정 모두 협회 주관. 군 본부 ↔ 협회 간 협의 채널로 작전 동기화.
     - **"제대" / "전역" 개념 X → 퇴소** (부상 또는 자의). *제대할 때쯤* / *전역 후* 표현 절대 X.
-    - **챕터 본문 = 액션·판타지·소설 톤**. 시처럼·국어선생님처럼 X. 잔잔한 일과 묘사 위주 X. *한 박자 머물렀다 / 지나갔다* 류 박자·정적 묘사 반복 X. *"~ 했다. 다. 했다."* 단조 종결어 반복 X.
+    - **챕터 본문 = 액션·판타지·소설 톤**. 시처럼·국어선생님처럼 X. 잔잔한 일과 묘사 위주 X. *한 박자 머물렀다 / 지나갔다* 류 박자·정적 묘사 반복 X.
+      *"~ 했다. 다. 했다."* 단조 종결어 반복 X.
     - **대화 중심**. 인물 간 *주고받는 대화* 가 사건 끌고 가야. § 절반 이상이 묘사·내면이면 위반.
     - **자연 한국어**. *유도 동기* / *첫 손이 간다* / *진하게 가다* / *119 있다가 왔다* 류 어색 신조 X.
     - **다나까 존대 정합**. 같은 계급 자대 첫 만남 = 다나까. 분대장 → 신참 = 반말.
     - **"결" 단어** 절대 X.
-    - **캐릭터 카드 스포일러 = 분기 절** (`## H-eries 분기 — 차원 격돌 변형`) 으로만. 사망·미래 사건·핵심 반전은 *공개 절* / role / summary 절대 노출 X.
+    - **캐릭터 카드 스포일러 = 분기 절** (`## H-eries 분기 — 차원 격돌 변형`) 으로만. 사망·미래 사건·핵심 반전은 *공개 절* / role /
+      summary 절대 노출 X.
     - **나이 = 한국 나이** (고졸 직후 입대 = 만 20세).
     - 위반 시 사용자 분노 사유. 즉시 정정 + memory 갱신.
 11. **공통 컴포넌트 (`shared/ui/`) 스토리북 강제** (2026-05-14 신설) — `src/shared/ui/{name}/` 신규 컴포넌트 추가 시 동일
     슬라이스에 `{name}.stories.tsx` **반드시** 함께 작성. 누락 = 정책 위반. 스토리는 의미 있는 variant 최소 2 개 + 정상 케이스 1 개 (=
     최소 3 스토리). `widgets/`, `features/` 슬라이스는 권장 (강제 X). `pages/` 는 라우팅 의존이라 미적용.
-12. **AI 개발 흐름 강제** (2026-05-14 신설) — auto-mode (자율 진행) 또는 3 파일 이상 변경 / 신규 슬라이스 도입 / 콘텐츠 SSOT 갱신 시 [`./workflow/workflow.md`](./workflow/workflow.md) 의 6 단계 흐름 (Context → Prompt QA → Roadmap → Tech Review → Adaptive Execution → Commit/Close) 강제. 트랙별 프롬프트 템플릿: [`develop`](./workflow/template/prompt-template-develop.md) / [`improvement`](./workflow/template/prompt-template-improvement.md) / [`review`](./workflow/template/prompt-template-review.md). 단일 기준점: [`prompt-reference.md`](./workflow/template/prompt-reference.md).
-13. **개인 정보 / 시크릿 절대 비공개** *(2026-05-14 신설)* — 다음 데이터는 **코드 / git / dist 에 절대 포함 금지**: (a) 개인 식별 정보 — 실주소·실전화·실생년월일·실명 (이메일 `contact_hongdosan@naver.com` 은 공개 채널이라 예외) (b) API 키·토큰·시크릿 (c) DB 비밀번호·인증 정보 (d) 작가 모드 키 (`VITE_AUTHOR_KEY` — `.env.local` + GitHub Secret 만, hardcoded X) (e) OAuth secrets·결제 정보. 검증 = `scripts/check-secrets.mjs` (build 게이트 — 시크릿 패턴 정규식 검출). 위반 시 build fail.
+12. **AI 개발 흐름 강제** (2026-05-14 신설) — auto-mode (자율 진행) 또는 3 파일 이상 변경 / 신규 슬라이스 도입 / 콘텐츠 SSOT 갱신 시 [
+    `./workflow/workflow.md`](./workflow/workflow.md) 의 6 단계 흐름 (Context → Prompt QA → Roadmap →
+    Tech Review → Adaptive Execution → Commit/Close) 강제. 트랙별 프롬프트 템플릿: [
+    `develop`](./workflow/template/prompt-template-develop.md) / [
+    `improvement`](./workflow/template/prompt-template-improvement.md) / [
+    `review`](./workflow/template/prompt-template-review.md). 단일 기준점: [
+    `prompt-reference.md`](./workflow/template/prompt-reference.md).
+13. **개인 정보 / 시크릿 절대 비공개** *(2026-05-14 신설)* — 다음 데이터는 **코드 / git / dist 에 절대 포함 금지**: (a) 개인 식별
+    정보 — 실주소·실전화·실생년월일·실명 (이메일 `contact_hongdosan@naver.com` 은 공개 채널이라 예외) (b) API 키·토큰·시크릿 (c) DB
+    비밀번호·인증 정보 (d) 작가 모드 키 (`VITE_AUTHOR_KEY` — `.env.local` + GitHub Secret 만, hardcoded X) (e)
+    OAuth secrets·결제 정보. 검증 = `scripts/check-secrets.mjs` (build 게이트 — 시크릿 패턴 정규식 검출). 위반 시 build
+    fail.
 
 ## 도구 우선순위
 
@@ -97,7 +132,7 @@ H-eries 작업은 **`H-eries-orchestrator` 스킬** ([
 | 트리거 키워드                                                           | 호출 에이전트                                | 정의                                                                                   |
 |-------------------------------------------------------------------|----------------------------------------|--------------------------------------------------------------------------------------|
 | "등장인물 추가/갱신", "캐릭터 카드", "origin 누락", "무공 정정", "사부·문파"             | `H-eries-lorekeeper`                   | [`./agents/H-eries-lorekeeper.md`](./agents/H-eries-lorekeeper.md)                   |
-| "세계관 추가", "연표 갱신", "용어집", "`_series.md`", "페이즈 구조"    | `H-eries-worldsmith`                   | [`./agents/H-eries-worldsmith.md`](./agents/H-eries-worldsmith.md)                   |
+| "세계관 추가", "연표 갱신", "용어집", "`_series.md`", "페이즈 구조"                | `H-eries-worldsmith`                   | [`./agents/H-eries-worldsmith.md`](./agents/H-eries-worldsmith.md)                   |
 | "챕터 작성", "ep-NN 작성", "본문 집필", "시놉시스 받아", "떡밥 매설"                  | `H-eries-author` (→ 자동 reviewer 파이프라인) | [`./agents/H-eries-author.md`](./agents/H-eries-author.md)                           |
 | "정합성 감사", "연속성 검증", "챕터 검수", "SSOT 정합", "떡밥 추적"                   | `H-eries-continuity-reviewer`          | [`./agents/H-eries-continuity-reviewer.md`](./agents/H-eries-continuity-reviewer.md) |
 | "컴포넌트 추가/수정", "렌더러", "UX 개선", "FSD", "빌드 스크립트", "타입 에러", "마스킹 로직" | `H-eries-frontend-engineer`            | [`./agents/H-eries-frontend-engineer.md`](./agents/H-eries-frontend-engineer.md)     |
