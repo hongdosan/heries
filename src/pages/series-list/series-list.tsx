@@ -70,21 +70,18 @@ function SeriesListContent({items}: Readonly<{ items: SeriesIndex[] }>) {
         <span>시리즈</span>
       </nav>
 
-      <header className="mb-10 pb-6 border-b border-rule">
-        <p className="m-0 mb-3 text-xs sm:text-sm font-medium tracking-[0.24em] uppercase text-fg-3">
-          Multi-verse Collection
-        </p>
+      <header className="mb-10 py-4 border-b border-rule">
+
         <div className="flex items-baseline justify-between gap-6 flex-wrap">
-          <h1 className="m-0 text-[clamp(32px,5vw,56px)] font-normal tracking-[-0.02em] leading-[1.1]">
+          <h1
+            className="m-0 text-[clamp(32px,5vw,56px)] font-normal tracking-[-0.02em] leading-[1.1]">
             시리즈
           </h1>
-          <div className="text-sm text-fg-3 tabular-nums flex items-baseline gap-3">
-            <span>전체 <b className="text-fg">{total}</b>편</span>
-            <span aria-hidden>·</span>
-            <span>연재 중 <b className="text-fg">{ongoing}</b></span>
-            <span aria-hidden>·</span>
-            <span>완결 <b className="text-fg">{done}</b></span>
-          </div>
+
+          <p
+            className="m-0 mb-3 text-xs sm:text-sm font-medium tracking-[0.24em] uppercase text-fg-3">
+            Multi-verse Collection
+          </p>
         </div>
       </header>
 
