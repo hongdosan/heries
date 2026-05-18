@@ -23,7 +23,7 @@ export function HomeHero() {
         alt=""
         aria-hidden="true"
         loading="eager"
-        className="absolute inset-y-0 right-0 h-full w-[min(60vw,720px)] object-cover object-center opacity-25 pointer-events-none mask-[linear-gradient(to_left,black,transparent_85%)] [-webkit-mask-image:linear-gradient(to_left,black,transparent_85%)]"
+        className="absolute inset-y-0 right-0 h-full w-[min(100vw,1000px)] object-cover object-center opacity-30 pointer-events-none mask-[linear-gradient(to_left,black,transparent_85%)] [-webkit-mask-image:linear-gradient(to_left,black,transparent_85%)]"
       />
       {/* sr-only 본 이미지 의미 (screen reader) */}
       <span className="sr-only">{HERO_ALT}</span>

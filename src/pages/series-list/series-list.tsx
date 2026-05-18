@@ -245,8 +245,7 @@ function ComingSoonCard({index}: Readonly<{index: number}>) {
             loading="lazy"
             className="absolute inset-0 w-full h-full object-cover opacity-40"
           />
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-fg-3 text-xs font-mono tracking-[0.16em] bg-bg-soft/40">
-            <span aria-hidden>⊟</span>
+          <div className="absolute inset-0 flex items-center justify-center text-fg-3 text-xs font-mono tracking-[0.16em] bg-bg-soft/40">
             <span>Vol. 0{index}</span>
           </div>
         </div>
