@@ -1,11 +1,13 @@
 import {Link, useSearchParams} from 'react-router-dom'
-import {fetchSeriesIndex, fetchSeriesManifest, type SeriesIndex} from '../../entities/series'
+import {fetchSeriesIndex, fetchSeriesManifest, type SeriesIndex, type SeriesManifest} from '../../entities/series'
 import {assetUrl} from '../../shared/lib/env.js'
 import {useAsync} from '../../shared/lib/use-async.js'
 import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
 import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
 import {Empty, Loading} from '../../shared/ui'
 import PLACEHOLDER_IMG from '../../shared/images/thumbnail-placeholder.webp?url'
+
+type ManifestMap = ReadonlyMap<string, SeriesManifest>
 
 /**
  * 시리즈 목록 페이지 (`/series`).
@@ -19,13 +21,21 @@ import PLACEHOLDER_IMG from '../../shared/images/thumbnail-placeholder.webp?url'
  */
 export function SeriesListPage() {
   useDocumentTitle('시리즈')
-  const state = useAsync(() => fetchSeriesIndex(), [])
+  // page-level pre-fetch — series.json + 모든 시리즈 manifest 병렬 fetch.
+  // 카드 마다 별도 useAsync (N+1) 폐기 → 1 + Promise.all(N) round trip + UI 깜빡임 0.
+  const state = useAsync(async () => {
+    const index = await fetchSeriesIndex()
+    const manifestEntries = await Promise.all(
+      index.series.map(async (s) => [s.slug, await fetchSeriesManifest(s.slug)] as const),
+    )
+    return {items: index.series, metas: new Map(manifestEntries) as ManifestMap}
+  }, [])
 
   if (state.status === 'loading') return <main className={MAIN_CLS}><Loading/></main>
   if (state.status === 'error') return <main className={MAIN_CLS}>
     <Empty>오류: {state.error.message}</Empty></main>
 
-  return <SeriesListContent items={state.data.series}/>
+  return <SeriesListContent items={state.data.items} metas={state.data.metas}/>
 }
 
 const MAIN_CLS = 'flex-1 w-full max-w-page mx-auto pt-7 px-[clamp(16px,4vw,32px)] pb-9'
@@ -34,7 +44,7 @@ type Filter = 'all' | 'ongoing' | 'done'
 const FILTER_LABEL: Record<Filter, string> = {all: '전체', ongoing: '연재 중', done: '완결'}
 const FILTER_KEYS: ReadonlySet<Filter> = new Set(['all', 'ongoing', 'done'])
 
-function SeriesListContent({items}: Readonly<{ items: SeriesIndex[] }>) {
+function SeriesListContent({items, metas}: Readonly<{items: SeriesIndex[]; metas: ManifestMap}>) {
   // 정렬 = 시작일 최신 순 (started 내림차순), 미시작은 뒤로.
   // 필터 = URL ?filter=ongoing|done|all (기본 all).
   const [searchParams, setSearchParams] = useSearchParams()
@@ -108,7 +118,7 @@ function SeriesListContent({items}: Readonly<{ items: SeriesIndex[] }>) {
       ) : (
         <ul className="m-0 p-0 list-none flex flex-col gap-8">
           {visible.map((item, idx) => (
-            <SeriesCard key={item.slug} item={item} index={idx + 1}/>
+            <SeriesCard key={item.slug} item={item} index={idx + 1} manifest={metas.get(item.slug)}/>
           ))}
           {filter === 'all' && <ComingSoonCard index={visible.length + 1}/>}
         </ul>
@@ -144,7 +154,7 @@ function FilterTab({
   )
 }
 
-function SeriesCard({item, index}: Readonly<{ item: SeriesIndex; index: number }>) {
+function SeriesCard({item, index, manifest}: Readonly<{item: SeriesIndex; index: number; manifest: SeriesManifest | undefined}>) {
   const cover = useImgFallback()
   let src: string | null
   if (cover.fatal) src = null
@@ -152,19 +162,18 @@ function SeriesCard({item, index}: Readonly<{ item: SeriesIndex; index: number }
   else src = assetUrl(`content/${item.thumbnail}`)
 
   const ongoing = item.status === '연재 중'
-  const meta = useAsync(() => fetchSeriesManifest(item.slug), [item.slug])
 
-  // 최근 갱신일 = manifest 의 chapters 중 published 최댓값 (chapters 없거나 부정확 시 fallback = started)
+  // 최근 갱신일 = manifest.chapters 중 published 최댓값. page-level pre-fetch (props 전달) — N+1 fetch 폐기.
   let recent: string | undefined
   let chapterCount: number | undefined
-  if (meta.status === 'success') {
-    const chapters = meta.data.chapters
+  if (manifest) {
+    const chapters = manifest.chapters
     chapterCount = chapters.length
     if (chapters.length > 0) {
       const dates = chapters
-      .map((c) => c.published)
-      .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
-      .sort()
+        .map((c) => c.published)
+        .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
+        .sort((a, b) => a.localeCompare(b))
       recent = dates.at(-1)
     }
   }
@@ -176,7 +185,7 @@ function SeriesCard({item, index}: Readonly<{ item: SeriesIndex; index: number }
         to={`/series/${item.slug}`}
         className="grid grid-cols-[minmax(0,1fr)_2fr] gap-7 p-2 -m-2 rounded-lg transition-colors hover:bg-bg-soft group max-md:grid-cols-1 max-md:gap-4"
       >
-        <div className="aspect-[4/3] bg-bg-sunken border border-rule rounded-md overflow-hidden">
+        <div className="aspect-4/3 bg-bg-sunken border border-rule rounded-md overflow-hidden">
           {src ? (
             <img
               src={src}
@@ -252,7 +261,7 @@ function ComingSoonCard({index}: Readonly<{ index: number }>) {
       <div
         className="grid grid-cols-[minmax(0,1fr)_2fr] gap-7 p-2 -m-2 rounded-lg opacity-70 max-md:grid-cols-1 max-md:gap-4">
         <div
-          className="aspect-[4/3] bg-bg-soft border border-rule rounded-md relative overflow-hidden">
+          className="aspect-4/3 bg-bg-soft border border-rule rounded-md relative overflow-hidden">
           {/* 임시 = thumbnail-placeholder (H-eries 컬렉션 hero). 실제 시리즈 cover 결정 후 교체. */}
           <img
             src={PLACEHOLDER_IMG}
