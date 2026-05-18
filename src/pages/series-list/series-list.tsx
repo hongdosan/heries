@@ -79,7 +79,7 @@ function SeriesListContent({items}: Readonly<{ items: SeriesIndex[] }>) {
           </h1>
 
           <p
-            className="m-0 mb-3 text-xs sm:text-sm font-medium tracking-[0.24em] uppercase text-fg-3">
+            className="m-0 text-xs sm:text-sm font-medium tracking-[0.24em] uppercase text-fg-3">
             Multi-verse Collection
           </p>
         </div>

@@ -59,7 +59,7 @@ export function UnlockPage() {
 
   return (
     <main className="max-w-120 mx-auto pt-5 px-4 pb-7">
-      <nav className="breadcrumb">
+      <nav className="breadcrumb" aria-label="경로">
         <Link to="/">H-eries</Link>
         <span className="sep">/</span>
         <span>작가 모드</span>

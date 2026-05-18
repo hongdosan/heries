@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {NavLink, useLocation} from 'react-router-dom'
 import {useDialog} from '../../shared/lib/use-dialog.js'
 
@@ -33,10 +33,13 @@ export function HeaderMobileMenu() {
   const [openedPath, setOpenedPath] = useState<string | null>(null)
 
   // 라우트 변경 감지 — open 시점 path 저장 후 변경되면 close.
-  if (openedPath !== null && openedPath !== location.pathname) {
-    setOpenedPath(null)
-    close()
-  }
+  // imperative dialog.close() 호출은 render 외부 (effect) 에서 — render purity 정합.
+  useEffect(() => {
+    if (openedPath !== null && openedPath !== location.pathname) {
+      setOpenedPath(null)
+      close()
+    }
+  }, [location.pathname, openedPath, close])
 
   const handleOpen = () => {
     setOpenedPath(location.pathname)
