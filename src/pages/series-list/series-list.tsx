@@ -112,9 +112,6 @@ function SeriesListContent({items}: Readonly<{items: SeriesIndex[]}>) {
         </ul>
       )}
 
-      <p className="mt-12 text-center text-sm">
-        <Link to="/about" className="text-fg-3 hover:text-accent">H-eries 소개 →</Link>
-      </p>
     </main>
   )
 }
