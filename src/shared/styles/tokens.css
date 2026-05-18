@@ -29,10 +29,10 @@
   /* accent 배경 위 텍스트 색 — 라이트 = 흰색 (남색 위), 다크 = 진한 글자 (밝은 파랑 위). 다크 [data-theme] 룰에서 override. */
   --accent-fg: #ffffff;
 
-  /* CTA primary (홈 *H-eries 보러 가기* 등) — 라이트 = 파란 배경 + 흰 글자 / 다크 = 흰 배경 + 파란 글자 (사용자 명시 컨벤션) */
-  --cta-bg: var(--accent);
+  /* CTA primary (홈 *H-eries 보러 가기* 등) — 라이트/다크 모드 동일 = 파란 배경 + 흰 글자 (사용자 명시 — 다크 모드도 컨벤션 유지) */
+  --cta-bg: #3050a0;
   --cta-fg: #ffffff;
-  --cta-bg-hover: var(--accent-hover);
+  --cta-bg-hover: #1f3878;
 
   --rule: #e6e6e2;
   --rule-strong: #cfcfcb;
@@ -99,11 +99,6 @@
     /* 다크 모드의 --accent 가 밝은 파랑 → 위에 진한 글자가 가독성 ↑ */
     --accent-fg: #16161a;
 
-    /* 다크 모드 CTA — 흰 배경 + 파란 글자 (사용자 명시 컨벤션) */
-    --cta-bg: #ffffff;
-    --cta-fg: var(--accent);
-    --cta-bg-hover: #ebebef;
-
     --rule: #2a2a30;
     --rule-strong: #3a3a42;
 
@@ -130,11 +125,6 @@
 
   --accent: #8aaaff;
   --accent-hover: #b0c5ff;
-
-  /* 다크 모드 CTA — 흰 배경 + 파란 글자 (사용자 명시 컨벤션, data-theme override) */
-  --cta-bg: #ffffff;
-  --cta-fg: var(--accent);
-  --cta-bg-hover: #ebebef;
 
   --accent-soft: rgba(138, 170, 255, 0.10);
   --accent-ring: rgba(138, 170, 255, 0.30);
