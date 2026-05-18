@@ -1,6 +1,6 @@
 ---
-title: NOTICE
-updated: 2026-05-12
+title: 저작권 고지 (NOTICE)
+updated: 2026-05-18
 ---
 
 <!-- © 2026 홍도산. All rights reserved. Original creator work. -->

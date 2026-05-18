@@ -2,10 +2,12 @@
   "series": [
     {
       "slug": "clash-of-multiverses",
-      "title": "차원의 격돌",
+      "title": "차원 격돌",
       "status": "연재 중",
       "started": "2026-05-15",
-      "thumbnail": "series/clash-of-multiverses/thumbnails/cover.webp"
+      "thumbnail": "series/clash-of-multiverses/thumbnails/cover.webp",
+      "description": "마수가 처음 출현한 도시의 우진혁. 그는 언제나 생사의 경계를 넘어 죽음을 몰고 온다.",
+      "chapterCount": 4
     }
   ]
 }

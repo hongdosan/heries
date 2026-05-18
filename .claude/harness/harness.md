@@ -2,7 +2,7 @@
 
 # H-eries 하네스 — 인덱스
 
-`H-eries` 는 *나만의 웹 시리즈* 정적 사이트 프로젝트. 이름은 `홍도산` 의 `h` + `series` 의 `eries`. 첫 작품 `차원의 격돌` (`series/clash-of-multiverses/`) 을 비롯한 소설을 markdown / HTML 만으로 발행하며, **라이브러리 의존성 0**.
+`H-eries` 는 *나만의 웹 시리즈* 정적 사이트 프로젝트. 이름은 `홍도산` 의 `h` + `series` 의 `eries`. 첫 작품 `차원 격돌` (`series/clash-of-multiverses/`) 을 비롯한 소설을 markdown / HTML 만으로 발행하며, **라이브러리 의존성 0**.
 
 본 디렉토리는 [revfactory/harness](https://github.com/revfactory/harness) 플러그인 위에서 운영되는 *문서 기반 프로세스 하네스* 의 3종 문서를 보관한다.
 

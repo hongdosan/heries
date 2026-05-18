@@ -127,7 +127,7 @@ Claude Code 세션에서 다음 자연어 프롬프트 입력:
 하네스 구성해줘.
 
 도메인: 작가 hongdosan 의 오리지널 웹 시리즈 'H-eries' 의 등장인물·세계관·연표·용어집을 markdown SSOT 로 관리·검증하는 에이전트.
-첫 작품: series/clash-of-multiverses/ (차원의 격돌).
+첫 작품: series/clash-of-multiverses/ (차원 격돌).
 등장인물 .md 스키마: frontmatter (name, origin: original, role, first_appearance, reader_snapshot, heries_arc, aliases, summary) + 서술 본문.
 모든 캐릭터는 origin: original (100% 자작).
 정적 사이트는 라이브러리 의존성 0 — markdown / HTML 만 사용. GitHub Pages raw static (`.nojekyll`).

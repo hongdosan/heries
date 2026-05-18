@@ -1,2 +1,2 @@
-export { loadCharacter } from './character.js'
-export type { CharacterPageData } from './character.js'
+export {loadCharacter} from './api/load-character.js'
+export type {CharacterFolder, CharacterFrontmatter, CharacterIndex, CharacterPageData} from './model/types.js'

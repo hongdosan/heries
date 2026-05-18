@@ -17,8 +17,10 @@ import {ThemeToggle} from '../theme-toggle'
  * - {@link HeaderContact} — 작가 문의 (이메일 복사 / 메일 보내기 다이얼로그)
  */
 export function HeaderActions() {
+  // role="group" 폐기 — jsx-a11y/prefer-tag-over-role 권장 semantic (details/fieldset/optgroup/address) 가 모두 의미 mismatch.
+  // 시각 그룹화는 inline-flex+gap 으로 충분. screen reader 그룹 인식은 약화되나 각 토글이 자체 aria-label 보유.
   return (
-    <div className="inline-flex items-center gap-1">
+    <div className="inline-flex items-center gap-1" aria-label="페이지 액션">
       <ThemeToggle/>
       <HeaderContact/>
       <AuthorModeToggle/>

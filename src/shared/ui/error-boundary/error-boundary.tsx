@@ -41,13 +41,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   handleReload = (): void => {
-    window.location.reload()
+    globalThis.location.reload()
   }
 
   handleHome = (): void => {
     // import.meta.env.BASE_URL 은 vite base 값 (production='/H-eries/', dev/author='/').
     // BrowserRouter basename 과 맞추어 홈으로 이동.
-    window.location.assign(import.meta.env.BASE_URL)
+    globalThis.location.assign(import.meta.env.BASE_URL)
   }
 
   override render(): ReactNode {

@@ -1,8 +1,8 @@
-import {type FormEvent, useEffect, useState} from 'react'
+import {useEffect, useState, type SubmitEventHandler} from 'react'
 import {Link, useNavigate, useSearchParams} from 'react-router-dom'
 import {isAuthorMode, setAuthorMode, verifyAuthorKey} from '../../shared/lib/env.js'
 import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
-import {Button} from '../../shared/ui/button'
+import {Button} from '../../shared/ui'
 
 // 작가 모드 진입 페이지. 정책 #9 v2 (2026-05-14).
 // - 폼: 작가 키 입력 → verifyAuthorKey 검증 통과 시 sessionStorage 플래그 set.
@@ -34,7 +34,8 @@ export function UnlockPage() {
     setParams(next, {replace: true})
   }, [params, setParams])
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  // React 19 의 @types/react 에서 FormEvent / FormEventHandler 가 deprecated → SubmitEventHandler 사용.
+  const onSubmit: SubmitEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault()
     if (!input) {
       setError('키를 입력해 주세요.')
@@ -57,7 +58,7 @@ export function UnlockPage() {
   }
 
   return (
-    <main className="max-w-[480px] mx-auto pt-5 px-4 pb-7">
+    <main className="max-w-120 mx-auto pt-5 px-4 pb-7">
       <nav className="breadcrumb">
         <Link to="/">H-eries</Link>
         <span className="sep">/</span>

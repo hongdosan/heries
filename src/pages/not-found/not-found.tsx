@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom'
-import { useDocumentTitle } from '../../shared/lib/use-document-title.js'
-import { Empty } from '../../shared/ui/empty'
+import {Link} from 'react-router-dom'
+import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
+import {Empty} from '../../shared/ui'
 
 export function NotFoundPage() {
   useDocumentTitle('페이지를 찾을 수 없습니다')

@@ -1,4 +1,4 @@
-import type {Meta, StoryObj} from '@storybook/react'
+import type {Meta, StoryObj} from '@storybook/react-vite'
 import {Gwangsalgeom} from './gwangsalgeom'
 
 // 광살검 (gwangsalgeom 슬라이스) — 가로 진행 검술·장풍·이형환위 액션 시연.

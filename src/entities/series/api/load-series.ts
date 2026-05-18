@@ -1,14 +1,10 @@
-import type { DocFile, SeriesFrontmatter, SeriesManifest } from '../../shared/lib/types.js'
-import { parseFrontmatter } from '../../shared/lib/frontmatter.js'
-import { renderMarkdown } from '../../shared/lib/markdown.js'
-import { fetchMarkdown, fetchSeriesManifest } from '../../shared/lib/manifest.js'
-import { maskSpoilersFromMarkdown, maskSpoilersFromFrontmatter } from '../../shared/lib/spoiler.js'
-
-export interface SeriesPageData {
-  frontmatter: SeriesFrontmatter
-  bodyHtml: string
-  manifest: SeriesManifest
-}
+import type {DocFile} from '../../../shared/lib/types.js'
+import {parseFrontmatter} from '../../../shared/lib/frontmatter.js'
+import {renderMarkdown} from '../../../shared/lib/markdown.js'
+import {fetchMarkdown} from '../../../shared/api/markdown.js'
+import {fetchSeriesManifest} from './fetch-manifest.js'
+import {maskSpoilersFromMarkdown, maskSpoilersFromFrontmatter} from '../../../shared/lib/spoiler.js'
+import type {SeriesFrontmatter, SeriesPageData} from '../model/types.js'
 
 /**
  * 시리즈 페이지 데이터 로더.
@@ -31,5 +27,5 @@ export async function loadSeries(slug: string): Promise<SeriesPageData> {
   const doc: DocFile<SeriesFrontmatter> = parseFrontmatter<SeriesFrontmatter>(raw)
   const maskedBody = maskSpoilersFromMarkdown(doc.body, 'series')
   const maskedFm = maskSpoilersFromFrontmatter(doc.frontmatter, 'series')
-  return { frontmatter: maskedFm, bodyHtml: renderMarkdown(maskedBody), manifest }
+  return {frontmatter: maskedFm, bodyHtml: renderMarkdown(maskedBody), manifest}
 }

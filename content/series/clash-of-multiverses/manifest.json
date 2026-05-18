@@ -1,6 +1,6 @@
 {
   "slug": "clash-of-multiverses",
-  "title": "차원의 격돌",
+  "title": "차원 격돌",
   "status": "연재 중",
   "thumbnail": "thumbnails/cover.webp",
   "characters": [
@@ -9,6 +9,24 @@
       "folder": "1-protagonist",
       "name": "우진혁",
       "summary": "동생을 위해 운동을 포기하고 입대한 군인."
+    },
+    {
+      "id": "woo-seon-a",
+      "folder": "2-major-supporting",
+      "name": "우선아",
+      "summary": "주인공 우진혁의 동생."
+    },
+    {
+      "id": "kim-seong-hun",
+      "folder": "2-major-supporting",
+      "name": "김성훈",
+      "summary": "우진혁의 자대 동기. 서울 출신, 다정한 성격."
+    },
+    {
+      "id": "choi-gi-jun",
+      "folder": "4-minor",
+      "name": "최기준",
+      "summary": "진혁의 첫 자대 1 분대 1 조 일병 선임. 신참 인계 + 무전 콜사인 가르침."
     }
   ],
   "chapters": [
@@ -32,6 +50,13 @@
       "title": "입소",
       "published": "2026-05-16",
       "thumbnail": "thumbnails/ep-03/ep-03.webp"
+    },
+    {
+      "episode": 4,
+      "slug": "ep-04",
+      "title": "자대",
+      "published": "2026-05-18",
+      "thumbnail": "thumbnails/ep-04/ep-04.webp"
     }
   ]
 }

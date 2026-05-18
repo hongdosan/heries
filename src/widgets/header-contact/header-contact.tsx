@@ -1,4 +1,5 @@
-import {type MouseEvent, useRef, useState} from 'react'
+import {useState} from 'react'
+import {useDialog} from '../../shared/lib/use-dialog.js'
 import {Button} from '../../shared/ui/button'
 
 // 작가 연락처 (공개) — naver 이메일. 정책 #13 의 예외 (공개 채널).
@@ -43,18 +44,8 @@ const CheckIcon = () => (
  * `HeaderActions` 안에서 author / theme 와 함께 segmented-control 그룹화.
  */
 export function HeaderContact() {
-  const dialogRef = useRef<HTMLDialogElement>(null)
   const [copied, setCopied] = useState(false)
-
-  const open = () => {
-    setCopied(false)
-    dialogRef.current?.showModal()
-  }
-  const close = () => dialogRef.current?.close()
-
-  const onBackdropClick = (e: MouseEvent<HTMLDialogElement>) => {
-    if (e.target === dialogRef.current) close()
-  }
+  const {dialogRef, open, close, onBackdropClick} = useDialog(() => setCopied(false))
 
   const onCopy = async () => {
     try {
@@ -83,6 +74,8 @@ export function HeaderContact() {
         <MailIcon/>
       </button>
 
+      {/* native dialog backdrop click 닫기 = W3C 표준 패턴. Escape 키는 dialog 자체 처리 (showModal).
+          IDE 의 a11y 검사가 warning 표시할 수 있으나 (CLI eslint 룰은 적용 안 함) 의도된 패턴. */}
       <dialog
         ref={dialogRef}
         onClick={onBackdropClick}

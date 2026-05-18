@@ -10,9 +10,77 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 ---
 
-## [Unreleased]
+## [v0.3.1] — 2026-05-18
 
-(다음 release 후보 — develop 안 누적 변경)
+콘텐츠 (ep-04 + 우선아·김성훈 카드) + 헤더 SoC + FSD segment + dependency major. 상세 = git log 12e65d0.
+
+### Added (콘텐츠 — ep-04 발행)
+- **`chapters/ep-04.md` *자대*** — 4 절 (수료 / 자대 도착 / 동기 / 첫 출동 명령), 3824 자. 진혁이 수료 평가 양호로 본인 희망 자대 (서울 북부 비각성자 부대) 배치, 4 인 1 조 편성 (김성훈 + 전직 119 / 대학 휴학 2 명), 첫 출동 직전 학생증 사진을 한 박자 보는 행동으로 컷
+- **자대 동기 김성훈** 첫 등장 (ep-04 §3 — 윤곽만, 미래 정보 백엔드 전용)
+
+### Added (캐릭터 카드 — SSOT)
+- **`characters/2-major-supporting/woo-seon-a.md`** 신규 (우선아) — 진혁의 동생, 고등학생, 공개 절 5 + 백엔드 절 5. ep-04 §4 학생증 사진 정서적 앵커 정합. 거주지 = 구리 (백엔드 SSOT, 본문 노출 X)
+- **`characters/2-major-supporting/kim-seong-hun.md`** 신규 (김성훈, 자대 동기) — 공개 절 5 + 백엔드 절 5. **각성 트리거 인물** (백엔드 전용, 미래 정보)
+
+### Changed (캐릭터 카드 — 우진혁 ep-04 정합)
+- `frontmatter.reader_snapshot: ep-03 → ep-04`
+- §외형 손 백엔드: 손등 옅은 흉터 1줄 (졸업식 강당 ep-02 정합 — continuity-reviewer M1)
+- §군 §훈련 종합: 수료 평가 양호 + 본인 희망 자대 배치
+- §군 §부대 위치 (신규): 서울 북부 비각성자 부대 + 4 인 1 조 + 분대장 상사 + 동기 3 명
+- §가족 §남매 거주지 (백엔드): 구리
+- §각성 트리거: 입대 동기 = 김성훈 매핑
+- §주변 호칭 사전: 5 행 추가 (수료 동기 / 자대 분대장 / 김성훈 / 119 / 휴학)
+
+### Changed (발행 메타)
+- `manifest.json`: ep-04 chapter + 우선아 / 김성훈 character 등록
+- `_series.md` updated: 2026-05-18
+- `thumbnails/ep-04/` 디렉토리 + `PROMPT.md` ep-04 5장 영문 cinematic (대표 + §1~§4)
+
+### Added (시각 검증 — Storybook)
+- **5 신규 widget storybook stories**: `author-mode-toggle / theme-toggle / header-contact / header-actions / header-brand` 각 3 variant (잠금/활성/다크 또는 sun/moon/monitor 등). 정책 #11 (shared/ui 강제) 외 widgets 도 권장 적용. build-storybook 통과
+
+### Added (audit 보고서 — 사용자 결정 대기)
+- **`.claude/workflow/audit/2026-05-18-gwangsalgeom-complexity.md`** — 1369 줄 광살검 컴포넌트 5 파일 분할 권장 (Phase 1 적용 시 메인 920→480 줄 60% 감소). 게임 메커닉 변경 risk 0 — 순수 추출만 (상수/타입/순수 함수). **자동 적용 X**
+- **`.claude/workflow/audit/2026-05-18-gwangsalgeom-css.md`** — 795 줄 60 selector cross-check. 진짜 dead 0 건 (false positive 12 건 분석). 실제 issue 1 건: `sm-hud-title` className CSS 정의 누락 (unstyled). **자동 적용 X**
+
+### Fixed (사소)
+- `pages/home/home.tsx`: `<h1>` 마침표 제거 (브랜드 톤 정합)
+
+### Fixed (콘텐츠 SSOT — 정합 사이클)
+- **`chapters/ep-03.md` SSOT fix** — 진혁 출신 답 `"구리시"` → `"서울."` (우진혁 카드 §출신 배경 SSOT + ep-04 §3 *서울입니다.* 정합) + 수료 동기 출신 *남양주 호평. 오는 데...* → *외곽 쪽. 오는 데...* (자치구·동 단위 본문 노출 정책 *서울 북부* 한계 위반 정정, 시간 디테일 보존). 사건/결과/플롯 변경 0
+- **`chapters/ep-04.md` (M2 적용)** — §2 마무리 비교절 *사물함 문을 닫는 손이 본가의 옷장 문을 닫던 결과 비슷했다* 삭제 (사용자 메모리 시적 표현 금지 정합, continuity-reviewer minor M2)
+- 신규 카드 **헤더 한글 통일** (`woo-seon-a.md` / `kim-seong-hun.md`) — `## H-eries 분기 — Clash of Multiverses 변형` → `## H-eries 분기 — 차원 격돌 변형` (우진혁 카드 + 시리즈 한글 명 정합)
+- **`woo-seon-a.md` SSOT reference 정정** — *(ep-03 §2 본문 명시)* → *(백엔드 SSOT — 본문 노출 X)* (ep-03 본문 정정 후 reference 어긋남 해소)
+- **`kim-seong-hun.md` markdown 정합** — 테이블 외부 `|` 시작 한 줄 → 일반 텍스트
+- **ep-04 frontmatter** `characters: ["우진혁"]` → `["우진혁", "우선아"]` (ep-01~03 정합, 우선아 학생증 사진 + 호명 5 회 정서적 등장)
+
+### Added (audit 보고서)
+- **`.claude/workflow/audit/2026-05-18-chapter-vocab-region.md`** — 어휘 / 자치구 grep cross-check. ep-03 SSOT 위반 1 건 자동 정정 완료, 정정 후 grep 0 ✓
+- **`.claude/workflow/audit/2026-05-18-autonomous-cycle-summary.md`** — 자율 사이클 누계 + 결정 대기 항목 정리
+
+### Added (시각 검증 — Interaction Stories)
+- **`AuthorModeToggle` / `HeaderContact`** `play` function 추가 (`@storybook/test` 활용) — 다이얼로그 open + 제목 + input/이메일 expect 검증
+
+### Changed (캐릭터 카드 — 김성훈 신설)
+- **`characters/2-major-supporting/kim-seong-hun.md`** 신규 (자대 동기 — 각성 트리거 인물). 공개 절 5 + 백엔드 절 6 (성격·대화·출신·각성 트리거·호칭·이력). 미래 정보 백엔드 전용
+
+### Changed (운영 정합)
+- `manifest.json`: 김성훈 character entry 등록
+- 신규 widget 5 종 + Interaction stories 반영 → `src/README.md` widgets 목록 갱신
+- public/sitemap.xml: ep-04 chapter URL 추가 (`/chapter/4`)
+- `gwangsalgeom.tsx` 주석 + `tailwind-migration.md` stale stickman-murim 텍스트 정정 (sm- prefix 호환 보존 명시)
+
+### Changed (FSD 아키텍처 정합 — segment 도입 + Bottom-Up 가이드)
+- **entities/ segment 분리** — 3 entity (`series` / `character` / `chapter`) 각각 `api/load-*.ts` + `model/types.ts` + `index.ts` (re-export) 구조. 이전 단일 파일 (loader + type 혼재) 폐기. FSD segment 네이밍 (`api` / `model` / `lib` / `config` / `ui`) 정합
+- **shared/api/ 분리** — `shared/lib/manifest.ts` → `shared/api/manifest.ts` (git mv). fetch + 정규화 함수 (fetchSeriesIndex / fetchSeriesManifest / fetchMarkdown / normalizeSeriesManifest) 모음. import 경로 6 파일 정정 (pages 2 + widgets 1 + entities 3)
+- **shared/config/ 분리** — `shared/lib/spoiler-patterns.json` → `shared/config/spoiler-patterns.json` (git mv). 설정 파일 segment 분리 (정책 SSOT)
+- **`CLAUDE.md §4` FSD 가이드 보강** — Bottom-Up 작업 흐름 (pages → features → entities → shared 순으로 위 레이어 이동) / Segment 네이밍 원칙 (`components` / `hooks` 같은 성격 X) / widgets 활용 / Slice grouping 미사용 (단일 작품 도메인) 명시
+- **`src/README.md` 갱신** — H-eries FSD 적용 결정 6 절 추가 (widgets / grouping / segment / API 위치 / Bottom-Up / 격리), 디렉토리 트리 = entities api/model + shared/{api, config, lib, ui, images, styles}
+
+### Changed (a11y micro)
+- `HeaderActions` = `role="group" + aria-label="페이지 액션"` 추가 (3 토글 그룹 시맨틱)
+- `series.tsx` tabs = `id` + `aria-controls` + 각 panel `role="tabpanel" + aria-labelledby` (WAI-ARIA tabs 완전 정합)
+- `chapter.tsx` scroll-nav = `<div role="toolbar" aria-label>` 변경 (role 없는 aria 무의미 해소)
 
 ---
 
@@ -267,7 +335,7 @@ dev tooling 대규모 도입 + CSS Tailwind 전면 전환 + bundle 최적화. **
 
 ### Added (초기화 사이클 + 브랜치 전략 도입 전 누적)
 - H-eries 프로젝트 초기 구조 (FSD 6 레이어, React 19 + Vite + Storybook)
-- 작품 #1 *차원의 격돌* (clash-of-multiverses) 골격
+- 작품 #1 *차원 격돌* (clash-of-multiverses) 골격
 - 우진혁 카드 작가 백엔드 700+ 줄
 - 미니 게임 *검기생존록 (swordsman-survival)* 신규
 - 작가 모드 unlock 정책 v2 (단일 빌드 + runtime `/unlock` + `?unlock=KEY`)

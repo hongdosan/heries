@@ -1,5 +1,5 @@
 // © 2026 홍도산. All rights reserved. Original creator work.
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Empty } from './empty'
 
 const meta: Meta<typeof Empty> = {

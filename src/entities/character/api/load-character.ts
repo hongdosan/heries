@@ -1,19 +1,10 @@
-import type {
-  CharacterFrontmatter,
-  CharacterIndex,
-  DocFile,
-  SeriesManifest,
-} from '../../shared/lib/types.js'
-import { parseFrontmatter } from '../../shared/lib/frontmatter.js'
-import { renderMarkdown } from '../../shared/lib/markdown.js'
-import { fetchMarkdown } from '../../shared/lib/manifest.js'
-import { maskSpoilersFromMarkdown, maskSpoilersFromFrontmatter } from '../../shared/lib/spoiler.js'
-
-export interface CharacterPageData {
-  frontmatter: CharacterFrontmatter
-  bodyHtml: string
-  index: CharacterIndex
-}
+import type {DocFile} from '../../../shared/lib/types.js'
+import {parseFrontmatter} from '../../../shared/lib/frontmatter.js'
+import {renderMarkdown} from '../../../shared/lib/markdown.js'
+import {fetchMarkdown} from '../../../shared/api/markdown.js'
+import {maskSpoilersFromFrontmatter, maskSpoilersFromMarkdown} from '../../../shared/lib/spoiler.js'
+import type {SeriesManifest} from '../../series'
+import type {CharacterFrontmatter, CharacterPageData} from '../model/types.js'
 
 /**
  * 캐릭터 상세 페이지 데이터 로더.
@@ -46,5 +37,5 @@ export async function loadCharacter(
   const doc: DocFile<CharacterFrontmatter> = parseFrontmatter<CharacterFrontmatter>(raw)
   const maskedBody = maskSpoilersFromMarkdown(doc.body, 'character')
   const maskedFm = maskSpoilersFromFrontmatter(doc.frontmatter, 'character')
-  return { frontmatter: maskedFm, bodyHtml: renderMarkdown(maskedBody), index }
+  return {frontmatter: maskedFm, bodyHtml: renderMarkdown(maskedBody), index}
 }

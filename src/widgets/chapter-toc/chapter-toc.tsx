@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { assetUrl } from '../../shared/lib/env.js'
-import type { ChapterIndex } from '../../shared/lib/types.js'
-import { useImgFallback, PLACEHOLDER_THUMB } from '../../shared/lib/use-img-fallback.js'
-import { Empty } from '../../shared/ui'
+import {useEffect, useState} from 'react'
+import {Link} from 'react-router-dom'
+import {assetUrl} from '../../shared/lib/env.js'
+import type {ChapterIndex} from '../../entities/chapter'
+import {PLACEHOLDER_THUMB, useImgFallback} from '../../shared/lib/use-img-fallback.js'
+import {Empty} from '../../shared/ui'
 
 export interface ChapterTocProps {
   slug: string
@@ -23,7 +23,7 @@ function readSavedOrder(): Order {
   }
 }
 
-export function ChapterToc({ slug, chapters }: ChapterTocProps) {
+export function ChapterToc({slug, chapters}: Readonly<ChapterTocProps>) {
   const [order, setOrder] = useState<Order>(() => readSavedOrder())
 
   useEffect(() => {
@@ -45,15 +45,16 @@ export function ChapterToc({ slug, chapters }: ChapterTocProps) {
   return (
     <>
       <div className="flex justify-end m-0 mb-3">
-        <fieldset className="inline-flex p-1 border border-rule rounded-pill bg-bg-soft gap-1 m-0 [&>legend]:sr-only">
+        <fieldset
+          className="inline-flex p-1 border border-rule rounded-pill bg-bg-soft gap-1 m-0 [&>legend]:sr-only">
           <legend>챕터 정렬</legend>
-          <SortBtn label="최신순" active={order === 'desc'} onClick={() => setOrder('desc')} />
-          <SortBtn label="연재순" active={order === 'asc'} onClick={() => setOrder('asc')} />
+          <SortBtn label="최신순" active={order === 'desc'} onClick={() => setOrder('desc')}/>
+          <SortBtn label="연재순" active={order === 'asc'} onClick={() => setOrder('asc')}/>
         </fieldset>
       </div>
       <ul className="list-none p-0 m-0">
         {sorted.map((ch) => (
-          <ChapterRow key={ch.episode} slug={slug} ch={ch} />
+          <ChapterRow key={ch.episode} slug={slug} ch={ch}/>
         ))}
       </ul>
     </>
@@ -61,7 +62,11 @@ export function ChapterToc({ slug, chapters }: ChapterTocProps) {
 }
 
 // active = inline style 로 강제 (Tailwind utility 가 일부 cache/HMR 케이스에서 미적용되는 안전망).
-function SortBtn({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+function SortBtn({label, active, onClick}: Readonly<{
+  label: string;
+  active: boolean;
+  onClick: () => void
+}>) {
   return (
     <button
       type="button"
@@ -71,19 +76,19 @@ function SortBtn({ label, active, onClick }: { label: string; active: boolean; o
       style={
         active
           ? {
-              backgroundColor: 'var(--accent)',
-              color: 'var(--accent-fg)',
-              fontWeight: 600,
-              boxShadow: '0 1px 3px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08)',
-            }
-          : { backgroundColor: 'transparent', color: 'var(--fg-3)' }
+            backgroundColor: 'var(--accent)',
+            color: 'var(--accent-fg)',
+            fontWeight: 600,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08)',
+          }
+          : {backgroundColor: 'transparent', color: 'var(--fg-3)'}
       }
     >{label}</button>
   )
 }
 
-function ChapterRow({ slug, ch }: { slug: string; ch: ChapterIndex }) {
-  const { error, fatal, onError } = useImgFallback()
+function ChapterRow({slug, ch}: Readonly<{ slug: string; ch: ChapterIndex }>) {
+  const {error, fatal, onError} = useImgFallback()
   let src: string | null
   if (!ch.thumbnail || fatal) src = null
   else if (error) src = PLACEHOLDER_THUMB
@@ -97,7 +102,7 @@ function ChapterRow({ slug, ch }: { slug: string; ch: ChapterIndex }) {
       >
         {src ? (
           <img
-            className="w-24 h-[54px] object-cover rounded-sm bg-bg-soft block max-sm:row-span-3 max-sm:w-20 max-sm:h-[45px]"
+            className="w-24 h-13.5 object-cover rounded-sm bg-bg-soft block max-sm:row-span-3 max-sm:w-20 max-sm:h-11.25"
             src={src}
             alt=""
             loading="lazy"
@@ -105,13 +110,16 @@ function ChapterRow({ slug, ch }: { slug: string; ch: ChapterIndex }) {
           />
         ) : (
           <span
-            className="w-24 h-[54px] rounded-sm bg-[linear-gradient(135deg,var(--bg-soft),var(--bg-sunken))] border border-rule block max-sm:row-span-3 max-sm:w-20 max-sm:h-[45px]"
+            className="w-24 h-13.5 rounded-sm bg-[linear-gradient(135deg,var(--bg-soft),var(--bg-sunken))] border border-rule block max-sm:row-span-3 max-sm:w-20 max-sm:h-11.25"
             aria-hidden
           />
         )}
-        <span className="font-mono text-sm text-fg-4 tabular-nums tracking-[0.04em] max-sm:col-start-2 max-sm:self-end">EP {String(ch.episode).padStart(2, '0')}</span>
-        <span className="text-md font-medium text-fg transition-colors group-hover:text-accent max-sm:col-start-2">{ch.title}</span>
-        <time className="text-xs text-fg-3 tabular-nums whitespace-nowrap max-sm:col-start-2" dateTime={ch.published}>{ch.published}</time>
+        <span
+          className="font-mono text-sm text-fg-4 tabular-nums tracking-[0.04em] max-sm:col-start-2 max-sm:self-end">EP {String(ch.episode).padStart(2, '0')}</span>
+        <span
+          className="text-md font-medium text-fg transition-colors group-hover:text-accent max-sm:col-start-2">{ch.title}</span>
+        <time className="text-xs text-fg-3 tabular-nums whitespace-nowrap max-sm:col-start-2"
+              dateTime={ch.published}>{ch.published}</time>
       </Link>
     </li>
   )

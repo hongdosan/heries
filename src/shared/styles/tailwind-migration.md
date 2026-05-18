@@ -24,7 +24,7 @@ CSS specificity 가 *낮음 → 높음* 으로 점진 증가하는 7 레이어 (
 | **3. Generic** | `base.css` *reset* (`box-sizing`, `margin: 0` 등) + Tailwind preflight | 브라우저 reset. element selector. |
 | **4. Elements** | `base.css` 의 `a / button / img` + `typography.css` 의 `h1~h6 / main h*` | unstyled HTML element 기본 룰. |
 | **5. Objects** | `layout.css` (`main`, `.breadcrumb`) + `utilities.css` (`.empty`, `.skip-link`, `.route-transition`) | layout pattern (cosmetic 없음). 재사용 가능 시맨틱. |
-| **6. Components** | 슬라이스 별 `.css` (게임 = mini-game.css / stickman-murim.css 등) + shadcn 형 컴포넌트 시맨틱 class | UI 컴포넌트 구체 룰. |
+| **6. Components** | 슬라이스 별 `.css` (게임 = mini-game.css / gwangsalgeom.css 등) + shadcn 형 컴포넌트 시맨틱 class | UI 컴포넌트 구체 룰. |
 | **7. Utilities** | **Tailwind utility class** (`bg-accent`, `p-4`, `flex` 등) | 가장 높은 specificity. 빈번한 직접 적용. atomic. |
 
 **원칙**: 컴포넌트는 utility (layer 7) 우선 → 표현 안 되면 component class (layer 6) → 그래도 안 되면 object / element / generic 으로 내려감. Settings (token) 은 모든 layer 의 SSOT.
@@ -125,5 +125,5 @@ Tailwind v4 의 기본:
 - shadcn/ui (디자인 패턴 차용): https://ui.shadcn.com
 - 본 프로젝트 디자인 토큰 SSOT: [`tokens.css`](./tokens.css)
 - 게임 토큰 (`--mg-*`): [`../../features/mini-game/mini-game.css`](../../features/mini-game/mini-game.css)
-- 게임 토큰 (`--sm-*`): [`../../features/mini-game/games/stickman-murim/stickman-murim.css`](../../features/mini-game/games/stickman-murim/stickman-murim.css)
+- 게임 토큰 (`--sm-*`): [`../../features/mini-game/games/gwangsalgeom/gwangsalgeom.css`](../../features/mini-game/games/gwangsalgeom/gwangsalgeom.css) (`sm-` prefix = stickman-murim 시절 잔존, 호환 보존)
 - cn() helper: [`../lib/cn.ts`](../lib/cn.ts)

@@ -1,11 +1,10 @@
-import { Link } from 'react-router-dom'
-import { assetUrl } from '../../shared/lib/env.js'
-import { renderMarkdown } from '../../shared/lib/markdown.js'
-import { parseFrontmatter } from '../../shared/lib/frontmatter.js'
-import { useAsync } from '../../shared/lib/use-async.js'
-import { useDocumentTitle } from '../../shared/lib/use-document-title.js'
-import { Empty } from '../../shared/ui/empty'
-import { Loading } from '../../shared/ui/loading'
+import {Link} from 'react-router-dom'
+import {assetUrl} from '../../shared/lib/env.js'
+import {renderMarkdown} from '../../shared/lib/markdown.js'
+import {parseFrontmatter} from '../../shared/lib/frontmatter.js'
+import {useAsync} from '../../shared/lib/use-async.js'
+import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
+import {Empty, Loading} from '../../shared/ui'
 
 type NoticeFrontmatter = { title?: string; updated?: string }
 
@@ -15,8 +14,8 @@ export function NoticePage() {
     const res = await fetch(assetUrl('content/notice.md'))
     if (!res.ok) throw new Error(`notice.md 로드 실패 (${res.status})`)
     const raw = await res.text()
-    const { frontmatter, body } = parseFrontmatter<NoticeFrontmatter>(raw)
-    return { frontmatter, html: renderMarkdown(body) }
+    const {frontmatter, body} = parseFrontmatter<NoticeFrontmatter>(raw)
+    return {frontmatter, html: renderMarkdown(body)}
   }, [])
 
   return (
@@ -27,19 +26,20 @@ export function NoticePage() {
         <span>저작권</span>
       </nav>
 
-      {state.status === 'loading' && <Loading />}
+      {state.status === 'loading' && <Loading/>}
       {state.status === 'error' && <Empty>오류: {state.error.message}</Empty>}
       {state.status === 'success' && (
         <>
           {state.data.frontmatter.updated && (
             <p className="m-0 mb-5 text-xs text-fg-4 font-mono">
               마지막 업데이트{' '}
-              <time dateTime={state.data.frontmatter.updated}>{state.data.frontmatter.updated}</time>
+              <time
+                dateTime={state.data.frontmatter.updated}>{state.data.frontmatter.updated}</time>
             </p>
           )}
           <article
             className="article article-prose"
-            dangerouslySetInnerHTML={{ __html: state.data.html }}
+            dangerouslySetInnerHTML={{__html: state.data.html}}
           />
         </>
       )}
