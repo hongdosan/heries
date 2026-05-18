@@ -22,7 +22,8 @@ export function SeriesListPage() {
   const state = useAsync(() => fetchSeriesIndex(), [])
 
   if (state.status === 'loading') return <main className={MAIN_CLS}><Loading/></main>
-  if (state.status === 'error') return <main className={MAIN_CLS}><Empty>오류: {state.error.message}</Empty></main>
+  if (state.status === 'error') return <main className={MAIN_CLS}>
+    <Empty>오류: {state.error.message}</Empty></main>
 
   return <SeriesListContent items={state.data.series}/>
 }
@@ -33,7 +34,7 @@ type Filter = 'all' | 'ongoing' | 'done'
 const FILTER_LABEL: Record<Filter, string> = {all: '전체', ongoing: '연재 중', done: '완결'}
 const FILTER_KEYS: ReadonlySet<Filter> = new Set(['all', 'ongoing', 'done'])
 
-function SeriesListContent({items}: Readonly<{items: SeriesIndex[]}>) {
+function SeriesListContent({items}: Readonly<{ items: SeriesIndex[] }>) {
   // 정렬 = 시작일 최신 순 (started 내림차순), 미시작은 뒤로.
   // 필터 = URL ?filter=ongoing|done|all (기본 all).
   const [searchParams, setSearchParams] = useSearchParams()
@@ -45,16 +46,16 @@ function SeriesListContent({items}: Readonly<{items: SeriesIndex[]}>) {
   const done = items.filter((x) => x.status === '완결').length
 
   const visible = items
-    .filter((x) => {
-      if (filter === 'all') return true
-      if (filter === 'ongoing') return x.status === '연재 중'
-      return x.status === '완결'
-    })
-    .sort((a, b) => {
-      const da = a.started ?? ''
-      const db = b.started ?? ''
-      return db.localeCompare(da)
-    })
+  .filter((x) => {
+    if (filter === 'all') return true
+    if (filter === 'ongoing') return x.status === '연재 중'
+    return x.status === '완결'
+  })
+  .sort((a, b) => {
+    const da = a.started ?? ''
+    const db = b.started ?? ''
+    return db.localeCompare(da)
+  })
 
   const setFilter = (next: Filter): void => {
     if (next === 'all') setSearchParams({}, {replace: false})
@@ -69,21 +70,21 @@ function SeriesListContent({items}: Readonly<{items: SeriesIndex[]}>) {
         <span>시리즈</span>
       </nav>
 
-      <header className="mb-10 pb-6 border-b border-rule flex items-end justify-between gap-6 flex-wrap">
-        <div>
-          <p className="m-0 mb-3 text-xs sm:text-sm font-medium tracking-[0.24em] uppercase text-fg-3">
-            Multi-verse Collection
-          </p>
-          <h1 className="m-0 text-[clamp(32px,5vw,56px)] font-bold tracking-[-0.02em] leading-[1.1]">
+      <header className="mb-10 pb-6 border-b border-rule">
+        <p className="m-0 mb-3 text-xs sm:text-sm font-medium tracking-[0.24em] uppercase text-fg-3">
+          Multi-verse Collection
+        </p>
+        <div className="flex items-baseline justify-between gap-6 flex-wrap">
+          <h1 className="m-0 text-[clamp(32px,5vw,56px)] font-normal tracking-[-0.02em] leading-[1.1]">
             시리즈
           </h1>
-        </div>
-        <div className="text-sm text-fg-3 tabular-nums flex items-center gap-3">
-          <span>전체 <b className="text-fg">{total}</b>편</span>
-          <span aria-hidden>·</span>
-          <span>연재 중 <b className="text-fg">{ongoing}</b></span>
-          <span aria-hidden>·</span>
-          <span>완결 <b className="text-fg">{done}</b></span>
+          <div className="text-sm text-fg-3 tabular-nums flex items-baseline gap-3">
+            <span>전체 <b className="text-fg">{total}</b>편</span>
+            <span aria-hidden>·</span>
+            <span>연재 중 <b className="text-fg">{ongoing}</b></span>
+            <span aria-hidden>·</span>
+            <span>완결 <b className="text-fg">{done}</b></span>
+          </div>
         </div>
       </header>
 
@@ -93,9 +94,12 @@ function SeriesListContent({items}: Readonly<{items: SeriesIndex[]}>) {
         className="flex items-center justify-between mb-8 flex-wrap gap-3"
       >
         <div className="flex items-center gap-1 text-sm">
-          <FilterTab filter="all" label={FILTER_LABEL.all} count={total} active={filter === 'all'} onSelect={setFilter}/>
-          <FilterTab filter="ongoing" label={FILTER_LABEL.ongoing} count={ongoing} active={filter === 'ongoing'} onSelect={setFilter}/>
-          <FilterTab filter="done" label={FILTER_LABEL.done} count={done} active={filter === 'done'} onSelect={setFilter}/>
+          <FilterTab filter="all" label={FILTER_LABEL.all} count={total} active={filter === 'all'}
+                     onSelect={setFilter}/>
+          <FilterTab filter="ongoing" label={FILTER_LABEL.ongoing} count={ongoing}
+                     active={filter === 'ongoing'} onSelect={setFilter}/>
+          <FilterTab filter="done" label={FILTER_LABEL.done} count={done} active={filter === 'done'}
+                     onSelect={setFilter}/>
         </div>
         <div className="text-sm text-fg-3">
           <span>최신 순</span>
@@ -118,8 +122,14 @@ function SeriesListContent({items}: Readonly<{items: SeriesIndex[]}>) {
 }
 
 function FilterTab({
-  filter, label, count, active, onSelect,
-}: Readonly<{filter: Filter; label: string; count: number; active: boolean; onSelect: (f: Filter) => void}>) {
+                     filter, label, count, active, onSelect,
+                   }: Readonly<{
+  filter: Filter;
+  label: string;
+  count: number;
+  active: boolean;
+  onSelect: (f: Filter) => void
+}>) {
   const cls = active
     ? 'inline-flex flex-col items-center px-4 py-2 border border-rule rounded-full bg-bg-soft text-fg font-semibold transition-colors cursor-pointer'
     : 'inline-flex flex-col items-center px-4 py-2 text-fg-3 hover:text-accent rounded-full transition-colors cursor-pointer'
@@ -137,7 +147,7 @@ function FilterTab({
   )
 }
 
-function SeriesCard({item, index}: Readonly<{item: SeriesIndex; index: number}>) {
+function SeriesCard({item, index}: Readonly<{ item: SeriesIndex; index: number }>) {
   const cover = useImgFallback()
   let src: string | null
   if (cover.fatal) src = null
@@ -155,9 +165,9 @@ function SeriesCard({item, index}: Readonly<{item: SeriesIndex; index: number}>)
     chapterCount = chapters.length
     if (chapters.length > 0) {
       const dates = chapters
-        .map((c) => c.published)
-        .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
-        .sort()
+      .map((c) => c.published)
+      .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
+      .sort()
       recent = dates.at(-1)
     }
   }
@@ -179,20 +189,25 @@ function SeriesCard({item, index}: Readonly<{item: SeriesIndex; index: number}>)
               className="w-full h-full object-cover block transition-transform duration-280 group-hover:scale-[1.03]"
             />
           ) : (
-            <div className="w-full h-full bg-[linear-gradient(135deg,var(--bg-soft),var(--bg-sunken))]"/>
+            <div
+              className="w-full h-full bg-[linear-gradient(135deg,var(--bg-soft),var(--bg-sunken))]"/>
           )}
         </div>
 
         <div className="flex flex-col gap-3 min-w-0">
           <div className="flex items-center gap-3 flex-wrap text-xs text-fg-3">
-            <span className="font-mono font-semibold tracking-[0.16em] uppercase">Series {String(index).padStart(2, '0')}</span>
+            <span
+              className="font-mono font-semibold tracking-[0.16em] uppercase">Series {String(index).padStart(2, '0')}</span>
             <span className="flex items-center gap-1.5">
-              <span className={`inline-block w-1.5 h-1.5 rounded-full ${ongoing ? 'bg-emerald-500' : 'bg-fg-4'}`} aria-hidden/>
+              <span
+                className={`inline-block w-1.5 h-1.5 rounded-full ${ongoing ? 'bg-emerald-500' : 'bg-fg-4'}`}
+                aria-hidden/>
               <span>{item.status}</span>
             </span>
           </div>
 
-          <h2 className="m-0 text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.01em] text-fg group-hover:text-accent transition-colors">
+          <h2
+            className="m-0 text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.01em] text-fg group-hover:text-accent transition-colors">
             {item.title}
           </h2>
 
@@ -202,7 +217,8 @@ function SeriesCard({item, index}: Readonly<{item: SeriesIndex; index: number}>)
             </p>
           )}
 
-          <div className="flex items-center gap-x-4 gap-y-1 text-xs text-fg-3 flex-wrap mt-1 tabular-nums">
+          <div
+            className="flex items-center gap-x-4 gap-y-1 text-xs text-fg-3 flex-wrap mt-1 tabular-nums">
             {typeof chapterCount === 'number' && (
               <span className="inline-flex items-baseline gap-1">
                 <span className="text-fg-4">화</span>
@@ -212,7 +228,8 @@ function SeriesCard({item, index}: Readonly<{item: SeriesIndex; index: number}>)
             {item.started && /^\d{4}-\d{2}-\d{2}$/.test(item.started) && (
               <span className="inline-flex items-baseline gap-1">
                 <span className="text-fg-4">시작</span>
-                <time dateTime={item.started} className="text-fg-2 font-medium">{item.started}</time>
+                <time dateTime={item.started}
+                      className="text-fg-2 font-medium">{item.started}</time>
               </span>
             )}
             {recent && (
@@ -232,11 +249,13 @@ function SeriesCard({item, index}: Readonly<{item: SeriesIndex; index: number}>)
   )
 }
 
-function ComingSoonCard({index}: Readonly<{index: number}>) {
+function ComingSoonCard({index}: Readonly<{ index: number }>) {
   return (
     <li>
-      <div className="grid grid-cols-[minmax(0,1fr)_2fr] gap-7 p-2 -m-2 rounded-lg opacity-70 max-md:grid-cols-1 max-md:gap-4">
-        <div className="aspect-[4/3] bg-bg-soft border border-rule rounded-md relative overflow-hidden">
+      <div
+        className="grid grid-cols-[minmax(0,1fr)_2fr] gap-7 p-2 -m-2 rounded-lg opacity-70 max-md:grid-cols-1 max-md:gap-4">
+        <div
+          className="aspect-[4/3] bg-bg-soft border border-rule rounded-md relative overflow-hidden">
           {/* 임시 = thumbnail-placeholder (H-eries 컬렉션 hero). 실제 시리즈 cover 결정 후 교체. */}
           <img
             src={PLACEHOLDER_IMG}
@@ -245,14 +264,16 @@ function ComingSoonCard({index}: Readonly<{index: number}>) {
             loading="lazy"
             className="absolute inset-0 w-full h-full object-cover opacity-40"
           />
-          <div className="absolute inset-0 flex items-center justify-center text-fg-3 text-xs font-mono tracking-[0.16em] bg-bg-soft/40">
+          <div
+            className="absolute inset-0 flex items-center justify-center text-fg-3 text-xs font-mono tracking-[0.16em] bg-bg-soft/40">
             <span>Vol. 0{index}</span>
           </div>
         </div>
 
         <div className="flex flex-col gap-3 min-w-0 justify-center">
           <div className="flex items-center gap-3 text-xs text-fg-3">
-            <span className="font-mono font-semibold tracking-[0.16em] uppercase">Series {String(index).padStart(2, '0')}</span>
+            <span
+              className="font-mono font-semibold tracking-[0.16em] uppercase">Series {String(index).padStart(2, '0')}</span>
             <span className="italic text-fg-4">Coming soon</span>
           </div>
 
