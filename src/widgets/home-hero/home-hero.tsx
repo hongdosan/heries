@@ -32,8 +32,8 @@ export function HomeHero() {
       <div className="flex items-center gap-6 flex-wrap">
         <Link
           to="/series"
-          style={{color: 'var(--bg)'}}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-fg rounded-full font-semibold text-sm transition-transform hover:-translate-y-0.5 hover:bg-accent hover:[color:var(--accent-fg)]"
+          style={{color: 'var(--accent-fg)'}}
+          className="inline-flex items-center gap-2 px-6 py-3 bg-accent rounded-full font-semibold text-sm transition-[transform,background] hover:-translate-y-0.5 hover:bg-accent-hover"
         >
           시리즈 보러 가기
           <span aria-hidden="true">→</span>
