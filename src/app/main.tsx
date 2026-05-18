@@ -19,6 +19,7 @@ import {useScrollbarAutoHide} from '../shared/lib/use-scrollbar-autohide.js'
 
 const AboutPage = lazy(() => import('../pages/about').then((m) => ({default: m.AboutPage})))
 const NoticePage = lazy(() => import('../pages/notice').then((m) => ({default: m.NoticePage})))
+const SeriesListPage = lazy(() => import('../pages/series-list').then((m) => ({default: m.SeriesListPage})))
 const SeriesPage = lazy(() => import('../pages/series').then((m) => ({default: m.SeriesPage})))
 const ChapterPage = lazy(() => import('../pages/chapter').then((m) => ({default: m.ChapterPage})))
 const CharacterPage = lazy(() => import('../pages/character').then((m) => ({default: m.CharacterPage})))
@@ -65,6 +66,7 @@ function App() {
               <Route path="/about" element={<ErrorBoundary><AboutPage/></ErrorBoundary>}/>
               <Route path="/notice" element={<ErrorBoundary><NoticePage/></ErrorBoundary>}/>
               <Route path="/unlock" element={<ErrorBoundary><UnlockPage/></ErrorBoundary>}/>
+              <Route path="/series" element={<ErrorBoundary><SeriesListPage/></ErrorBoundary>}/>
               <Route path="/series/:slug" element={<ErrorBoundary><SeriesPage/></ErrorBoundary>}/>
               <Route path="/series/:slug/chapter/:episode"
                      element={<ErrorBoundary><ChapterPage/></ErrorBoundary>}/>

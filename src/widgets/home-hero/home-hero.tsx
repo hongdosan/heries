@@ -1,47 +1,50 @@
 import {Link} from 'react-router-dom'
-import HERO_IMAGE from '../../shared/images/thumbnail-placeholder.webp?url'
-
-const HERO_ALT = 'H-eries — 홍도산의 오리지널 웹 시리즈 컬렉션'
 
 /**
- * 홈 페이지 히어로 영역 — 좌측 H-eries 멀티버스 컬렉션 hero 이미지 + 우측 부제 / 헤드라인 / about 링크.
+ * 홈 페이지 히어로 영역 — 큰 헤드라인 + 부제 + CTA.
  *
- * **H-eries 정체성**: 홍도산 작가의 작품 시리즈 서비스.
- * - 좌측 이미지 = `thumbnail-placeholder.webp` (사실은 H-eries 컬렉션 hero — heries 로고 + "Stories Beyond Worlds" 슬로건 포함)
- *   파일명이 placeholder 이지만 실제 = 사이트 hero 이미지. fallback 역할도 겸함 (use-img-fallback.ts).
- * - kicker = `ORIGINAL · WEB SERIES`
- * - h1 = `홍도산의 오리지널 웹 시리즈 컬렉션`
- * - about 링크
+ * **디자인 정합** (2026-05-19 시안 img.png):
+ * - 캡션 = `H-ERIES · MULTI-VERSE COLLECTION` (작은 tracking)
+ * - 큰 헤드라인 (2 줄 한국어 — *서로 다른 세계가 / 하나의 상상으로 연결됩니다.*)
+ * - 본문 2줄 = 컬렉션 소개 + 자작 명시
+ * - CTA = *시리즈 보러 가기 →* (검정 둥근 버튼, /series 로)
+ * - 보조 = *H-eries 소개* (텍스트 링크)
  *
- * **주의**: 특정 작품 cover (예: content/series/{slug}/thumbnails/cover.webp) hardcode 금지 — 컬렉션 정체성 훼손.
+ * **여백 강조** — img.png 정합. 헤드라인 ~6vw 큰 글씨, 모바일은 축소.
  */
 export function HomeHero() {
   return (
-    <header
-      className="grid grid-cols-[1fr_3fr] gap-5 items-stretch p-5 mt-2 mb-6 bg-bg-soft border border-rule rounded-lg shadow-soft max-sm:grid-cols-1 max-sm:gap-4 max-sm:p-4">
-      <div className="flex flex-col gap-2">
-        <figure
-          className="m-0 w-full aspect-video rounded-md overflow-hidden bg-bg-sunken">
-          <img src={HERO_IMAGE} alt={HERO_ALT} loading="eager"
-               className="block w-full h-full object-cover"/>
-        </figure>
+    <section className="py-[clamp(48px,10vh,128px)]">
+      <p className="m-0 mb-6 text-xs sm:text-sm font-medium tracking-[0.24em] uppercase text-fg-3">
+        H-eries · Multi-verse Collection
+      </p>
+
+      <h1 className="m-0 mb-8 text-[clamp(36px,6vw,72px)] font-bold leading-[1.2] tracking-[-0.02em] text-fg break-keep">
+        서로 다른 세계가<br/>
+        하나의 상상으로 연결됩니다.
+      </h1>
+
+      <div className="flex flex-col gap-1 mb-10 text-fg-2 text-base sm:text-md leading-[1.6] break-keep">
+        <p className="m-0">홍도산이 직접 빚어낸 오리지널 웹 시리즈 컬렉션.</p>
+        <p className="m-0">등장인물·세계관·능력 체계 모두 작가 본인의 창작입니다.</p>
       </div>
 
-      <div className="flex flex-col justify-center gap-2 min-h-0 overflow-hidden">
-        <p
-          className="m-0 w-full text-xs font-semibold tracking-[0.16em] uppercase text-fg-3 whitespace-nowrap overflow-hidden text-ellipsis">ORIGINAL
-          · WEB SERIES</p>
+      <div className="flex items-center gap-6 flex-wrap">
+        <Link
+          to="/series"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-fg text-bg rounded-full font-semibold text-sm transition-transform hover:-translate-y-0.5 hover:bg-accent hover:text-accent-fg"
+        >
+          시리즈 보러 가기
+          <span aria-hidden="true">→</span>
+        </Link>
 
-        <h1 className="m-0 text-lg font-normal tracking-normal leading-[1.45] text-fg-3">
-          홍도산의 오리지널 웹 시리즈 컬렉션
-        </h1>
-
-        <p className="m-0 text-sm">
-          <Link to="/about"
-                className="font-semibold border-b border-accent-ring pb-0.5 transition-[color,border-color] hover:border-accent-hover">H-eries
-            가 무엇인가요? →</Link>
-        </p>
+        <Link
+          to="/about"
+          className="text-sm text-fg-3 underline-offset-4 hover:underline hover:text-accent transition-colors"
+        >
+          H-eries 소개
+        </Link>
       </div>
-    </header>
+    </section>
   )
 }
