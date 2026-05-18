@@ -605,8 +605,8 @@ export function MiniGame({autoFocus = false}: Readonly<MiniGameProps>) {
     }
     apply()
     if (typeof ResizeObserver === 'undefined') {
-      window.addEventListener('resize', apply)
-      return () => window.removeEventListener('resize', apply)
+      globalThis.addEventListener('resize', apply)
+      return () => globalThis.removeEventListener('resize', apply)
     }
     const ro = new ResizeObserver(apply)
     ro.observe(frameEl)

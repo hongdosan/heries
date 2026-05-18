@@ -1,21 +1,37 @@
-import {memo, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react'
+import {type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react'
 import './gwangsalgeom.css'
+import {
+  WORLD_W, WORLD_H, GROUND_Y,
+  PLAYER_W, PLAYER_H, PLAYER_MAX_HP, PLAYER_IFRAME_MS, PLAYER_HURT_KNOCKBACK, PLAYER_BOUND_PAD,
+  ENEMY_W, ENEMY_H, ENEMY_HIT_STUN_MS,
+  SLASH_COOLDOWN_MS, SLASH_FLASH_MS, SLASH_REACH, SLASH_NEAR, SLASH_W, SLASH_H, SLASH_OFFSET_Y, SLASH_KNOCKBACK,
+  QI_COOLDOWN_MS, QI_COST, QI_W, QI_OFFSET_NEAR, QI_OFFSET_Y,
+  DASH_COOLDOWN_MS, DASH_DURATION_MS, DASH_DISTANCE, DASH_VX, DASH_IFRAME_MS, DASH_COST, DASH_PATH_PAD_RATIO,
+  SCORE_PER_HIT, SCORE_PER_KILL, SCORE_PER_COMBO_5,
+  KI_PER_HIT, KI_PER_KILL, KI_PER_WHIFF, KI_MAX, KI_GWANGSAL, KI_GWANGSAL_LOSS, KI_HURT_LOSS,
+  PARTICLES_HIT, PARTICLES_KILL, PARTICLES_PLAYER_HURT,
+  HITSTOP_HIT_MS, HITSTOP_KILL_MS, HITSTOP_PLAYER_HURT_MS,
+  HURT_FLASH_MS, QI_CAST_POSE_MS, GWANGSAL_FX_MS, GWANGSAL_FX_CLEAR_MS, GWANGSAL_HITSTOP_MS,
+  EFFECT_IMPACT_LIFE_MS, EFFECT_DEATH_LIFE_MS, EFFECT_CAP,
+  COLOR_HIT_NORMAL, COLOR_KILL_NORMAL, COLOR_KILL_ELITE, COLOR_PLAYER_HURT,
+  JUDGE_FADE_MS, SHAKE_MS, SHAKE_KILL_MS,
+  STAGE_FIT_DESKTOP_BREAK, STAGE_FIT_DESKTOP_PAD, STAGE_FIT_DESKTOP_MAX_SCALE,
+} from './constants.js'
+import type {
+  ActionKey, Effect, EffectKind, Enemy, Judge, JudgeTone, KeysHeld, Particle, Phase, Player, View, Wave,
+} from './types.js'
+import {actionOf, clamp, makeEnemy, makePlayer, makeWave, nextId, rectsOverlap, spawnParticles} from './lib.js'
+import {useGameLoop} from './use-game-loop.js'
+import {
+  createEffectEl, createEnemyEl, createParticleEl, createWaveEl,
+  SPRITE_HERO,
+  syncEntityLayer,
+  updateEffectEl, updateEnemyEl, updateParticleEl, updatePlayerEl, updateWaveEl,
+} from './render.js'
 
 // 스프라이트 — vite ?url import. 빌드 시 자동 hash + dist/assets/ 통합.
-import SPRITE_HERO from '../../../../shared/images/mini-game/stickman-murim/hero.webp?url'
-import SPRITE_HERO_ATTACK
-  from '../../../../shared/images/mini-game/stickman-murim/hero-attack.webp?url'
-import SPRITE_HERO_QI from '../../../../shared/images/mini-game/stickman-murim/hero-qi.webp?url'
-import SPRITE_HERO_DASH from '../../../../shared/images/mini-game/stickman-murim/hero-dash.webp?url'
-import SPRITE_ASSASSIN from '../../../../shared/images/mini-game/stickman-murim/assassin.webp?url'
-import SPRITE_ELITE from '../../../../shared/images/mini-game/stickman-murim/elite.webp?url'
-import SPRITE_IMPACT from '../../../../shared/images/mini-game/stickman-murim/impact.webp?url'
-import SPRITE_IMPACT_ELITE
-  from '../../../../shared/images/mini-game/stickman-murim/impact-elite.webp?url'
-import SPRITE_DEATH from '../../../../shared/images/mini-game/stickman-murim/death.webp?url'
+// entity sprite import 는 render.ts 로 이동. 풀스크린 광살 fx 만 JSX 단일 element 라 유지.
 import SPRITE_GWANGSAL from '../../../../shared/images/mini-game/stickman-murim/gwangsal.webp?url'
-// qi.webp 부재 — dash-burst.webp 가 plasma 잔상 결로 적합, 장풍에 임시 alias.
-import SPRITE_QI from '../../../../shared/images/mini-game/stickman-murim/dash-burst.webp?url'
 
 // ─────────────────────────────────────────────────────────────────
 // 광살검 — 가로 진행 검술·장풍·이형환위 액션 (검기생존록과는 다른 결)
@@ -23,346 +39,7 @@ import SPRITE_QI from '../../../../shared/images/mini-game/stickman-murim/dash-b
 // 좌표계 SSOT = WORLD_W × WORLD_H. CSS scale 로 fit.
 // ─────────────────────────────────────────────────────────────────
 
-// 월드 상수
-const WORLD_W = 820
-const WORLD_H = 460
-const GROUND_Y = 358
 
-// 플레이어 — 시각 크기 (사용자 명시 = 작게).
-const PLAYER_W = 64
-const PLAYER_H = 120
-const PLAYER_SPEED = 3.8
-const PLAYER_MAX_HP = 5
-const PLAYER_IFRAME_MS = 700
-const PLAYER_HURT_KNOCKBACK = 4.6
-
-// 적 — 플레이어와 동일 박스 (사용자 명시).
-const ENEMY_W = PLAYER_W
-const ENEMY_H = PLAYER_H
-const ENEMY_BASE_SPEED = 1.8
-const ENEMY_ELITE_SPEED = 1.45
-const ENEMY_SPEED_PER_LEVEL = 0.05
-const ENEMY_ELITE_SPEED_PER_LEVEL = 0.04
-const ENEMY_HP = 2
-const ENEMY_ELITE_HP = 3
-const ENEMY_ELITE_RATE_BASE = 0.08
-const ENEMY_ELITE_RATE_PER_LEVEL = 0.012
-const ENEMY_ELITE_RATE_MAX = 0.28
-const ENEMY_HIT_STUN_MS = 200
-const ENEMY_QI_STUN_MS = 160
-const ENEMY_DESPAWN_PAD = 120
-
-// 베기 (근접) — 플레이어 박스 중심 기준 좌우 대칭
-const SLASH_COOLDOWN_MS = 200
-const SLASH_FLASH_MS = 170
-const SLASH_REACH = 130              // 박스 중심에서 도달 거리 (PLAYER 비례)
-const SLASH_NEAR = 4
-const SLASH_W = SLASH_REACH - SLASH_NEAR
-const SLASH_H = 80
-const SLASH_OFFSET_Y = 18
-const SLASH_KNOCKBACK = 32
-
-// 장풍 (원거리) — 단일 type
-const QI_COOLDOWN_MS = 0           // 쿨타임 없음 (ki 비용으로 제어)
-const QI_COST = 14
-const QI_DAMAGE = 1                  // 1 데미지 / 관통 (적 다수 hit 가능)
-const QI_W = 84
-const QI_H = 36
-const QI_SPEED = 16                  // 관통 + 빠른 속도
-const QI_LIFE = 64
-const QI_DESPAWN_PAD = 140
-const QI_OFFSET_NEAR = 10            // 박스 중심에서 시작 거리
-const QI_OFFSET_Y = 38
-
-// 이형환위 — 발동 직후 3초 무적 (이형환위 / 도검불침). 내공 11 소모.
-const DASH_COOLDOWN_MS = 0          // 쿨타임 없음 (ki 18 비용으로 제어)
-const DASH_DURATION_MS = 260        // 시각 잔상 표시 길이
-const DASH_DISTANCE = 138
-const DASH_VX = 7.5
-const DASH_IFRAME_MS = 3000         // 무적 3 초
-const DASH_COST = 31                // 내공 소모 (사용자 명시)
-
-// 적 spawn 곡선 — 사용자 *난이도 어려움* 정합 (완화)
-const SPAWN_GAP_BASE = 1300
-const SPAWN_GAP_PER_LEVEL = 60
-const SPAWN_GAP_MIN = 450
-const SPAWN_CAP_BASE = 3
-const SPAWN_CAP_PER_LEVEL = 3
-const SPAWN_CAP_MAX = 8
-
-// 점수·콤보 — 레벨 도달 천천히 (난이도 ↓ 정합)
-const SCORE_PER_LEVEL = 1200
-const SCORE_PER_HIT = 90
-const SCORE_PER_KILL = 90
-const SCORE_PER_COMBO_5 = 20
-const SCORE_QI_HIT = 70
-const SCORE_QI_KILL = 120
-const SCORE_TICK = 1
-const KI_PER_HIT = 4
-const KI_PER_KILL = 8
-const KI_PER_WHIFF = 1
-const KI_MAX = 234
-const KI_GWANGSAL = 234             // 광살 = 게이지 가득 차면 발동
-const KI_GWANGSAL_LOSS = 200        // 광살 발동 시 내공 감소 (잔여 34)
-const KI_HURT_LOSS = 33             // 피격 시 내공 감소
-
-// 파티클 / Hit-stop — count 줄임 (다중 적 시 paint 비용 ↓)
-const PARTICLES_HIT = 3
-const PARTICLES_QI_HIT = 5
-const PARTICLES_KILL = 8
-const PARTICLES_PLAYER_HURT = 6
-const PARTICLES_CAP = 80          // 동시 파티클 상한 (cap 넘으면 오래된 것 drop)
-const PARTICLE_LIFE_MS = 420
-const PARTICLE_LIFE_JITTER_MIN = 0.65        // 파티클별 수명 = LIFE_MS × (MIN ~ MIN+RANGE)
-const PARTICLE_LIFE_JITTER_RANGE = 0.7
-const PARTICLE_VY_BIAS_RATIO = 0.45          // 상방 초기 속도 = speed × 본 비율 (튀어오름 보정)
-const PARTICLE_SPEED_MIN = 60
-const PARTICLE_SPEED_RANGE = 220
-const PARTICLE_GRAVITY = 380
-const PARTICLE_FRICTION = 0.92
-const HITSTOP_HIT_MS = 36
-const HITSTOP_KILL_MS = 72
-const HITSTOP_PLAYER_HURT_MS = 100
-const SCORE_TICK_RATE = 4         // 매 N frame 마다 1점 (60→15tick/s)
-
-// 액션 타이밍 (ms / 비율)
-const HURT_FLASH_MS = 200                    // 피격 깜빡임 표시 길이
-const QI_CAST_POSE_MS = 240                  // 장풍 발사 자세 길이
-const GWANGSAL_FX_MS = 450                   // 광살 풀스크린 sprite fade 길이 (CSS .sm-gwangsal-fx 와 일치)
-const GWANGSAL_FX_CLEAR_MS = GWANGSAL_FX_MS + 10  // setTimeout clear 여유 (sprite fade 완전 종료 후 정리)
-const GWANGSAL_HITSTOP_MS = 200              // 광살 발동 시 hit-stop
-const DASH_PATH_PAD_RATIO = 0.3              // 이형환위 경로 양끝 padding = ENEMY_W × 본 비율
-const ENEMY_KNOCKBACK_ON_DAMAGE = 42         // 적이 플레이어에 부딪힐 때 자기 후퇴 거리
-
-// 임팩트·사망 이펙트 (sprite 기반)
-const EFFECT_IMPACT_LIFE_MS = 220
-const EFFECT_DEATH_LIFE_MS = 420
-const EFFECT_IMPACT_SIZE = 72
-const EFFECT_DEATH_SIZE = 100
-const EFFECT_CAP = 24             // 동시 이펙트 상한
-
-// 파티클 색상 — gwangsalgeom.css 의 --sm-* 토큰과 동일 hex 유지 (sm prefix = stickman-murim 시절 잔존, 호환 보존).
-// string literal 은 CSS var 사용 불가 (inline style 의 background 에 직접 들어감).
-// CSS 토큰 변경 시 본 상수도 동기화 필수.
-const COLOR_HIT_NORMAL = '#67e8f9'   // see --sm-accent in gwangsalgeom.css
-const COLOR_HIT_QI = '#fcd34d'       // see --sm-amber
-const COLOR_KILL_NORMAL = '#fda4af'  // see --sm-danger
-const COLOR_KILL_ELITE = '#f0abfc'   // see --sm-elite-bright
-const COLOR_PLAYER_HURT = '#fda4af'  // see --sm-danger
-
-// UX 타이밍
-const JUDGE_FADE_MS = 420
-const SHAKE_MS = 140
-const SHAKE_KILL_MS = 220
-const STAGE_FIT_DESKTOP_BREAK = 768
-const STAGE_FIT_DESKTOP_PAD = 36
-const STAGE_FIT_DESKTOP_MAX_SCALE = 1.25
-const DT_BASE_MS = 16.67
-const DT_MAX_MS = 32
-const FRICTION = 0.82
-const ENEMY_INTERSECT_PAD_X = 8
-const ENEMY_INTERSECT_PAD_Y = 14
-const PLAYER_BOUND_PAD = 18
-
-// ─── 타입 ─────────────────────────────────────────────────────
-interface Player {
-  x: number
-  y: number
-  vx: number
-  dir: 1 | -1
-  hp: number
-  invuln: number
-  hurtFlash: number   // 피격 깜빡임 (이형환위 무적과 분리)
-  attacking: number
-  qiCasting: number   // 장풍 발사 자세 ms
-  dashing: number
-  slashCd: number
-  qiCd: number
-  dashCd: number
-}
-
-interface Enemy {
-  id: number
-  x: number
-  y: number
-  vx: number
-  dir: 1 | -1
-  hp: number
-  maxHp: number
-  elite: boolean
-  hitStun: number
-}
-
-interface Wave {
-  id: number
-  x: number
-  y: number
-  w: number
-  h: number
-  vx: number
-  life: number
-  hitIds: ReadonlySet<number>   // 본 wave 가 이미 hit 한 적 (중복 차단)
-}
-
-type JudgeTone = 'cyan' | 'red' | 'amber' | 'violet' | 'stone'
-
-interface Judge {
-  id: number
-  text: string
-  tone: JudgeTone
-}
-
-interface KeysHeld {
-  left: boolean
-  right: boolean
-}
-
-interface Particle {
-  id: number
-  x: number
-  y: number
-  vx: number
-  vy: number
-  life: number
-  max: number
-  color: string
-  size: number
-}
-
-type EffectKind = 'impact' | 'impact-elite' | 'death'
-
-interface Effect {
-  id: number
-  kind: EffectKind
-  x: number
-  y: number
-  life: number
-  max: number
-  flipped: boolean      // 왼쪽 hit 시 sprite 좌우 반전
-}
-
-type Phase = 'idle' | 'playing' | 'over'
-
-interface View {
-  width: number
-  height: number
-  scale: number
-  isDesktop: boolean
-}
-
-// ─── 유틸 ─────────────────────────────────────────────────────
-function clamp(v: number, lo: number, hi: number): number {
-  return v < lo ? lo : Math.min(v, hi)
-}
-
-function rectsOverlap(
-  ax: number, ay: number, aw: number, ah: number,
-  bx: number, by: number, bw: number, bh: number,
-): boolean {
-  return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by
-}
-
-let _idSeq = 1
-
-function nextId(): number {
-  _idSeq = (_idSeq + 1) & 0x7fffffff
-  return _idSeq
-}
-
-function makePlayer(): Player {
-  return {
-    x: WORLD_W / 2 - PLAYER_W / 2,
-    y: GROUND_Y - PLAYER_H,
-    vx: 0,
-    dir: 1,
-    hp: PLAYER_MAX_HP,
-    invuln: 0,
-    hurtFlash: 0,
-    attacking: 0,
-    qiCasting: 0,
-    dashing: 0,
-    slashCd: 0,
-    qiCd: 0,
-    dashCd: 0,
-  }
-}
-
-function makeEnemy(level: number, side?: 'left' | 'right'): Enemy {
-  const useSide: 'left' | 'right' = side ?? (Math.random() > 0.5 ? 'right' : 'left')
-  const elite = Math.random() < Math.min(
-    ENEMY_ELITE_RATE_BASE + level * ENEMY_ELITE_RATE_PER_LEVEL,
-    ENEMY_ELITE_RATE_MAX,
-  )
-  const x = useSide === 'right' ? WORLD_W + 60 : -90
-  const dir: 1 | -1 = useSide === 'right' ? -1 : 1
-  const baseSpeed = elite
-    ? ENEMY_ELITE_SPEED + level * ENEMY_ELITE_SPEED_PER_LEVEL
-    : ENEMY_BASE_SPEED + level * ENEMY_SPEED_PER_LEVEL
-  return {
-    id: nextId(),
-    x,
-    y: GROUND_Y - ENEMY_H,
-    vx: dir * baseSpeed,
-    dir,
-    hp: elite ? ENEMY_ELITE_HP : ENEMY_HP,
-    maxHp: elite ? ENEMY_ELITE_HP : ENEMY_HP,
-    elite,
-    hitStun: 0,
-  }
-}
-
-function spawnParticles(
-  out: Particle[],
-  cx: number,
-  cy: number,
-  count: number,
-  color: string,
-  speedScale = 1,
-  sizeRange: [number, number] = [2, 5],
-): void {
-  for (let i = 0; i < count; i += 1) {
-    const angle = Math.random() * Math.PI * 2
-    const speed = (PARTICLE_SPEED_MIN + Math.random() * PARTICLE_SPEED_RANGE) * speedScale
-    const life = PARTICLE_LIFE_MS * (PARTICLE_LIFE_JITTER_MIN + Math.random() * PARTICLE_LIFE_JITTER_RANGE)
-    out.push({
-      id: nextId(),
-      x: cx,
-      y: cy,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed - speed * PARTICLE_VY_BIAS_RATIO,
-      life,
-      max: life,
-      color,
-      size: sizeRange[0] + Math.random() * (sizeRange[1] - sizeRange[0]),
-    })
-  }
-}
-
-function makeWave(x: number, y: number, dir: 1 | -1): Wave {
-  return {
-    id: nextId(),
-    x,
-    y,
-    w: QI_W,
-    h: QI_H,
-    vx: dir * QI_SPEED,
-    life: QI_LIFE,
-    hitIds: new Set()
-  }
-}
-
-type ActionKey = 'left' | 'right' | 'slash' | 'qi' | 'dash' | 'enter'
-
-function actionOf(key: string, code: string): ActionKey | null {
-  const k = key?.toLowerCase?.() ?? ''
-  if (k === 'a' || code === 'KeyA' || k === 'arrowleft' || code === 'ArrowLeft') return 'left'
-  if (k === 'd' || code === 'KeyD' || k === 'arrowright' || code === 'ArrowRight') return 'right'
-  if (k === ' ' || code === 'Space') return 'slash'
-  if (k === 'z' || code === 'KeyZ') return 'qi'
-  if (k === 'shift' || code === 'ShiftLeft' || code === 'ShiftRight') return 'dash'
-  if (k === 'enter' || code === 'Enter') return 'enter'
-  return null
-}
 
 // ─── 컴포넌트 ─────────────────────────────────────────────────
 interface GwangsalgeomProps {
@@ -370,12 +47,8 @@ interface GwangsalgeomProps {
 }
 
 export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
+  // ─── HUD state — React 재렌더로 표시되는 값만 ──────────────
   const [phase, setPhase] = useState<Phase>('idle')
-  const [player, setPlayer] = useState<Player>(makePlayer)
-  const [enemies, setEnemies] = useState<readonly Enemy[]>([])
-  const [waves, setWaves] = useState<readonly Wave[]>([])
-  const [particles, setParticles] = useState<readonly Particle[]>([])
-  const [effects, setEffects] = useState<readonly Effect[]>([])
   const [gwangsalFx, setGwangsalFx] = useState<number>(0)   // 광살 발동 시 풀스크린 sprite ms
   const [score, setScore] = useState<number>(0)
   const [combo, setCombo] = useState<number>(0)
@@ -389,24 +62,72 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
     scale: 1,
     isDesktop: false
   })
+  // viewport 가시성 + focus — 둘 다 활성이어야 RAF 가동 (CPU 절감 + 사고 방지). 검기생존록 정합.
+  const [isVisible, setIsVisible] = useState<boolean>(true)
+  const [isFocused, setIsFocused] = useState<boolean>(false)
 
+  // ─── DOM ref ───────────────────────────────────────────────
   const stageRef = useRef<HTMLDivElement | null>(null)
-  // 모바일 가상 패드 (좌측 영역 swipe) — 검기생존록 패턴 정합. 광살검은 1D (가로).
   const padActiveRef = useRef<{id: number; ox: number} | null>(null)
   const padBaseRef = useRef<HTMLDivElement | null>(null)
   const padDotRef = useRef<HTMLDivElement | null>(null)
+  // entity layer container — render() 가 createElement + appendChild 로 채움.
+  const playerElRef = useRef<HTMLDivElement | null>(null)
+  const waveLayerRef = useRef<HTMLDivElement | null>(null)
+  const enemyLayerRef = useRef<HTMLDivElement | null>(null)
+  const particleLayerRef = useRef<HTMLDivElement | null>(null)
+  const effectLayerRef = useRef<HTMLDivElement | null>(null)
+  // id → DOM 매핑 (syncEntityLayer 가 사용). frame 간 element 재사용.
+  const waveElMap = useRef<Map<number, HTMLDivElement>>(new Map())
+  const enemyElMap = useRef<Map<number, HTMLDivElement>>(new Map())
+  const particleElMap = useRef<Map<number, HTMLDivElement>>(new Map())
+  const effectElMap = useRef<Map<number, HTMLDivElement>>(new Map())
+
+  // ─── 시뮬레이션 ref (mutable, frame 당 alloc ~0) — 검기생존록 정합 ──
+  const playerRef = useRef<Player>(makePlayer())
+  const enemiesRef = useRef<Enemy[]>([])
+  const wavesRef = useRef<Wave[]>([])
+  const particlesRef = useRef<Particle[]>([])
+  const effectsRef = useRef<Effect[]>([])
+
+  // ─── 보조 ref ─────────────────────────────────────────────
   const frameRef = useRef<number | null>(null)
   const keysRef = useRef<KeysHeld>({left: false, right: false})
   const lastSpawnRef = useRef<number>(0)
   const hitStopUntilRef = useRef<number>(0)
   const scoreTickRef = useRef<number>(0)
   const timersRef = useRef<number[]>([])
-  // 상태 ref — RAF loop 가 항상 최신 값 참조 (setState batch 영향 X).
-  const stateRef = useRef({player, enemies, waves, phase, ki})
+  // score·combo·level 동기 ref — RAF deps 에서 제외 (재구독 차단). setState 호출 옆에서 .current 동기 갱신.
+  const scoreRef = useRef<number>(0)
+  const comboRef = useRef<number>(0)
+  const levelRef = useRef<number>(1)
+  // HUD dirty flag — RAF tick 안 변경 시 mark, frame-end 에 setState 1회 batch (검기생존록 정합).
+  const hudDirtyRef = useRef<boolean>(false)
 
+  // ─── render — DOM 직접 갱신 + HUD batch (검기생존록 정합) ──
+  // RAF tick 끝에 호출. entity = DOM 직접, HUD = dirty 시 1회 setState (batch).
+  const renderFrame = useCallback(() => {
+    if (playerElRef.current) updatePlayerEl(playerElRef.current, playerRef.current, phaseRef.current === 'playing')
+    syncEntityLayer(wavesRef.current, waveElMap.current, waveLayerRef.current, createWaveEl, updateWaveEl)
+    syncEntityLayer(enemiesRef.current, enemyElMap.current, enemyLayerRef.current, createEnemyEl, updateEnemyEl)
+    syncEntityLayer(particlesRef.current, particleElMap.current, particleLayerRef.current, createParticleEl, updateParticleEl)
+    syncEntityLayer(effectsRef.current, effectElMap.current, effectLayerRef.current, createEffectEl, updateEffectEl)
+    if (hudDirtyRef.current) {
+      hudDirtyRef.current = false
+      setScore(scoreRef.current)
+      setCombo(comboRef.current)
+      setLevel(levelRef.current)
+    }
+  }, [])
+
+  // phase 동기 ref — renderFrame 안에서 sm-stickman-hurt class 가 phase==='playing' 일 때만 적용되게.
+  // 초기값 'idle' = phase state 초기값과 동일 (line ~56). 변경 시 두 곳 동시 갱신.
+  const phaseRef = useRef<Phase>('idle')
   useEffect(() => {
-    stateRef.current = {player, enemies, waves, phase, ki}
-  }, [player, enemies, waves, phase, ki])
+    phaseRef.current = phase
+    // RAF 가 phase!=='playing' 일 때 안 돌아 — 첫 마운트·idle/over 화면에서 player 위치/sprite 갱신 위해 1회 호출.
+    renderFrame()
+  }, [phase, renderFrame])
 
   // ─── 스테이지 fit ──────────────────────────────────────────
   // ResizeObserver 미사용 — 광살검은 가로형(820×460)이라 stage size 가
@@ -439,12 +160,29 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
   }, [])
 
   // ─── 클린업 ────────────────────────────────────────────────
+  // unmount 시점 살아있는 RAF id·timer 취소 — ref.current 직접 사용이 정답.
+  // local capture 는 unmount 직전 갱신된 RAF id 를 놓침.
   useEffect(() => {
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current)
       for (const id of timersRef.current) globalThis.clearTimeout(id)
       timersRef.current = []
     }
+  }, [])
+
+  // ─── viewport 가시성 감시 ─────────────────────────────────
+  useEffect(() => {
+    const stage = stageRef.current
+    if (!stage || typeof IntersectionObserver === 'undefined') return
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) setIsVisible(entry.isIntersecting)
+      },
+      {threshold: 0.1},
+    )
+    io.observe(stage)
+    return () => io.disconnect()
   }, [])
 
   // ─── 헬퍼 ──────────────────────────────────────────────────
@@ -467,59 +205,55 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
   const spawnBurst = useCallback((
     cx: number, cy: number, count: number, color: string, speedScale = 1, sizeRange?: [number, number],
   ) => {
-    setParticles((prev) => {
-      const arr = [...prev]
-      spawnParticles(arr, cx, cy, count, color, speedScale, sizeRange)
-      return arr
-    })
+    spawnParticles(particlesRef.current, cx, cy, count, color, speedScale, sizeRange)
   }, [])
 
   const spawnEffect = useCallback((kind: EffectKind, cx: number, cy: number, dir: 1 | -1 = 1) => {
     const life = kind === 'death' ? EFFECT_DEATH_LIFE_MS : EFFECT_IMPACT_LIFE_MS
-    setEffects((prev) => {
-      const next: Effect[] = [...prev, {
-        id: nextId(),
-        kind,
-        x: cx,
-        y: cy,
-        life,
-        max: life,
-        flipped: dir > 0
-      }]
-      return next.length > EFFECT_CAP ? next.slice(-EFFECT_CAP) : next
+    effectsRef.current.push({
+      id: nextId(),
+      kind,
+      x: cx,
+      y: cy,
+      life,
+      max: life,
+      flipped: dir > 0,
     })
+    if (effectsRef.current.length > EFFECT_CAP) {
+      effectsRef.current.splice(0, effectsRef.current.length - EFFECT_CAP)
+    }
   }, [])
 
   // 광살 — ki 200 (KI_GWANGSAL) 도달 시 자동 발동: 화면 위 모든 적 즉시 사망 + ki 0 + 점수 보너스
   useEffect(() => {
     if (ki < KI_GWANGSAL || phase !== 'playing') return
-    const current = stateRef.current.enemies
+    const current = enemiesRef.current
     if (current.length === 0) {
       // 적 0 일 때도 ki 는 0 으로 리셋 (overflow 방지)
       setKi(0)
       return
     }
     for (const e of current) {
-      setEffects((prev) => {
-        const arr: Effect[] = [
-          ...prev,
-          {
-            id: nextId(),
-            kind: 'death',
-            x: e.x + ENEMY_W / 2,
-            y: e.y + ENEMY_H / 2,
-            life: EFFECT_DEATH_LIFE_MS,
-            max: EFFECT_DEATH_LIFE_MS,
-            flipped: e.dir > 0,
-          },
-        ]
-        return arr.length > EFFECT_CAP ? arr.slice(-EFFECT_CAP) : arr
+      effectsRef.current.push({
+        id: nextId(),
+        kind: 'death',
+        x: e.x + ENEMY_W / 2,
+        y: e.y + ENEMY_H / 2,
+        life: EFFECT_DEATH_LIFE_MS,
+        max: EFFECT_DEATH_LIFE_MS,
+        flipped: e.dir > 0,
       })
     }
-    setScore((v) => v + current.length * SCORE_PER_KILL)
-    setEnemies([])
+    if (effectsRef.current.length > EFFECT_CAP) {
+      effectsRef.current.splice(0, effectsRef.current.length - EFFECT_CAP)
+    }
+    const killedCount = current.length
+    scoreRef.current += killedCount * SCORE_PER_KILL
+    setScore(scoreRef.current)
+    enemiesRef.current.length = 0
     setKi((v) => Math.max(0, v - KI_GWANGSAL_LOSS))  // -200 (남은 34)
-    setCombo((v) => v + current.length)
+    comboRef.current += killedCount
+    setCombo(comboRef.current)
     setGwangsalFx(GWANGSAL_FX_MS)
     const gid = globalThis.setTimeout(() => setGwangsalFx(0), GWANGSAL_FX_CLEAR_MS)
     timersRef.current.push(gid)
@@ -532,15 +266,19 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
 
   const reset = useCallback(() => {
     setPhase('playing')
-    setPlayer(makePlayer())
-    setEnemies([makeEnemy(1, 'right')])
-    setWaves([])
-    setParticles([])
-    setEffects([])
+    playerRef.current = makePlayer()
+    enemiesRef.current = [makeEnemy(1, 'right')]
+    wavesRef.current = []
+    particlesRef.current = []
+    effectsRef.current = []
     setGwangsalFx(0)
+    scoreRef.current = 0
     setScore(0)
+    comboRef.current = 0
     setCombo(0)
+    levelRef.current = 1
     setLevel(1)
+    hudDirtyRef.current = false
     setKi(0)
     setJudge(null)
     lastSpawnRef.current = performance.now()
@@ -553,36 +291,32 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
 
   // ─── 액션 ──────────────────────────────────────────────────
   const takeDamage = useCallback(() => {
-    const s = stateRef.current
-    if (s.phase !== 'playing') return
-    const p = s.player
+    const p = playerRef.current
+    if (phase !== 'playing') return
     if (p.invuln > 0) return
     triggerShake(true)
     hitStop(HITSTOP_PLAYER_HURT_MS)
     spawnBurst(p.x + PLAYER_W / 2, p.y + PLAYER_H / 2, PARTICLES_PLAYER_HURT, COLOR_PLAYER_HURT, 1.1, [3, 6])
     flashText('피격', 'red')
+    comboRef.current = 0
     setCombo(0)
     setKi((v) => Math.max(0, v - KI_HURT_LOSS))  // 피격 시 내공 30 감소
-    setPlayer((prev) => {
-      const nextHp = prev.hp - 1
-      if (nextHp <= 0) {
-        setPhase('over')
-        return {...prev, hp: 0, invuln: 9999}
-      }
-      return {
-        ...prev,
-        hp: nextHp,
-        invuln: PLAYER_IFRAME_MS,
-        hurtFlash: HURT_FLASH_MS,
-        vx: -prev.dir * PLAYER_HURT_KNOCKBACK
-      }
-    })
-  }, [flashText, hitStop, spawnBurst, triggerShake])
+    const nextHp = p.hp - 1
+    if (nextHp <= 0) {
+      p.hp = 0
+      p.invuln = 9999
+      setPhase('over')
+    } else {
+      p.hp = nextHp
+      p.invuln = PLAYER_IFRAME_MS
+      p.hurtFlash = HURT_FLASH_MS
+      p.vx = -p.dir * PLAYER_HURT_KNOCKBACK
+    }
+  }, [flashText, hitStop, phase, spawnBurst, triggerShake])
 
   const slashAttack = useCallback(() => {
-    const s = stateRef.current
-    if (s.phase !== 'playing') return
-    const p = s.player
+    if (phase !== 'playing') return
+    const p = playerRef.current
     if (p.slashCd > 0) return
 
     const centerX = p.x + PLAYER_W / 2
@@ -602,12 +336,10 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
       elite: boolean
     }> = []
 
-    const nextEnemies: Enemy[] = []
-    for (const enemy of s.enemies) {
-      if (!rectsOverlap(attackBox.x, attackBox.y, attackBox.w, attackBox.h, enemy.x, enemy.y, ENEMY_W, ENEMY_H)) {
-        nextEnemies.push(enemy)
-        continue
-      }
+    // 적 list in-place mutate — hit 적 hp 감소, kill 시 splice.
+    for (let i = enemiesRef.current.length - 1; i >= 0; i -= 1) {
+      const enemy = enemiesRef.current[i]!
+      if (!rectsOverlap(attackBox.x, attackBox.y, attackBox.w, attackBox.h, enemy.x, enemy.y, ENEMY_W, ENEMY_H)) continue
       hitCount += 1
       const nextHp = enemy.hp - 1
       const cx = enemy.x + ENEMY_W / 2
@@ -619,20 +351,18 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
           cy,
           color: enemy.elite ? COLOR_KILL_ELITE : COLOR_KILL_NORMAL,
           kill: true,
-          elite: enemy.elite
+          elite: enemy.elite,
         })
+        enemiesRef.current.splice(i, 1)
         continue
       }
       burstSpots.push({cx, cy, color: COLOR_HIT_NORMAL, kill: false, elite: enemy.elite})
-      nextEnemies.push({
-        ...enemy,
-        hp: nextHp,
-        x: enemy.x + p.dir * SLASH_KNOCKBACK,
-        hitStun: ENEMY_HIT_STUN_MS
-      })
+      enemy.hp = nextHp
+      enemy.x += p.dir * SLASH_KNOCKBACK
+      enemy.hitStun = ENEMY_HIT_STUN_MS
     }
-    setEnemies(nextEnemies)
-    setPlayer((prev) => ({...prev, attacking: SLASH_FLASH_MS, slashCd: SLASH_COOLDOWN_MS}))
+    p.attacking = SLASH_FLASH_MS
+    p.slashCd = SLASH_COOLDOWN_MS
 
     for (const spot of burstSpots) {
       spawnBurst(spot.cx, spot.cy, spot.kill ? PARTICLES_KILL : PARTICLES_HIT, spot.color, spot.kill ? 1.4 : 1, spot.kill ? [3, 7] : [2, 4])
@@ -645,21 +375,23 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
       triggerShake(killCount > 0)
       hitStop(killCount > 0 ? HITSTOP_KILL_MS : HITSTOP_HIT_MS)
       flashText(killCount >= 2 || hitCount >= 2 ? '연참' : '참격', hitCount >= 2 ? 'violet' : 'cyan')
-      setScore((v) => v + hitCount * SCORE_PER_HIT + killCount * SCORE_PER_KILL + Math.floor(combo / 5) * SCORE_PER_COMBO_5)
-      setCombo((v) => v + hitCount)
+      scoreRef.current += hitCount * SCORE_PER_HIT + killCount * SCORE_PER_KILL + Math.floor(comboRef.current / 5) * SCORE_PER_COMBO_5
+      setScore(scoreRef.current)
+      comboRef.current += hitCount
+      setCombo(comboRef.current)
       setKi((v) => clamp(v + hitCount * KI_PER_HIT + killCount * KI_PER_KILL, 0, KI_MAX))
       return
     }
     flashText('허공', 'stone')
+    comboRef.current = 0
     setCombo(0)
     setKi((v) => clamp(v + KI_PER_WHIFF, 0, KI_MAX))
-  }, [combo, flashText, hitStop, spawnBurst, spawnEffect, triggerShake])
+  }, [flashText, hitStop, phase, spawnBurst, spawnEffect, triggerShake])
 
   const qiAttack = useCallback(() => {
-    const s = stateRef.current
-    if (s.phase !== 'playing') return
-    const p = s.player
-    if (s.ki < QI_COST) {
+    if (phase !== 'playing') return
+    const p = playerRef.current
+    if (ki < QI_COST) {
       flashText('내공 부족', 'stone')
       return
     }
@@ -667,16 +399,16 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
     const startX = p.dir > 0 ? centerX + QI_OFFSET_NEAR : centerX - QI_OFFSET_NEAR - QI_W
     const startY = p.y + QI_OFFSET_Y
     setKi((v) => Math.max(0, v - QI_COST))
-    setWaves((prev) => [...prev, makeWave(startX, startY, p.dir)])
-    setPlayer((prev) => ({...prev, qiCd: QI_COOLDOWN_MS, qiCasting: QI_CAST_POSE_MS}))
+    wavesRef.current.push(makeWave(startX, startY, p.dir))
+    p.qiCd = QI_COOLDOWN_MS
+    p.qiCasting = QI_CAST_POSE_MS
     flashText('장풍', 'amber')
-  }, [flashText])
+  }, [flashText, ki, phase])
 
   const dash = useCallback(() => {
-    const s = stateRef.current
-    if (s.phase !== 'playing') return
-    const p = s.player
-    if (s.ki < DASH_COST) {
+    if (phase !== 'playing') return
+    const p = playerRef.current
+    if (ki < DASH_COST) {
       flashText('내공 부족', 'stone')
       return
     }
@@ -689,31 +421,32 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
     const endX = clamp(p.x + p.dir * DASH_DISTANCE, PLAYER_BOUND_PAD, WORLD_W - PLAYER_W - PLAYER_BOUND_PAD)
     const pathMin = Math.min(startX, endX) - ENEMY_W * DASH_PATH_PAD_RATIO
     const pathMax = Math.max(startX, endX) + PLAYER_W + ENEMY_W * DASH_PATH_PAD_RATIO
-    const survivors: Enemy[] = []
+    // 적 list in-place mutate — 경로 안 적 splice + death effect.
     const killed: Enemy[] = []
-    for (const e of s.enemies) {
-      if (e.x + ENEMY_W >= pathMin && e.x <= pathMax) killed.push(e)
-      else survivors.push(e)
+    for (let i = enemiesRef.current.length - 1; i >= 0; i -= 1) {
+      const e = enemiesRef.current[i]!
+      if (e.x + ENEMY_W >= pathMin && e.x <= pathMax) {
+        killed.push(e)
+        enemiesRef.current.splice(i, 1)
+      }
     }
     if (killed.length > 0) {
-      setEnemies(survivors)
-      setScore((v) => v + killed.length * SCORE_PER_KILL)
-      setCombo((v) => v + killed.length)
+      scoreRef.current += killed.length * SCORE_PER_KILL
+      setScore(scoreRef.current)
+      comboRef.current += killed.length
+      setCombo(comboRef.current)
       for (const e of killed) {
         spawnEffect('death', e.x + ENEMY_W / 2, e.y + ENEMY_H / 2, p.dir)
       }
       flashText(killed.length >= 2 ? '一閃' : '참섬', 'violet')
     }
 
-    setPlayer((prev) => ({
-      ...prev,
-      x: endX,
-      vx: prev.dir * DASH_VX,
-      invuln: Math.max(prev.invuln, DASH_IFRAME_MS),
-      dashing: DASH_DURATION_MS,
-      dashCd: DASH_COOLDOWN_MS,
-    }))
-  }, [flashText, spawnEffect, triggerShake])
+    p.x = endX
+    p.vx = p.dir * DASH_VX
+    p.invuln = Math.max(p.invuln, DASH_IFRAME_MS)
+    p.dashing = DASH_DURATION_MS
+    p.dashCd = DASH_COOLDOWN_MS
+  }, [flashText, ki, phase, spawnEffect, triggerShake])
 
   // ─── 입력 ──────────────────────────────────────────────────
   const onKeyDown = useCallback((e: ReactKeyboardEvent<HTMLDivElement>) => {
@@ -724,14 +457,14 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
     if (action === 'left') keysRef.current.left = true
     if (action === 'right') keysRef.current.right = true
     if (action === 'enter') {
-      if (stateRef.current.phase !== 'playing') reset()
+      if (phase !== 'playing') reset()
       return
     }
-    if (stateRef.current.phase !== 'playing') return
+    if (phase !== 'playing') return
     if (action === 'slash') slashAttack()
     if (action === 'qi') qiAttack()
     if (action === 'dash') dash()
-  }, [dash, qiAttack, reset, slashAttack])
+  }, [dash, phase, qiAttack, reset, slashAttack])
 
   const onKeyUp = useCallback((e: ReactKeyboardEvent<HTMLDivElement>) => {
     const action = actionOf(e.key, e.code)
@@ -740,221 +473,14 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
   }, [])
 
   // ─── RAF loop ──────────────────────────────────────────────
-  useEffect(() => {
-    if (phase !== 'playing') {
-      if (frameRef.current !== null) {
-        cancelAnimationFrame(frameRef.current)
-        frameRef.current = null
-      }
-      return
-    }
-    let prev = performance.now()
-    const loop = (now: number) => {
-      const rawDt = now - prev
-      prev = now
-      // Hit-stop = simulation freeze (애니메이션·콤보 텍스트는 시각 유지).
-      if (now < hitStopUntilRef.current) {
-        frameRef.current = requestAnimationFrame(loop)
-        return
-      }
-      const dt = Math.min(DT_MAX_MS, rawDt)
-      const dtScale = dt / DT_BASE_MS
-
-      const nextLevel = Math.floor(score / SCORE_PER_LEVEL) + 1
-      if (nextLevel !== level) setLevel(nextLevel)
-
-      // spawn
-      const spawnGap = Math.max(SPAWN_GAP_MIN, SPAWN_GAP_BASE - nextLevel * SPAWN_GAP_PER_LEVEL)
-      if (now - lastSpawnRef.current > spawnGap) {
-        lastSpawnRef.current = now
-        setEnemies((old) => {
-          const cap = clamp(SPAWN_CAP_BASE + Math.floor(nextLevel / SPAWN_CAP_PER_LEVEL), SPAWN_CAP_BASE, SPAWN_CAP_MAX)
-          if (old.length >= cap) return old
-          return [...old, makeEnemy(nextLevel)]
-        })
-      }
-
-      // player update
-      setPlayer((p) => {
-        const vx = p.vx * FRICTION
-        let dir: 1 | -1 = p.dir
-        let x = p.x
-        const speed = PLAYER_SPEED * (dt / DT_BASE_MS)
-        if (keysRef.current.left) {
-          x -= speed
-          dir = -1
-        }
-        if (keysRef.current.right) {
-          x += speed
-          dir = 1
-        }
-        x += vx * dtScale
-        return {
-          ...p,
-          x: clamp(x, PLAYER_BOUND_PAD, WORLD_W - PLAYER_W - PLAYER_BOUND_PAD),
-          vx,
-          dir,
-          invuln: Math.max(0, p.invuln - dt),
-          hurtFlash: Math.max(0, p.hurtFlash - dt),
-          attacking: Math.max(0, p.attacking - dt),
-          qiCasting: Math.max(0, p.qiCasting - dt),
-          dashing: Math.max(0, p.dashing - dt),
-          slashCd: Math.max(0, p.slashCd - dt),
-          qiCd: Math.max(0, p.qiCd - dt),
-          dashCd: Math.max(0, p.dashCd - dt),
-        }
-      })
-
-      // enemy update + 충돌
-      setEnemies((prevEnemies) => {
-        const p = stateRef.current.player
-        const next: Enemy[] = []
-        let damaged = false
-        for (const enemy of prevEnemies) {
-          const stun = Math.max(0, enemy.hitStun - dt)
-          const chaseDir: 1 | -1 = p.x + PLAYER_W / 2 > enemy.x + ENEMY_W / 2 ? 1 : -1
-          const speed = stun > 0 ? 0 : chaseDir * Math.abs(enemy.vx)
-          const moved: Enemy = {
-            ...enemy,
-            x: enemy.x + speed * dtScale,
-            dir: chaseDir,
-            hitStun: stun
-          }
-          if (moved.x < -ENEMY_DESPAWN_PAD || moved.x > WORLD_W + ENEMY_DESPAWN_PAD) continue
-          // 플레이어와 충돌
-          if (
-            rectsOverlap(
-              moved.x, moved.y, ENEMY_W, ENEMY_H,
-              p.x + ENEMY_INTERSECT_PAD_X, p.y + ENEMY_INTERSECT_PAD_Y,
-              PLAYER_W - ENEMY_INTERSECT_PAD_X * 2, PLAYER_H - ENEMY_INTERSECT_PAD_Y - 4,
-            )
-            && p.invuln <= 0
-          ) {
-            damaged = true
-            moved.x -= chaseDir * ENEMY_KNOCKBACK_ON_DAMAGE
-          }
-          next.push(moved)
-        }
-        if (damaged) requestAnimationFrame(takeDamage)
-        return next
-      })
-
-      // wave update + 적 충돌
-      setWaves((prevWaves) => {
-        const currentEnemies = stateRef.current.enemies
-        const nextWaves: Wave[] = []
-        const damagedIds = new Set<number>()
-        let hitCount = 0
-        let killCount = 0
-        const mutEnemies: Enemy[] = currentEnemies.map((e) => ({...e}))
-
-        for (const wave of prevWaves) {
-          const moved: Wave = {
-            ...wave,
-            x: wave.x + wave.vx * dtScale,
-            life: wave.life - dtScale,
-          }
-          if (moved.life <= 0 || moved.x < -QI_DESPAWN_PAD || moved.x > WORLD_W + QI_DESPAWN_PAD) continue
-
-          // 장풍 = 관통. 본 wave 가 이미 hit 한 적은 중복 X (hitIds per-wave).
-          let movedHitIds: ReadonlySet<number> = moved.hitIds
-          for (const enemy of mutEnemies) {
-            if (enemy.hp <= 0 || movedHitIds.has(enemy.id)) continue
-            if (!rectsOverlap(moved.x, moved.y, moved.w, moved.h, enemy.x, enemy.y + 10, ENEMY_W, ENEMY_H - 10)) continue
-            hitCount += 1
-            enemy.hp -= QI_DAMAGE
-            enemy.hitStun = ENEMY_QI_STUN_MS
-            // 장풍은 적을 밀어내지 않음 (사용자 명시) — knockback 0
-            if (enemy.hp <= 0) killCount += 1
-            damagedIds.add(enemy.id)          // 파티클 spawn 용 (frame 단위 누적)
-            const nextSet = new Set(movedHitIds)
-            nextSet.add(enemy.id)
-            movedHitIds = nextSet
-          }
-          nextWaves.push({...moved, hitIds: movedHitIds})    // 수명 종료까지 유지, hit 누적
-        }
-
-        if (hitCount > 0) {
-          setEnemies(mutEnemies.filter((e) => e.hp > 0))
-          setScore((v) => v + hitCount * SCORE_QI_HIT + killCount * SCORE_QI_KILL)
-          setCombo((v) => v + hitCount)
-          // 장풍 자체로는 내공 회복 0 — 베기 적중·처치로만 내공 쌓이도록 (무한 장풍 방지).
-          flashText(killCount > 0 ? '격파' : '명중', killCount > 0 ? 'violet' : 'amber')
-          // 장풍 hit 파티클
-          for (const id of damagedIds) {
-            const e = currentEnemies.find((c) => c.id === id)
-            if (!e) continue
-            const dead = mutEnemies.find((c) => c.id === id)?.hp === 0
-            const count = dead ? PARTICLES_KILL : PARTICLES_QI_HIT
-            let color: string
-            if (dead) {
-              color = e.elite ? COLOR_KILL_ELITE : COLOR_KILL_NORMAL
-            } else {
-              color = COLOR_HIT_QI
-            }
-            setParticles((prev) => {
-              const arr = [...prev]
-              spawnParticles(arr, e.x + ENEMY_W / 2, e.y + ENEMY_H / 2, count, color, dead ? 1.4 : 1, dead ? [3, 7] : [2, 4])
-              return arr
-            })
-          }
-          if (killCount > 0) {
-            hitStopUntilRef.current = performance.now() + HITSTOP_KILL_MS
-            setShake(true)
-            const sid = globalThis.setTimeout(() => setShake(false), SHAKE_KILL_MS)
-            timersRef.current.push(sid)
-          }
-        }
-        return nextWaves
-      })
-
-      // 이펙트 update — life decay 후 expired drop
-      setEffects((prev) => {
-        if (prev.length === 0) return prev
-        const next: Effect[] = []
-        for (const e of prev) {
-          const life = e.life - dt
-          if (life <= 0) continue
-          next.push({...e, life})
-        }
-        return next
-      })
-
-      // 파티클 update + cap
-      setParticles((prev) => {
-        if (prev.length === 0) return prev
-        const next: Particle[] = []
-        const dtSec = dt / 1000
-        for (const p of prev) {
-          const life = p.life - dt
-          if (life <= 0) continue
-          next.push({
-            ...p,
-            x: p.x + p.vx * dtSec,
-            y: p.y + p.vy * dtSec,
-            vx: p.vx * PARTICLE_FRICTION,
-            vy: p.vy * PARTICLE_FRICTION + PARTICLE_GRAVITY * dtSec,
-            life,
-          })
-        }
-        // 상한 초과 시 오래된 것 drop (배열 앞쪽 = 오래된 것 가정)
-        return next.length > PARTICLES_CAP ? next.slice(-PARTICLES_CAP) : next
-      })
-
-      // 점수 tick — 매 frame X (4 frame 마다 = 15tick/s)
-      scoreTickRef.current += 1
-      if (scoreTickRef.current >= SCORE_TICK_RATE) {
-        scoreTickRef.current = 0
-        setScore((v) => v + SCORE_TICK)
-      }
-      frameRef.current = requestAnimationFrame(loop)
-    }
-    frameRef.current = requestAnimationFrame(loop)
-    return () => {
-      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current)
-      frameRef.current = null
-    }
-  }, [flashText, level, phase, score, takeDamage])
+  useGameLoop({
+    phase, isVisible, isFocused,
+    hitStopUntilRef, lastSpawnRef, frameRef, keysRef, scoreTickRef, timersRef,
+    playerRef, enemiesRef, wavesRef, particlesRef, effectsRef,
+    scoreRef, comboRef, levelRef, hudDirtyRef,
+    setShake,
+    renderFrame, takeDamage, flashText,
+  })
 
   // ─── 모바일 버튼 핸들러 ────────────────────────────────────
   const onPadDown = useCallback((kind: ActionKey) => (e: ReactPointerEvent) => {
@@ -962,11 +488,11 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
     e.stopPropagation()
     if (kind === 'left') keysRef.current.left = true
     if (kind === 'right') keysRef.current.right = true
-    if (stateRef.current.phase !== 'playing') return
+    if (phase !== 'playing') return
     if (kind === 'slash') slashAttack()
     if (kind === 'qi') qiAttack()
     if (kind === 'dash') dash()
-  }, [dash, qiAttack, slashAttack])
+  }, [dash, phase, qiAttack, slashAttack])
 
   // onPadUp 폐기 — 좌측 [←][→] 버튼이 가상 패드 swipe 로 대체됨.
   // 우측 액션 버튼 (베기/장풍/이형환위) 은 *탭* 만 — release 추적 불필요.
@@ -985,7 +511,7 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
   }, [])
 
   const onStagePointerDown = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
-    if (stateRef.current.phase !== 'playing') return
+    if (phase !== 'playing') return
     const x = stageRectToWorldX(e.clientX)
     if (x == null) return
     if (x >= WORLD_W / 2) return  // 우측 = 버튼이 처리. 좌측 영역만 가상 패드.
@@ -1002,7 +528,7 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
       padDotRef.current.style.top = `${localY}px`
       padDotRef.current.style.opacity = '1'
     }
-  }, [stageRectToWorldX])
+  }, [phase, stageRectToWorldX])
 
   const onStagePointerMove = useCallback((e: ReactPointerEvent<HTMLDivElement>) => {
     const pad = padActiveRef.current
@@ -1041,6 +567,9 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
   }, [])
 
   // ─── 렌더 ─────────────────────────────────────────────────
+  // entity 5종 (player/enemies/waves/particles/effects) 은 DOM 직접 갱신 (render.ts).
+  // 본 JSX 는 HUD·layer container·오버레이만 — frame 당 React commit 0.
+  const player = playerRef.current
   const hpHearts = '●'.repeat(player.hp) + '○'.repeat(PLAYER_MAX_HP - player.hp)
   // 이형환위 시각 게이지 — ki 잔량 / DASH_COST 비율 (0..1). DASH_COOLDOWN_MS = 0 라
   // 쿨다운 기반 비율은 의미 없음 (0 / 0 = NaN). ki 진행률이 *사용 가능까지의 거리* 를 더 정확히 표현.
@@ -1062,6 +591,8 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
         onPointerMove={onStagePointerMove}
         onPointerUp={onStagePointerUp}
         onPointerCancel={onStagePointerUp}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         onContextMenu={(e) => e.preventDefault()}
         style={{width: view.width, height: view.height}}
         autoFocus={autoFocus}
@@ -1079,7 +610,7 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
           {/* HUD */}
           <header className="sm-hud-top">
             <div className="sm-hud-card">
-              <div className="sm-hud-title">
+              <div>
                 <div className="sm-hud-eyebrow">狂殺劍</div>
                 <div className="sm-hud-name">광살검</div>
               </div>
@@ -1095,47 +626,13 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
             {view.isDesktop ? '방향키 이동 · Space 베기 · Shift 이형환위 · Z 장풍' : '좌우 이동 · 베기 · 이형환위 · 장풍'}
           </div>
 
-          {/* 장풍 — sprite (dash-burst.webp 임시 alias). 좌측 발사 시 flip. */}
-          {waves.map((wave) => (
-            <div
-              key={wave.id}
-              className="sm-wave"
-              style={{left: wave.x, top: wave.y, width: wave.w, height: wave.h}}
-            >
-              <img
-                className="sm-sprite"
-                src={SPRITE_QI}
-                alt=""
-                draggable={false}
-                style={{transform: wave.vx < 0 ? 'scaleX(-1)' : undefined}}
-              />
-            </div>
-          ))}
+          {/* entity layer — render.ts 가 createElement + appendChild 로 채움 (React reconciliation 우회) */}
+          <div ref={waveLayerRef} className="sm-layer" aria-hidden="true" />
+          <div ref={enemyLayerRef} className="sm-layer" aria-hidden="true" />
+          <div ref={particleLayerRef} className="sm-layer" aria-hidden="true" />
+          <div ref={effectLayerRef} className="sm-layer" aria-hidden="true" />
 
-          {/* 적 */}
-          {enemies.map((enemy) => (
-            <EnemyView key={enemy.id} enemy={enemy}/>
-          ))}
-
-          {/* 이형환위 잔상·베기 호 div 모두 폐기 — sprite filter 만 시각 표현 (사용자 정합). */}
-
-          {/* 파티클 — boxShadow 폐기 (paint 비용 큼). 색은 CSS background 만. */}
-          {particles.map((p) => (
-            <div
-              key={p.id}
-              className="sm-particle"
-              style={{
-                left: p.x,
-                top: p.y,
-                width: p.size,
-                height: p.size,
-                background: p.color,
-                opacity: p.life / p.max,
-              }}
-            />
-          ))}
-
-          {/* 광살 풀스크린 sprite — ki 가득 차 발동 시 ~450ms */}
+          {/* 광살 풀스크린 sprite — ki 가득 차 발동 시 ~450ms (단일 element, React JSX 유지) */}
           {gwangsalFx > 0 && (
             <img
               className="sm-gwangsal-fx"
@@ -1145,47 +642,22 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
             />
           )}
 
-          {/* 임팩트 / 사망 이펙트 — 사용자 제공 sprite */}
-          {effects.map((e) => {
-            let sprite: string
-            if (e.kind === 'death') {
-              sprite = SPRITE_DEATH
-            } else if (e.kind === 'impact-elite') {
-              sprite = SPRITE_IMPACT_ELITE
-            } else {
-              sprite = SPRITE_IMPACT
-            }
-            const size = e.kind === 'death' ? EFFECT_DEATH_SIZE : EFFECT_IMPACT_SIZE
-            return (
-              <img
-                key={e.id}
-                className="sm-effect"
-                src={sprite}
-                alt=""
-                draggable={false}
-                style={{
-                  left: e.x - size / 2,
-                  top: e.y - size / 2,
-                  width: size,
-                  height: size,
-                  opacity: e.life / e.max,
-                  transform: e.flipped ? 'scaleX(-1)' : undefined,
-                }}
-              />
-            )
-          })}
-
-          {/* 플레이어 */}
-          <StickmanView
-            x={player.x}
-            y={player.y}
-            dir={player.dir}
-            attacking={player.attacking > 0}
-            qiCasting={player.qiCasting > 0}
-            dashing={player.dashing > 0}
-            hurt={player.hurtFlash > 0 && phase === 'playing'}
-            invuln={player.invuln > 0 && phase === 'playing'}
-          />
+          {/* 플레이어 — render.ts updatePlayerEl 가 transform·sprite·class 매 frame 갱신.
+              JSX 는 outer div + 자식 img 만 정적 생성, sprite src 초기값 = SPRITE_HERO (첫 paint broken icon 회피). */}
+          <div
+            ref={playerElRef}
+            className="sm-stickman"
+            aria-hidden="true"
+            style={{width: PLAYER_W, height: PLAYER_H}}
+          >
+            <img
+              className="sm-sprite"
+              src={SPRITE_HERO}
+              alt=""
+              draggable={false}
+              style={{transform: 'translateX(-50%)'}}
+            />
+          </div>
 
           {/* 판정 텍스트 */}
           {judge && (
@@ -1241,6 +713,27 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
             </div>
           )}
 
+          {/* 일시정지 오버레이 — playing + viewport/focus 잃음 (검기생존록 정합) */}
+          {phase === 'playing' && (!isFocused || !isVisible) && (
+            <div className="sm-overlay">
+              <div className="sm-overlay-card">
+                <div className="sm-overlay-emoji" aria-hidden="true">⏸</div>
+                <h1 className="sm-overlay-title">일시정지</h1>
+                <p className="sm-overlay-desc">
+                  {isVisible
+                    ? '게임 영역을 다시 클릭하면 재개됩니다.'
+                    : '게임 영역을 화면에 두면 자동 재개됩니다.'}
+                </p>
+                <button
+                  type="button"
+                  className="sm-overlay-btn"
+                  onClick={() => stageRef.current?.focus()}
+                >재개
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* 시작 / 오버 오버레이 */}
           {phase !== 'playing' && (
             <div className="sm-overlay">
@@ -1273,97 +766,5 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
   )
 }
 
-// ─── 졸라맨 (hero sprite view) ───────────────────────────
-interface StickmanViewProps {
-  readonly x: number
-  readonly y: number
-  readonly dir: 1 | -1
-  readonly attacking: boolean
-  readonly qiCasting: boolean
-  readonly dashing: boolean
-  readonly hurt: boolean
-  readonly invuln: boolean
-}
-
-// sprite src 우선순위: dashing > qiCasting > attacking > idle.
-function pickHeroSprite(attacking: boolean, qiCasting: boolean, dashing: boolean): string {
-  if (dashing) return SPRITE_HERO_DASH
-  if (qiCasting) return SPRITE_HERO_QI
-  if (attacking) return SPRITE_HERO_ATTACK
-  return SPRITE_HERO
-}
-
-// 플레이어 = sprite img. 박스와 1:1. 좌측 향 시 scaleX(-1). overflow visible 로 slash arc/dash trail 박스 밖.
-const StickmanView = memo(function StickmanView({
-                                                  x,
-                                                  y,
-                                                  dir,
-                                                  attacking,
-                                                  qiCasting,
-                                                  dashing,
-                                                  hurt,
-                                                  invuln,
-                                                }: StickmanViewProps) {
-  const isRight = dir > 0
-  // 본체 + 상태 클래스 (CSS 가 sprite filter / opacity 결정).
-  const classes = [
-    'sm-stickman',
-    hurt && 'sm-stickman-hurt',
-    attacking && 'sm-stickman-attacking',
-    dashing && 'sm-stickman-dashing',
-    invuln && !hurt && 'sm-stickman-invuln',
-  ].filter(Boolean).join(' ')
-  return (
-    <div
-      className={classes}
-      style={{
-        transform: `translate(${x}px, ${y}px)${isRight ? '' : ' scaleX(-1)'}`,
-        width: PLAYER_W,
-        height: PLAYER_H,
-      }}
-    >
-      <img
-        className="sm-sprite"
-        src={pickHeroSprite(attacking, qiCasting, dashing)}
-        alt=""
-        draggable={false}
-        style={{transform: 'translateX(-50%)'}}
-      />
-    </div>
-  )
-})
-
-// ─── 적 (sprite view) ───────────────────────────────────
-interface EnemyViewProps {
-  readonly enemy: Enemy
-}
-
-// 적 = sprite img (일반 = assassin, 정예 = elite). 박스와 1:1. 좌측 향 시 scaleX(-1).
-const EnemyView = memo(function EnemyView({enemy}: EnemyViewProps) {
-  const isRight = enemy.dir > 0
-  const stunClass = enemy.hitStun > 0 ? ' sm-enemy-stun' : ''
-  const eliteClass = enemy.elite ? ' sm-enemy-elite' : ''
-  return (
-    <div
-      className={`sm-enemy${  stunClass  }${eliteClass}`}
-      style={{
-        transform: `translate(${enemy.x}px, ${enemy.y}px)${isRight ? '' : ' scaleX(-1)'}`,
-        width: ENEMY_W,
-        height: ENEMY_H,
-      }}
-    >
-      <img
-        className="sm-sprite"
-        src={enemy.elite ? SPRITE_ELITE : SPRITE_ASSASSIN}
-        alt=""
-        draggable={false}
-        style={{transform: 'translateX(-50%)'}}
-      />
-      {enemy.maxHp > 1 && (
-        <div className="sm-enemy-hp">
-          <div className="sm-enemy-hp-fill" style={{width: `${(enemy.hp / enemy.maxHp) * 100}%`}}/>
-        </div>
-      )}
-    </div>
-  )
-})
+// StickmanView / EnemyView / pickHeroSprite 폐기 — render.ts 로 이동 (Step 3b-2).
+// 모든 entity (player / enemies / waves / particles / effects) = DOM 직접 갱신.

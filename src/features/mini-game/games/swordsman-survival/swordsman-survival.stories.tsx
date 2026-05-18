@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { MiniGame } from './swordsman-survival'
 
 // 검기생존록 — swordsman-survival 슬라이스 시연.
@@ -45,7 +45,9 @@ export const Narrow: Story = {
 
 // 어두운 배경 — 다크모드 환경 시연.
 export const DarkBackground: Story = {
-  parameters: {
-    backgrounds: { default: 'dark' },
+  globals: {
+    backgrounds: {
+      value: "dark"
+    }
   },
 }

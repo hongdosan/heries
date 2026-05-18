@@ -475,6 +475,13 @@
   transition: width 0.15s linear;
 }
 
+/* entity layer container — DOM 직접 렌더 (Step 3b-2). sm-world 좌표계 유지 위해 fill. */
+.sm-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 /* 장풍 */
 .sm-wave {
   position: absolute;
