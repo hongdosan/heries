@@ -1,4 +1,6 @@
+import type {HTMLAttributes} from 'react'
 import {Link} from 'react-router-dom'
+import {cn} from '../../shared/lib/cn.js'
 import HERO_IMAGE from '../../shared/images/thumbnail-placeholder.webp?url'
 
 const HERO_ALT = 'H-eries — 홍도산의 오리지널 웹 시리즈 컬렉션'
@@ -12,9 +14,11 @@ const HERO_ALT = 'H-eries — 홍도산의 오리지널 웹 시리즈 컬렉션'
  *
  * **여백 강조** — 헤드라인 ~5.5vw 큰 글씨, 모바일은 축소.
  */
-export function HomeHero() {
+export type HomeHeroProps = HTMLAttributes<HTMLElement>
+
+export function HomeHero({className, ...rest}: HomeHeroProps) {
   return (
-    <section className="relative py-[clamp(48px,10vh,128px)] overflow-hidden">
+    <section className={cn('relative py-[clamp(48px,10vh,128px)] overflow-hidden', className)} {...rest}>
       {/* 배경 이미지 — 우측 절반 fade-in, 좌측은 bg 색 (텍스트 가독성).
           mask-image gradient 로 우측 → 좌측 fade.
           aria-hidden 장식 이미지 (alt 무관). */}

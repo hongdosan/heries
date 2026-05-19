@@ -1,4 +1,6 @@
+import type {HTMLAttributes} from 'react'
 import {Link} from 'react-router-dom'
+import {cn} from '../../shared/lib/cn.js'
 
 // 저작권 시작 연도. 사이트 발행이 2026년이라 고정.
 const COPYRIGHT_START = 2026
@@ -8,10 +10,16 @@ function copyrightRange(): string {
   return now <= COPYRIGHT_START ? `${COPYRIGHT_START}` : `${COPYRIGHT_START}–${now}`
 }
 
-export function Footer() {
+export type FooterProps = HTMLAttributes<HTMLElement>
+
+export function Footer({className, ...rest}: Readonly<FooterProps>) {
   return (
     <footer
-      className="max-w-page mx-auto mt-9 px-[clamp(16px,4vw,32px)] py-6 border-t border-rule text-sm text-fg-3">
+      className={cn(
+        'max-w-page mx-auto mt-3 px-[clamp(16px,4vw,32px)] py-6 border-t border-rule text-sm text-fg-3',
+        className,
+      )}
+      {...rest}>
       <p
         className="bg-bg-soft border-l-[3px] border-rule-strong p-3 pl-4 mb-3 rounded-r-md text-fg-3 text-xs leading-[1.7]">
         본 사이트의 모든 소설 본문·등장인물·세계관·시각 자산은 홍도산의 100% 오리지널 창작입니다.

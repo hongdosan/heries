@@ -3,7 +3,7 @@ import {expect, userEvent, within} from 'storybook/test'
 import {HeaderContact} from './header-contact'
 
 const meta: Meta<typeof HeaderContact> = {
-  title: 'widgets/작가 문의',
+  title: 'molecules/작가 문의 (HeaderContact)',
   component: HeaderContact,
   parameters: {
     layout: 'centered',

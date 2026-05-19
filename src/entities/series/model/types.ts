@@ -30,13 +30,23 @@ export interface SeriesFrontmatter {
   started?: string
 }
 
-/** 시리즈 manifest — `content/series/{slug}/manifest.json`. 캐릭터/챕터 인덱스 포함. */
+/** 작품 상세 페이지의 lore note entry — 작품 헤더 우측 LORE NOTES 영역 노출 (각성자 / 마수 / 부대 등 핵심 용어). */
+export interface LoreNote {
+  term: string
+  body: string
+}
+
+/** 시리즈 manifest — `content/series/{slug}/manifest.json`. 캐릭터/챕터 인덱스 + 상세 페이지 노출 메타 포함. */
 export interface SeriesManifest {
   slug: string
   title: string
   status: string
   started?: string
   thumbnail?: string
+  /** 카테고리 라벨 = 작품 상세 페이지의 제목 아래 *각성자 · 마수 · 군대* 식 노출. */
+  categories?: string[]
+  /** 작품 상세 페이지 LORE NOTES 영역 — 작품 핵심 용어 짧은 사전. */
+  loreNotes?: LoreNote[]
   characters: CharacterIndex[]
   chapters: ChapterIndex[]
 }

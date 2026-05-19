@@ -1,5 +1,7 @@
+import type {HTMLAttributes} from 'react'
 import {Link} from 'react-router-dom'
 import {useAuthorMode} from '../../shared/lib/use-author-mode.js'
+import {cn} from '../../shared/lib/cn.js'
 import type {CharacterFolder, CharacterIndex} from '../../entities/character'
 
 /**
@@ -15,7 +17,7 @@ const GROUP_ORDER: ReadonlyArray<{ folder: CharacterFolder; label: string }> = [
   {folder: '4-minor', label: '단역·카메오'},
 ]
 
-export interface CharacterListProps {
+export interface CharacterListProps extends HTMLAttributes<HTMLElement> {
   slug: string
   characters: CharacterIndex[]
 }
@@ -31,13 +33,13 @@ export interface CharacterListProps {
  * **레이아웃**: 그룹 (h3) + 카드 그리드 (`auto-fill, minmax(240px, 1fr)`).
  * 빈 그룹 (members.length === 0) 은 렌더 X.
  */
-export function CharacterList({slug, characters}: Readonly<CharacterListProps>) {
+export function CharacterList({slug, characters, className, ...rest}: Readonly<CharacterListProps>) {
   // 작가 모드 활성 여부 — sessionStorage flag 구독.
   // 작가가 /unlock 에서 키 입력 시 본 hook 이 자동 재 render → 모든 카드 Link 화.
   const isAuthor = useAuthorMode()
 
   return (
-    <section>
+    <section className={cn(className)} {...rest}>
       {GROUP_ORDER.map(({folder, label}) => {
         const members = characters.filter((c) => c.folder === folder)
         // 빈 그룹 = 헤더·카드 모두 숨김 (시각 노이즈 차단).
@@ -67,6 +69,7 @@ export function CharacterList({slug, characters}: Readonly<CharacterListProps>) 
                       </Link>
                     ) : (
                       <div
+                        role="group"
                         className="flex flex-col gap-1 p-3 px-4 rounded-md text-fg-2"
                         aria-label={`${ch.name} — 작가 모드에서 상세 열람`}
                       >

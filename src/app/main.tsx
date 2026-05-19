@@ -58,7 +58,7 @@ function App() {
       >본문으로 건너뛰기</a>
       <Header/>
       <ErrorBoundary>
-        <div id="main"/>
+        <div id="main" tabIndex={-1}/>
         <RouteTransition>
           <Suspense fallback={<Loading/>}>
             <Routes>

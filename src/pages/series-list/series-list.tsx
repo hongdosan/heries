@@ -1,5 +1,11 @@
+import {type KeyboardEvent as ReactKeyboardEvent} from 'react'
 import {Link, useSearchParams} from 'react-router-dom'
-import {fetchSeriesIndex, fetchSeriesManifest, type SeriesIndex, type SeriesManifest} from '../../entities/series'
+import {
+  fetchSeriesIndex,
+  fetchSeriesManifest,
+  type SeriesIndex,
+  type SeriesManifest
+} from '../../entities/series'
 import {assetUrl} from '../../shared/lib/env.js'
 import {useAsync} from '../../shared/lib/use-async.js'
 import {useDocumentTitle} from '../../shared/lib/use-document-title.js'
@@ -44,7 +50,7 @@ type Filter = 'all' | 'ongoing' | 'done'
 const FILTER_LABEL: Record<Filter, string> = {all: '전체', ongoing: '연재 중', done: '완결'}
 const FILTER_KEYS: ReadonlySet<Filter> = new Set(['all', 'ongoing', 'done'])
 
-function SeriesListContent({items, metas}: Readonly<{items: SeriesIndex[]; metas: ManifestMap}>) {
+function SeriesListContent({items, metas}: Readonly<{ items: SeriesIndex[]; metas: ManifestMap }>) {
   // 정렬 = 시작일 최신 순 (started 내림차순), 미시작은 뒤로.
   // 필터 = URL ?filter=ongoing|done|all (기본 all).
   const [searchParams, setSearchParams] = useSearchParams()
@@ -72,6 +78,24 @@ function SeriesListContent({items, metas}: Readonly<{items: SeriesIndex[]; metas
     else setSearchParams({filter: next}, {replace: false})
   }
 
+  // WAI-ARIA tabs 키보드 네비 (자매 슬라이스 series.tsx TabNav 정합) — Arrow/Home/End + roving tabindex.
+  const filterList: Filter[] = ['all', 'ongoing', 'done']
+  const onTabKey = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    const key = e.key
+    if (key !== 'ArrowLeft' && key !== 'ArrowRight' && key !== 'Home' && key !== 'End') return
+    e.preventDefault()
+    const idx = filterList.indexOf(filter)
+    const nextIdx =
+      key === 'ArrowLeft' ? (idx - 1 + filterList.length) % filterList.length
+      : key === 'ArrowRight' ? (idx + 1) % filterList.length
+      : key === 'Home' ? 0
+      : filterList.length - 1
+    const next = filterList[nextIdx]
+    if (!next) return
+    setFilter(next)
+    requestAnimationFrame(() => document.getElementById(`filter-tab-${next}`)?.focus())
+  }
+
   return (
     <main className={MAIN_CLS}>
       <nav className="text-xs text-fg-3 mb-4" aria-label="경로">
@@ -95,12 +119,9 @@ function SeriesListContent({items, metas}: Readonly<{items: SeriesIndex[]; metas
         </div>
       </header>
 
-      <div
-        role="tablist"
-        aria-label="시리즈 필터"
-        className="flex items-center justify-between mb-8 flex-wrap gap-3"
-      >
-        <div className="flex items-center gap-1 text-sm">
+      <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
+        <div role="tablist" aria-label="시리즈 필터"
+             className="flex items-center gap-1 text-sm" onKeyDown={onTabKey}>
           <FilterTab filter="all" label={FILTER_LABEL.all} count={total} active={filter === 'all'}
                      onSelect={setFilter}/>
           <FilterTab filter="ongoing" label={FILTER_LABEL.ongoing} count={ongoing}
@@ -118,7 +139,8 @@ function SeriesListContent({items, metas}: Readonly<{items: SeriesIndex[]; metas
       ) : (
         <ul className="m-0 p-0 list-none flex flex-col gap-8">
           {visible.map((item, idx) => (
-            <SeriesCard key={item.slug} item={item} index={idx + 1} manifest={metas.get(item.slug)}/>
+            <SeriesCard key={item.slug} item={item} index={idx + 1}
+                        manifest={metas.get(item.slug)}/>
           ))}
           {filter === 'all' && <ComingSoonCard index={visible.length + 1}/>}
         </ul>
@@ -143,8 +165,10 @@ function FilterTab({
   return (
     <button
       type="button"
+      id={`filter-tab-${filter}`}
       role="tab"
       aria-selected={active}
+      tabIndex={active ? 0 : -1}
       onClick={() => onSelect(filter)}
       className={cls}
     >
@@ -154,7 +178,11 @@ function FilterTab({
   )
 }
 
-function SeriesCard({item, index, manifest}: Readonly<{item: SeriesIndex; index: number; manifest: SeriesManifest | undefined}>) {
+function SeriesCard({item, index, manifest}: Readonly<{
+  item: SeriesIndex;
+  index: number;
+  manifest: SeriesManifest | undefined
+}>) {
   const cover = useImgFallback()
   let src: string | null
   if (cover.fatal) src = null
@@ -171,9 +199,9 @@ function SeriesCard({item, index, manifest}: Readonly<{item: SeriesIndex; index:
     chapterCount = chapters.length
     if (chapters.length > 0) {
       const dates = chapters
-        .map((c) => c.published)
-        .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
-        .sort((a, b) => a.localeCompare(b))
+      .map((c) => c.published)
+      .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
+      .sort((a, b) => a.localeCompare(b))
       recent = dates.at(-1)
     }
   }
@@ -241,7 +269,7 @@ function SeriesCard({item, index, manifest}: Readonly<{item: SeriesIndex; index:
             {recent && (
               <span className="inline-flex items-baseline gap-1">
                 <span className="text-fg-4">최근</span>
-                <span className="text-fg-2 font-medium">{recent.slice(5)}</span>
+                <time dateTime={recent} className="text-fg-2 font-medium">{recent.slice(5)}</time>
               </span>
             )}
           </div>
@@ -270,10 +298,6 @@ function ComingSoonCard({index}: Readonly<{ index: number }>) {
             loading="lazy"
             className="absolute inset-0 w-full h-full object-cover opacity-40"
           />
-          <div
-            className="absolute inset-0 flex items-center justify-center text-fg-3 text-xs font-mono tracking-[0.16em] bg-bg-soft/40">
-            <span>Vol. 0{index}</span>
-          </div>
         </div>
 
         <div className="flex flex-col gap-3 min-w-0 justify-center">

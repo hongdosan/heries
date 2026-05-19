@@ -4,7 +4,7 @@
 
 **H-eries** = `홍도산` + `(s)eries`. 단일 작가(`홍도산`)가 운영하는 **오리지널 웹 시리즈 컬렉션**.
 
-**최소 의존 — 런타임은 React 19 + React Router 7 + Vite 6 + TypeScript strict.** dev 도구 (Storybook, ESLint 9 flat config,
+**최소 의존 — 런타임은 React 19 + React Router 7 + Vite 7 + TypeScript strict.** dev 도구 (Storybook 9, ESLint 9 flat config,
 babel-plugin-react-compiler, Tailwind v4 + @tailwindcss/vite) 는 devDependencies — dist 산출물에 0~수 KB 영향. 외부 UI/상태
 라이브러리 미사용. *코드만 있으면 어디서든 실행 가능* 한 이식성을 우선한다. GitHub Pages 로 발행 (BrowserRouter, `.nojekyll`).
 
@@ -115,9 +115,9 @@ reader 오로지 독자 본인의 책임 (스포에 대한 책임지지 않음.)
 
 ## 작품 목록
 
-| 슬러그                                                              | 상태  |
-|------------------------------------------------------------------|-----|
-| [`clash-of-multiverses`](./content/series/clash-of-multiverses/) | tba |
+| 슬러그                                                              | 상태   |
+|------------------------------------------------------------------|------|
+| [`clash-of-multiverses`](./content/series/clash-of-multiverses/) | 연재 중 |
 
 > 신규 작품 추가 시 `content/series/{slug}/` 트리 + `content/series.json` `series[]` + `manifest.json` 생성.
 
@@ -149,7 +149,7 @@ heries/
 │   ├── README.md                           # FSD 가이드
 │   ├── app/main.tsx                        # createRoot + BrowserRouter
 │   ├── pages/, widgets/, features/, entities/, shared/
-├── .storybook/                      # Storybook 8 설정
+├── .storybook/                      # Storybook 9 설정
 ├── .github/workflows/deploy.yml     # main 트리거 GitHub Pages 자동 배포
 └── .claude/                         # 하네스 운영 + 에이전트 정의
 ```

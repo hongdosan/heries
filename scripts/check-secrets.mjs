@@ -46,7 +46,7 @@ const SECRET_PATTERNS = [
 ]
 
 // 화이트리스트 = 명백히 false positive 인 자리 (정규식 정의 자체 / 주석 등).
-function isWhitelisted(filePath, line) {
+function isWhitelisted(filePath) {
   // 본 스크립트 자체
   if (filePath.endsWith('check-secrets.mjs')) return true
   // 정규식 패턴 본문 (예: spoiler-patterns.json 안 키 = 패턴 정의)
@@ -83,7 +83,7 @@ for await (const file of walk(DIST)) {
     const before = text.slice(0, idx).split('\n')
     const lineNo = before.length
     const lineText = (text.split('\n')[lineNo - 1] ?? '').trim().slice(0, 200)
-    if (isWhitelisted(file, lineText)) continue
+    if (isWhitelisted(file)) continue
     hits.push({ file, lineNo, pattern: pattern.source.slice(0, 60), snippet: lineText })
   }
 }

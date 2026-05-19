@@ -4,7 +4,7 @@ import {AuthorModeToggle} from './author-mode-toggle'
 import {setAuthorMode} from '../../shared/lib/env.js'
 
 const meta: Meta<typeof AuthorModeToggle> = {
-  title: 'widgets/작가 모드 토글',
+  title: 'molecules/작가 모드 토글 (AuthorModeToggle)',
   component: AuthorModeToggle,
   parameters: {
     layout: 'centered',

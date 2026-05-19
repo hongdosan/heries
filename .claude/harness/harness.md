@@ -18,15 +18,19 @@
 
 | 문서 | 내용 |
 |---|---|
-| [harness-state.md](harness-state.md) | 하네스 현 상태 · 도메인 정의 · 에이전트 인벤토리 · SSOT 구조 · 변경 이력 (SSOT) |
+| [harness-state.md](harness-state.md) | 하네스 현 상태 · 도메인 정의 · 에이전트 인벤토리 · SSOT 구조 · 변경 이력 (SSOT — `.private-config` 서브모듈 심링크) |
 | [harness-setup.md](harness-setup.md) | 도입 가이드 — H-eries 도메인 분담 · Phase 매트릭스 · 작업 사이클 |
 | [harness-install.md](harness-install.md) | 설치·적용 절차 — 플러그인 설치 · `agent-lorekeeper` 시범 생성 · 검증 · 트러블슈팅 |
+| [git-strategy.md](git-strategy.md) | commit / branch / tag 정책 SSOT — 3 branch (develop / release / main) + 사용자 직접 commit |
+| [private-config.md](private-config.md) | `.private-config` 서브모듈 운영 SSOT — 핸드오프·plan·prompt·env 분리 보관 |
 
 ## 진입 순서
 
 1. **현 상태 파악** — [`harness-state.md`](harness-state.md)
 2. **도입 결정** — [`harness-setup.md`](harness-setup.md)
 3. **실 설치** — [`harness-install.md`](harness-install.md) (`/plugin install harness@harness-marketplace` + `agent-lorekeeper` 시범 생성)
+4. **콘텐츠 작업 시** — *작가 원칙 SSOT* (`writing-principles.md` v2 / `awakener-system.md` / `dungeon.md` / `character-doctrine.md`) +
+   *워크플로우 강제* (`../workflow/workflow.md` §0 — 모든 챕터 / 신규 기능 / 개선 / SSOT 갱신 적용) 필수 정독
 
 ## 변경 추적
 

@@ -160,4 +160,4 @@ git commit -m "chore(release): vX.Y.Z 버전 정합"
 - 본 문서 SSOT: `.claude/harness/git-strategy.md`
 - 변경 이력: `CHANGELOG.md`
 - 운영 자동화: `.github/workflows/deploy.yml`
-- 정책 합의: [메모리 `feedback_main_only_user_commits.md`](file:///Users/hongdosan/.claude/projects/-Users-hongdosan-onion-workspace-heries/memory/feedback_main_only_user_commits.md) → 본 문서로 갱신
+- 정책 합의: 메모리 `feedback_main_only_user_commits.md` (LLM 세션 영구 메모리) → 본 문서로 갱신

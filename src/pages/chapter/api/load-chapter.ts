@@ -2,11 +2,11 @@ import type {DocFile} from '../../../shared/lib/types.js'
 import {parseFrontmatter} from '../../../shared/lib/frontmatter.js'
 import {renderMarkdown} from '../../../shared/lib/markdown.js'
 import {fetchMarkdown} from '../../../shared/api/markdown.js'
-import type {SeriesManifest} from '../../series/model/types.js'
-import type {ChapterFrontmatter, ChapterPageData} from '../model/types.js'
+import type {SeriesManifest} from '../../../entities/series/index.js'
+import type {ChapterFrontmatter, ChapterPageData} from '../../../entities/chapter/index.js'
 
 /**
- * 챕터 (에피소드) 페이지 데이터 로더.
+ * 챕터 (에피소드) 페이지 데이터 로더 (pages/chapter/api segment — 1 page only 라 page 정합).
  *
  * **흐름**:
  * 1. manifest.chapters 에서 `episode` (숫자) 매칭 entry 검색 (없으면 error)

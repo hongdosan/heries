@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { Header } from './header'
 
 const meta: Meta<typeof Header> = {
-  title: 'widgets/헤더',
+  title: 'organisms/헤더 (Header)',
   component: Header,
   decorators: [
     (Story) => (

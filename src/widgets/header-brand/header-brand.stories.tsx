@@ -3,7 +3,7 @@ import {MemoryRouter} from 'react-router-dom'
 import {HeaderBrand} from './header-brand'
 
 const meta: Meta<typeof HeaderBrand> = {
-  title: 'widgets/헤더 브랜드',
+  title: 'molecules/헤더 브랜드 (HeaderBrand)',
   component: HeaderBrand,
   decorators: [
     (Story) => (
