@@ -80,6 +80,7 @@ export function HeaderContact() {
         ref={dialogRef}
         onClick={onBackdropClick}
         className="fixed inset-0 m-auto p-0 border-0 bg-transparent max-w-[440px] w-[calc(100%-32px)] max-h-[calc(100dvh-32px)] backdrop:bg-black/40 backdrop:backdrop-blur-sm"
+        aria-modal="true"
         aria-labelledby="header-contact-dialog-title"
       >
         <div
@@ -95,7 +96,7 @@ export function HeaderContact() {
             <button
               type="button"
               onClick={onCopy}
-              className="inline-flex items-center justify-center text-fg-3 p-1.5 rounded-sm transition-[color,background-color] hover:text-accent hover:bg-accent-soft cursor-pointer"
+              className="inline-flex items-center justify-center text-fg-3 p-1.5 rounded-sm transition-[color,background] hover:text-accent hover:bg-accent-soft cursor-pointer"
               aria-label={copied ? '이메일 주소 복사됨' : '이메일 주소 복사'}
               title={copied ? '복사됨' : '복사'}
             >

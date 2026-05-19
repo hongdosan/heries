@@ -20,39 +20,63 @@
 ### 런타임 의존 (정책 #3 — 추가 시 사용자 확인 필수)
 - React 19
 - React Router 7 (BrowserRouter)
-- Vite 6 (빌드만, 결과는 정적 파일)
+- Vite 7 (빌드만, 결과는 정적 파일)
 
 ### Dev 의존 (devDependencies, dist 영향 0)
 - TypeScript 5.9 strict + 추가 옵션 (`noUncheckedIndexedAccess` / `noImplicitOverride` / `noPropertyAccessFromIndexSignature` + `noUnusedLocals/Parameters` / `noFallthroughCasesInSwitch` / `noImplicitReturns`)
-- Storybook 8.6 (Vite builder)
+- Storybook 9 (Vite builder)
 - `@vitejs/plugin-react` 4
 - Node 22 LTS (Active, CI + 로컬)
 
-### 외부 라이브러리 금지
+### 외부 *런타임* 라이브러리 금지
+
 - UI 키트 (shadcn / MUI / Chakra 등)
 - 상태 관리 (Redux / Zustand / Recoil 등)
 - 애니메이션 (framer-motion / react-spring 등)
-- CSS 프레임워크 (Tailwind / Emotion / styled-components 등)
+- **CSS-in-JS** (Emotion / styled-components 등)
 - 폼 (react-hook-form 등)
 - 마크다운 (marked / remark 등 — 자체 `renderMarkdown` 사용)
 
-**도입 시 사용자 확인** 후 *런타임 vs dev* 구분 명확화. dev 도구는 `dist/` 산출물에 0 영향 확인 의무.
+### 외부 *dev* 도구 (도입 시 사용자 확인 + dist 영향 0~수 KB 확인)
 
-## 3. 아키텍처 — FSD (Feature-Sliced Design) 엄격 준수
+- **Tailwind v4** *(v0.3.0+ 도입)* — `tailwindcss` + `@tailwindcss/vite`. utility-first CSS. devDeps 만. dist 영향 = 사용된 utility 만 tree-shake (수 KB).
+- **ESLint 9** (flat config + typescript / react / react-hooks / jsx-a11y plugins)
+- **Storybook 9** (Vite builder)
+- **babel-plugin-react-compiler** (`compilationMode: 'infer'`)
+
+**도입 시 사용자 확인** 후 *런타임 vs dev* 구분 명확화. dev 도구는 `dist/` 산출물에 0~수 KB 영향 확인 의무.
+
+## 3. 아키텍처 — FSD (Feature-Sliced Design) 엄격 준수 + Atomic Design 공존
 
 ```
 src/
 ├── app/          # createRoot + BrowserRouter + 전역 wrap
-├── pages/        # URL 단위 페이지 (home / series / chapter / character / about / notice / not-found)
-├── widgets/      # 페이지 구성 블록 (Header / Footer / SeriesList / ChapterToc / CharacterList)
-├── features/     # 사용자 시나리오 (mini-game / character-mention 등)
-├── entities/     # 도메인 데이터 로더 (loadSeries / loadChapter / loadCharacter)
-└── shared/       # 도메인 무지 (lib / styles / ui / img)
+├── pages/        # URL 단위 페이지 9 — home / series-list / series / chapter / character / about / notice / unlock / not-found
+├── widgets/      # 페이지 구성 블록 13 — header / header-brand / header-nav / header-actions / header-contact / header-mobile-menu / author-mode-toggle / theme-toggle / footer / home-hero / chapter-toc / character-list / book-reader
+├── features/     # 사용자 시나리오 — mini-game (in-page launcher + 광살검 + 검기생존록)
+├── entities/     # 도메인 데이터 type + 공통 fetch — series (api/fetch-manifest + model) / chapter (model only) / character (model only). page-only loader 는 pages/{slice}/api/ 로 이동 (2026-05-19).
+└── shared/       # 도메인 무지 — api / config / lib / styles / ui / images
 ```
 
 - **격리 규칙**: 상위 → 하위만 import. 동일 레이어 슬라이스 간 직접 import X.
 - **Public API**: 슬라이스 외부에서는 `index.ts` (Public API) 만 import.
-- **css 분산**: 슬라이스 옆 `{slice}.css` + `index.ts` 의 `import './{slice}.css'`. shared 전역 = `shared/styles/` (tokens / base / typography / layout / utilities / author-mode / responsive).
+- **css 분산**: 슬라이스 옆 `{slice}.css` + `index.ts` 의 `import './{slice}.css'`. shared 전역 = `shared/styles/` (tokens / base / typography / layout / utilities / author-mode / responsive / article / tailwind).
+
+### Atomic Design 공존 *(2026-05-19 도입)*
+
+FSD 6 레이어 위에 **Atomic Design 5 단계** (atoms / molecules / organisms / templates / pages) 를 *논리적 분류* 로 공존. 디렉토리는 FSD 유지, Atomic 은 **Storybook 사이드바 + 컴포넌트 작성 멘탈 모델 + 작성 5 원칙** 으로만 적용 (Atomic 디렉토리 신설 X).
+
+| Atomic | FSD 위치 | 기준 |
+|---|---|---|
+| **Atoms** | `shared/ui/` | 비즈니스 로직 0 + HTML element 수준 + 컨텍스트 0 |
+| **Molecules** | `widgets/` (소형) · `pages/{slice}/sub` · `shared/ui/` (조합 시) | SRP + 컨텍스트 X + UI 네이밍 (`IconButton`, `Tag`) |
+| **Organisms** | `widgets/` (합성) · `features/{slice}/` | 컨텍스트 ○ + 도메인 네이밍 (`Header`, `BookReader`) + 명확한 영역 |
+| **Templates** | (없음) | pages 가 직접 hero + section 구성 |
+| **Pages** | `pages/` | template 인스턴스 + 실제 콘텐츠 |
+
+**Molecule ↔ Organism 경계 = 컨텍스트 유무.** 모호 시 organism 으로 시작 → Bottom-Up 재사용 발견 시 molecule 추출.
+
+상세 가이드 = [`../../../src/README.md`](../../../src/README.md) §Atomic Design.
 
 ## 4. CLAUDE.md 핵심 원칙 13 항 (강제)
 
@@ -65,8 +89,15 @@ src/
 7. GitHub 공개 저장소 (비공개 토큰·시크릿·개인 정보 산출물 X)
 8. 누적 산출물 최적화 강제 (harness-state §변경 이력 hot 20 / 핸드오프 CURRENT.md 덮어쓰기, 세션 시작/종료 직전 점검)
 9. 스포일러 분리 (정책 v2 — 단일 빌드 + runtime `/unlock`. 마스킹 = `## 시놉시스` / `## H-eries 분기 ~` / `heries_arc` / worldbuilding/timeline/glossary + 비-주인공 캐릭터 상세 라우트 가드)
-10. 작가 원칙 SSOT (현재 tba — 무대 컨셉 결정 후 작성)
+10. 작가 원칙 SSOT *(2026-05-18 활성화 / 2026-05-19 v2)* — 모든 챕터·카드·세계관 작성 시 [
+    `writing-principles.md`](../../../content/series/clash-of-multiverses/worldbuilding/writing-principles.md) 필독.
+    비각성자 부대 *(자율 입대 정예 / 비각성자 only / 임무 중 각성 시 퇴소)* · 퇴소 사유 5종 *(사망·불구·PTSD·자의 탈진·자의 목표)* · 각성 시스템
+    *(단순 운 / 헌터 + 길드 + 협회, 군 X)* · 한국어 문법 정합 · 대화 중심 톤 강제.
 11. `shared/ui/` 신규 컴포넌트 = `.stories.tsx` 강제 (최소 3 스토리, widgets/features 권장)
+12. AI 개발 흐름 강제 — 모든 챕터 작성 / 신규 기능 / 개선 / SSOT 갱신 시 [
+    `../workflow.md`](../workflow.md) 의 6 단계 흐름 강제 *(2026-05-19 범위 확장)*
+13. 개인 정보 / 시크릿 절대 비공개 (실명·실주소·실전화·실생년월일 / API 키 / DB 비밀번호 / `VITE_AUTHOR_KEY` / OAuth secrets·결제 정보 → 코드 /
+    git / dist 0)
 
 ## 5. 검증 게이트 (매 commit 전 통과 의무)
 
@@ -113,6 +144,14 @@ content/
 - **컴포넌트**: PascalCase, 단일 책임, props 최소화, `readonly` 권장.
 - **CSS**: 사이트 토큰 (`var(--*)`) 우선. hardcoded px → spacing var / clamp() / vh / vw / dvh / rem. hex → `tokens.css` 정의 var.
 - **주석**: 기본은 작성 X. WHY 가 비명시인 경우만 (제약·invariant·workaround·surprise). WHAT 은 작성 금지.
+
+### 컴포넌트 작성 원칙 5종 *(2026-05-19 정립)*
+
+1. **레이아웃 스타일 외부 주입** — `interface Props extends HTMLAttributes<HTMLElement>` + `{ ...props }` spread. `margin` / `padding` / `width` 등 레이아웃 스타일은 컴포넌트 내부 hardcode 금지. 사용처가 `className` / `style` 로 주입. 재사용 시 사용처별 변형을 props 폭증 없이 처리.
+2. **Compound 컴포넌트 패턴** — 큰 organism (BookReader 등) 의 부분 노출 시 `<X.Header />` / `<X.Toc />` 식 compound. props 폭증 / 약간 다른 organism 의 중복 방지. 도입 시점 = 2+ 변형 발견 시.
+3. **UI 상태 / 이벤트 핸들러 = props 주입** — 비즈니스 로직 / 도메인 상태는 부모 (page / widget) 에서 처리. 컴포넌트 = presentational. Storybook 에서 모든 상태·동작 한눈 검증 가능.
+4. **SRP (Single Responsibility)** — molecule = 한 가지 일 / organism = 한 명확한 영역. props 폭증 = 분할 또는 compound 신호.
+5. **네이밍 = 의도 반영** — molecule = UI 네이밍 (`IconButton`, `Tag` — 컨텍스트 X) / organism = 도메인 네이밍 (`Header`, `BookReader` — 컨텍스트 ○). 모호 시 organism 시작 → 재사용 발견 시 molecule 추출.
 
 ## 8. 라이브러리 격리 / Adapter
 

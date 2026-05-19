@@ -297,7 +297,7 @@ franchise reference.
 Aspect ratio 16:9, 1600x900.
 ```
 
-### §5 (`ep-04-5.webp`) — 분대장 사망 직전: 마수 갑각 모서리 + 진혁 시야
+### §5 (`ep-04-5.webp`) — 분대장 사망 직전: 마수 피부 모서리 + 진혁 시야
 
 ```
 A cinematic 16:9 illustration in modern minimalist editorial style,

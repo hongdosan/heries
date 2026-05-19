@@ -3,11 +3,11 @@ import {parseFrontmatter} from '../../../shared/lib/frontmatter.js'
 import {renderMarkdown} from '../../../shared/lib/markdown.js'
 import {fetchMarkdown} from '../../../shared/api/markdown.js'
 import {maskSpoilersFromFrontmatter, maskSpoilersFromMarkdown} from '../../../shared/lib/spoiler.js'
-import type {SeriesManifest} from '../../series'
-import type {CharacterFrontmatter, CharacterPageData} from '../model/types.js'
+import type {SeriesManifest} from '../../../entities/series/index.js'
+import type {CharacterFrontmatter, CharacterPageData} from '../../../entities/character/index.js'
 
 /**
- * 캐릭터 상세 페이지 데이터 로더.
+ * 캐릭터 상세 페이지 데이터 로더 (pages/character/api segment — 1 page only 라 page 정합).
  *
  * **흐름**:
  * 1. manifest.characters 에서 `characterId` 매칭 entry 검색 (없으면 error)

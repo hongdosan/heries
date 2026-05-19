@@ -1,12 +1,6 @@
+import type {HTMLAttributes} from 'react'
 import {Link} from 'react-router-dom'
 import {Button} from '../../shared/ui'
-
-interface LockedCharacterCardProps {
-  readonly slug: string
-  readonly manifestTitle: string
-  readonly folderLabel: string
-  readonly mainClassName: string
-}
 
 /**
  * 작가 모드 OFF reader 가 비-주인공 카드 진입 시 노출되는 잠긴 카드 페이지.
@@ -15,10 +9,19 @@ interface LockedCharacterCardProps {
  * 작가 모드 한정. reader 빌드 진입 시 본 컴포넌트로 차단.
  *
  * **CTA**: 등장인물 목록으로 / 작가 모드 잠금 해제 2 버튼.
+ *
+ * 작성 5 원칙 §1 (레이아웃 외부 주입) — root `<main>` 의 `className` + 모든 HTML attribute 외부 주입.
+ * 이전 `mainClassName: string` props 폐기 (자매 정합).
  */
-export function LockedCharacterCard({slug, manifestTitle, folderLabel, mainClassName}: LockedCharacterCardProps) {
+export interface LockedCharacterCardProps extends HTMLAttributes<HTMLElement> {
+  readonly slug: string
+  readonly manifestTitle: string
+  readonly folderLabel: string
+}
+
+export function LockedCharacterCard({slug, manifestTitle, folderLabel, className, ...rest}: LockedCharacterCardProps) {
   return (
-    <main className={mainClassName}>
+    <main className={className} {...rest}>
       <nav className="breadcrumb" aria-label="경로">
         <Link to="/">H-eries</Link><span className="sep">/</span>
         <Link to="/series">시리즈</Link><span className="sep">/</span>

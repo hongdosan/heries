@@ -3,7 +3,7 @@ import {MemoryRouter} from 'react-router-dom'
 import {HeaderNav} from './header-nav'
 
 const meta: Meta<typeof HeaderNav> = {
-  title: 'widgets/헤더 nav',
+  title: 'organisms/헤더 내비 (HeaderNav)',
   component: HeaderNav,
   parameters: {
     layout: 'centered',

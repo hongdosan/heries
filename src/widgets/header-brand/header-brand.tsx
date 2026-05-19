@@ -1,4 +1,6 @@
+import type {HTMLAttributes} from 'react'
 import {Link} from 'react-router-dom'
+import {cn} from '../../shared/lib/cn.js'
 import markUrl from '../../shared/images/heries-mark.webp?url'
 
 /**
@@ -10,10 +12,14 @@ import markUrl from '../../shared/images/heries-mark.webp?url'
  * - aria-label `H-eries 홈` 으로 스크린리더 의미 보존
  *
  * 부제 = 모바일·데스크탑 모두 노출, 좌측 정렬.
+ *
+ * 작성 5 원칙 §1 (레이아웃 외부 주입) — `className` + 모든 HTML attribute 외부 주입 가능.
  */
-export function HeaderBrand() {
+export type HeaderBrandProps = HTMLAttributes<HTMLDivElement>
+
+export function HeaderBrand({className, ...rest}: HeaderBrandProps) {
   return (
-    <div className="flex flex-col items-start gap-0 leading-[1.05]">
+    <div className={cn('flex flex-col items-start gap-0 leading-[1.05]', className)} {...rest}>
       <Link to="/" className="inline-flex items-center gap-0.5 text-fg no-underline group"
             aria-label="H-eries 홈">
         <img

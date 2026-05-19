@@ -1,10 +1,9 @@
 // © 2026 홍도산. All rights reserved. Original creator work.
-import type { ReactNode } from 'react'
+import type { HTMLAttributes, ReactNode } from 'react'
 import { cn } from '../../lib/cn.js'
 
-export interface EmptyProps {
+export interface EmptyProps extends Omit<HTMLAttributes<HTMLParagraphElement>, 'children'> {
   readonly children: ReactNode
-  readonly className?: string
 }
 
 /**
@@ -12,15 +11,17 @@ export interface EmptyProps {
  *
  * Usage:
  *   <Empty>아직 등록된 항목이 없습니다.</Empty>
- *   <Empty>오류: {error.message}</Empty>
+ *   <Empty className="mt-4">오류: {error.message}</Empty>
+ *   <Empty id="err-msg" aria-live="polite">{error.message}</Empty>
  */
-export function Empty({ children, className }: EmptyProps) {
+export function Empty({ children, className, ...rest }: EmptyProps) {
   return (
     <p
       className={cn(
         'text-center text-fg-3 py-7 px-4 border border-dashed border-rule rounded-md bg-bg-soft text-sm',
         className,
       )}
+      {...rest}
     >
       {children}
     </p>

@@ -92,6 +92,7 @@ export function MiniGameLauncher() {
         className="mini-game-dialog"
         onClose={onDialogClose}
         onClick={onDialogClick}
+        aria-modal="true"
         aria-label="미니 게임"
       >
         <div className="mini-game-dialog-card">

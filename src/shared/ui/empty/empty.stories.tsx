@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Empty } from './empty'
 
 const meta: Meta<typeof Empty> = {
-  title: 'shared/ui/빈 상태 (Empty)',
+  title: 'atoms/빈 상태 (Empty)',
   component: Empty,
 }
 export default meta

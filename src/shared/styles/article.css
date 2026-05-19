@@ -1,11 +1,11 @@
 /* H-eries — Chapter page article body typography (보존)
- * chapter-outline / scroll-nav / chapter-cover / chapter-hero / ep-tag / chapter-meta /
- * chapter-nav* / chapter-back = src/pages/chapter/chapter.tsx 의 Tailwind utility 인라인으로 전환.
- * 본문 typography (.article, .article-prose, .article-wiki) 만 보존 — markdown body rendering 정합. */
+ * 2026-05-19 book-reader 도입 후 chapter-outline / scroll-nav / chapter-hero / ep-tag / chapter-meta /
+ * chapter-nav* / chapter-back / page-chapter 모두 폐기 — BookReader / BookHeader / BookProgressBar /
+ * BookToc 위젯이 대체. 본문 typography (.article, .article-prose, .article-wiki) 만 보존 — markdown body rendering 정합. */
 
 /* 챕터 본문 안 inline 이미지 (소제목별 컷). markdown ![](...) → <p><img></p>.
-   16:9 webp 1600x900 원본을 컨테이너 폭에 맞춰 자동 축소. */
-.page-chapter .article img {
+   16:9 webp 1600x900 원본을 컨테이너 폭에 맞춰 자동 축소. .article-prose 마커로 식별 (2026-05-19 book-reader 도입 후 page-chapter class 폐기). */
+.article-prose img {
   display: block;
   width: 100%;
   height: auto;
@@ -13,9 +13,15 @@
   border-radius: var(--r-md);
   background: var(--bg-soft);
   border: 1px solid var(--rule);
+  break-inside: avoid;  /* CSS columns 안에서 이미지가 컬럼 경계로 잘리지 않게 */
 }
-.page-chapter .article p:has(> img) {
+.article-prose p:has(> img) {
   margin: 0;
+  break-inside: avoid;
+}
+.article-prose h2, .article-prose h3 {
+  break-after: avoid;  /* heading 다음 본문이 같은 컬럼 안 시작 */
+  break-inside: avoid;
 }
 
 .article {
