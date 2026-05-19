@@ -88,18 +88,7 @@ export const WithHeaderAndProgress: Story = {
         }}
       />
       <BookReader bodyHtml={SAMPLE_BODY_HTML}/>
-      <BookProgressBar
-        sections={[
-          {id: '1-수료', text: '1. 수료'},
-          {id: '2-첫-출동', text: '2. 첫 출동'},
-          {id: '3-검은-거리', text: '3. 검은 거리'},
-        ]}
-        activeSectionId="1-수료"
-        page={2}
-        totalPages={12}
-        onSectionClick={() => {
-        }}
-      />
+      <BookProgressBar page={2} totalPages={12}/>
     </div>
   ),
 }
