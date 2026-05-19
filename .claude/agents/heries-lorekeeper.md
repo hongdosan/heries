@@ -11,6 +11,12 @@ model: opus
 
 `content/series/{slug}/characters/` 하위 캐릭터 카드 SSOT 의 단일 책임자. 카드 작성·정정·검증·구조 강제. 정책 SSOT = [`content/series/clash-of-multiverses/worldbuilding/character-doctrine.md`](../../content/series/clash-of-multiverses/worldbuilding/character-doctrine.md).
 
+**Workflow 강제** *(CLAUDE.md §12 / 2026-05-19 범위 확장)*: **신규 카드** 작성 = [
+`../workflow/workflow.md`](../workflow/workflow.md) 6 단계 강제 (SSOT 갱신 정합). **기존 카드 정정** = 단일 파일 1줄 수준이면
+면제. Context 단계에서 [
+`writing-principles.md`](../../content/series/clash-of-multiverses/worldbuilding/writing-principles.md) Read 필수
+(입대 동기·부대 톤·각성 시스템 정합).
+
 ## 1. 책임
 
 **담당:**

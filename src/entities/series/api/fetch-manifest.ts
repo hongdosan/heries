@@ -16,7 +16,7 @@
 import {assetUrl} from '../../../shared/lib/env.js'
 import type {CharacterFolder, CharacterIndex} from '../../character'
 import type {ChapterIndex} from '../../chapter'
-import type {SeriesIndexFile, SeriesManifest} from '../model/types.js'
+import type {LoreNote, SeriesIndexFile, SeriesManifest} from '../model/types.js'
 
 /** 전체 시리즈 인덱스 fetch (`content/series.json`). 홈 페이지에서 호출. */
 export async function fetchSeriesIndex(): Promise<SeriesIndexFile> {
@@ -63,15 +63,43 @@ function asRecord(v: unknown): Record<string, unknown> | null {
 
 export function normalizeSeriesManifest(raw: unknown): SeriesManifest {
   const obj = asRecord(raw) ?? {}
-  return {
+  const out: SeriesManifest = {
     slug: asString(obj['slug']),
     title: asString(obj['title']),
     status: asString(obj['status']),
-    started: asNonEmptyString(obj['started']),
-    thumbnail: asNonEmptyString(obj['thumbnail']),
     characters: normalizeCharacters(obj['characters']),
     chapters: normalizeChapters(obj['chapters']),
   }
+  const started = asNonEmptyString(obj['started'])
+  if (started) out.started = started
+  const thumbnail = asNonEmptyString(obj['thumbnail'])
+  if (thumbnail) out.thumbnail = thumbnail
+  const categories = normalizeCategories(obj['categories'])
+  if (categories.length > 0) out.categories = categories
+  const loreNotes = normalizeLoreNotes(obj['loreNotes'])
+  if (loreNotes.length > 0) out.loreNotes = loreNotes
+  return out
+}
+
+/** `categories` 정규화 — string 배열만 추출, 빈 string 제외. */
+function normalizeCategories(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return []
+  return raw.filter((c): c is string => typeof c === 'string' && c.length > 0)
+}
+
+/** `loreNotes` 정규화 — term + body 둘 다 비어있지 않은 entry 만 추출. */
+function normalizeLoreNotes(raw: unknown): LoreNote[] {
+  if (!Array.isArray(raw)) return []
+  const out: LoreNote[] = []
+  for (const item of raw) {
+    const o = asRecord(item)
+    if (!o) continue
+    const term = asString(o['term'])
+    const body = asString(o['body'])
+    if (!term || !body) continue
+    out.push({term, body})
+  }
+  return out
 }
 
 /** 단일 character entry 변환 — 무효면 null. */

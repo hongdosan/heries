@@ -308,11 +308,18 @@ function slugify(s: string): string {
  * chapter 페이지의 우측 outline (`<details>` 안 목차) 에서 사용.
  */
 export function extractOutline(html: string, level: 2 | 3 = 2): { id: string; text: string }[] {
-  const re = new RegExp(`<h${level} id="([^"]+)">([^<]+)</h${level}>`, 'g')
+  // 렌더러가 h2/h3 에 `<a class="heading-anchor">#</a>` 자식을 자동 부착 → 내부 `<` 등장. inner 는 non-greedy `.*?` + flag `s` 로 매치.
+  // text 는 `.heading-anchor` 통째 strip (= '#' 도 함께 제거) → 나머지 inline tag 제거.
+  const re = new RegExp(`<h${level} id="([^"]+)">(.*?)</h${level}>`, 'gs')
   const items: { id: string; text: string }[] = []
   let m: RegExpExecArray | null
   while ((m = re.exec(html)) !== null) {
-    items.push({ id: m[1] ?? '', text: m[2] ?? '' })
+    const id = m[1] ?? ''
+    const text = (m[2] ?? '')
+      .replace(/<a\b[^>]*class="[^"]*heading-anchor[^"]*"[^>]*>.*?<\/a>/gs, '')
+      .replace(/<[^>]*>/g, '')
+      .trim()
+    items.push({ id, text })
   }
   return items
 }

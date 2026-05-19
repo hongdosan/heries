@@ -2,12 +2,11 @@ import type {DocFile} from '../../../shared/lib/types.js'
 import {parseFrontmatter} from '../../../shared/lib/frontmatter.js'
 import {renderMarkdown} from '../../../shared/lib/markdown.js'
 import {fetchMarkdown} from '../../../shared/api/markdown.js'
-import {fetchSeriesManifest} from './fetch-manifest.js'
+import {fetchSeriesManifest, type SeriesFrontmatter, type SeriesPageData} from '../../../entities/series/index.js'
 import {maskSpoilersFromMarkdown, maskSpoilersFromFrontmatter} from '../../../shared/lib/spoiler.js'
-import type {SeriesFrontmatter, SeriesPageData} from '../model/types.js'
 
 /**
- * 시리즈 페이지 데이터 로더.
+ * 시리즈 페이지 데이터 로더 (pages/series/api segment — 1 page only 라 page 정합).
  *
  * **2 fetch 병렬**:
  * 1. `_series.md` (frontmatter + 본문 — 시놉시스·페이즈·세계관 요약 등)

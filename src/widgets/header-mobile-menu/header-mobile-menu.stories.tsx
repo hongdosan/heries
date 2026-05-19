@@ -4,7 +4,7 @@ import {MemoryRouter} from 'react-router-dom'
 import {HeaderMobileMenu} from './header-mobile-menu'
 
 const meta: Meta<typeof HeaderMobileMenu> = {
-  title: 'widgets/모바일 메뉴',
+  title: 'organisms/모바일 메뉴 (HeaderMobileMenu)',
   component: HeaderMobileMenu,
   parameters: {
     layout: 'centered',

@@ -3,7 +3,7 @@ import {ThemeToggle} from './theme-toggle'
 import {setTheme} from '../../shared/lib/theme.js'
 
 const meta: Meta<typeof ThemeToggle> = {
-  title: 'widgets/테마 토글',
+  title: 'molecules/테마 토글 (ThemeToggle)',
   component: ThemeToggle,
   parameters: {
     layout: 'centered',

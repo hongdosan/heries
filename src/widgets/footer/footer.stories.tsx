@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { Footer } from './footer'
 
 const meta: Meta<typeof Footer> = {
-  title: 'widgets/푸터',
+  title: 'organisms/푸터 (Footer)',
   component: Footer,
   decorators: [
     (Story) => (

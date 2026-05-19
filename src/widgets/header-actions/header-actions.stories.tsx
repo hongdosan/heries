@@ -3,7 +3,7 @@ import {HeaderActions} from './header-actions'
 import {setAuthorMode} from '../../shared/lib/env.js'
 
 const meta: Meta<typeof HeaderActions> = {
-  title: 'widgets/헤더 액션 그룹',
+  title: 'organisms/헤더 액션 그룹 (HeaderActions)',
   component: HeaderActions,
   parameters: {
     layout: 'centered',

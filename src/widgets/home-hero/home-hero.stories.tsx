@@ -3,7 +3,7 @@ import {MemoryRouter} from 'react-router-dom'
 import {HomeHero} from './home-hero'
 
 const meta: Meta<typeof HomeHero> = {
-  title: 'widgets/홈 히어로',
+  title: 'organisms/홈 히어로 (HomeHero)',
   component: HomeHero,
   parameters: {
     layout: 'fullscreen',

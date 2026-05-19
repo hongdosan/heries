@@ -7,11 +7,9 @@
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
   }
-  /* :hover transform 무력화 — 호버 시 translateY/scale 등 미세 모션 제거 */
-  a:hover, button:hover,
-  .series-card:hover .series-card-thumb img,
-  .scroll-nav-btn:hover,
-  .chapter-nav-link:hover {
+  /* :hover transform 무력화 — 호버 시 translateY/scale 등 미세 모션 제거.
+     Tailwind v4 migration 완료 후 (.series-card / .scroll-nav-btn / .chapter-nav-link 폐기됨) — 글로벌 a/button hover 만 유지. */
+  a:hover, button:hover {
     transform: none !important;
   }
   /* SPA route transition 무력화 */

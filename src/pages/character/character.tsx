@@ -1,5 +1,5 @@
 import {Link, useParams} from 'react-router-dom'
-import {loadCharacter} from '../../entities/character'
+import {loadCharacter} from './api/load-character.js'
 import {fetchSeriesManifest} from '../../entities/series'
 import {renderInline} from '../../shared/lib/markdown.js'
 import {useAsync} from '../../shared/lib/use-async.js'
@@ -47,7 +47,7 @@ export function CharacterPage() {
         slug={slug}
         manifestTitle={manifest.title}
         folderLabel={FOLDER_LABEL[data.index.folder] || data.index.folder}
-        mainClassName={MAIN_CLS}
+        className={MAIN_CLS}
       />
     )
   }

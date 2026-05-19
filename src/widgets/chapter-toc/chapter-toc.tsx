@@ -72,14 +72,14 @@ function SortBtn({label, active, onClick}: Readonly<{
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className="px-3 py-1 text-sm rounded-pill font-medium transition-[color,background-color,box-shadow] cursor-pointer"
+      className="px-3 py-1 text-sm rounded-pill font-medium transition-[color,background,box-shadow] cursor-pointer focus-visible:outline-none focus-visible:[box-shadow:0_0_0_2px_var(--accent-ring)]"
       style={
         active
           ? {
             backgroundColor: 'var(--accent)',
             color: 'var(--accent-fg)',
             fontWeight: 600,
-            boxShadow: '0 1px 3px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08)',
+            boxShadow: 'var(--shadow-md)',
           }
           : {backgroundColor: 'transparent', color: 'var(--fg-3)'}
       }

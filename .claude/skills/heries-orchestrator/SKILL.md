@@ -28,7 +28,7 @@ H-eries 프로젝트 (`/Users/홍도산/onion-workspace/H-eries/`) 에서 다음
 | "세계관 추가", "연표 갱신", "용어집", "`_series.md`", "지역·세력" | `H-eries-worldsmith` | Agent |
 | "챕터 작성", "ep-NN 작성", "본문 집필", "시놉시스 받아", "떡밥 매설" | `H-eries-author` → 자동으로 `H-eries-continuity-reviewer` | Agent (파이프라인) |
 | "정합성 감사", "연속성 검증", "챕터 검수", "SSOT 정합", "떡밥 추적" | `H-eries-continuity-reviewer` | Agent |
-| "컴포넌트 추가", "렌더러 수정", "UX 개선", "FSD 레이어", "빌드 스크립트", "타입 에러", "마스킹 로직" | `H-eries-frontend-engineer` | Agent |
+| "컴포넌트 추가", "렌더러 수정", "UX 개선", "FSD 레이어", "Atomic Design", "atoms / molecules / organisms", "Storybook title", "컴포넌트 작성 원칙", "빌드 스크립트", "타입 에러", "마스킹 로직" | `H-eries-frontend-engineer` | Agent |
 | "사이트 빌드", "GitHub 배포", "manifest 갱신", "썸네일 프롬프트", "이미지 압축", "발행", "`.nojekyll`" | `H-eries-publisher` | Agent |
 
 라우팅이 모호하면 사용자에게 1회만 확인 (사용자 메모리 *사전 4 질문 폭탄 X* 정책 준수).

@@ -11,6 +11,10 @@ model: opus
 
 `content/series/{slug}/` 의 비-캐릭터 SSOT 전담 — 시리즈 메타 + 세계관 + 연표 + 용어집. 작가 hongdosan 의 자작 무대를 일관되게 관리.
 
+**Workflow 강제** *(CLAUDE.md §12 / 2026-05-19 범위 확장)*: 모든 SSOT 갱신 (`_series.md` / `worldbuilding/*` / `timeline/*`
+/ `glossary/*`) 은 [`../workflow/workflow.md`](../workflow/workflow.md) 6 단계 흐름 강제. Context 단계에서 [
+`writing-principles.md`](../../content/series/clash-of-multiverses/worldbuilding/writing-principles.md) Read 필수.
+
 ## 1. 책임
 
 **담당:**

@@ -3,7 +3,7 @@ import {MemoryRouter} from 'react-router-dom'
 import {LockedCharacterCard} from './locked-character-card'
 
 const meta: Meta<typeof LockedCharacterCard> = {
-  title: 'pages/character/LockedCharacterCard',
+  title: 'molecules/잠금 캐릭터 카드 (LockedCharacterCard)',
   component: LockedCharacterCard,
   decorators: [
     (Story) => (
@@ -33,7 +33,7 @@ export const Supporting: Story = {
     slug: 'clash-of-multiverses',
     manifestTitle: '차원 격돌',
     folderLabel: '주연',
-    mainClassName: MAIN_CLS,
+    className: MAIN_CLS,
   },
 }
 
@@ -43,7 +43,7 @@ export const Antagonist: Story = {
     slug: 'clash-of-multiverses',
     manifestTitle: '차원 격돌',
     folderLabel: '빌런·멘토',
-    mainClassName: MAIN_CLS,
+    className: MAIN_CLS,
   },
 }
 
@@ -53,6 +53,6 @@ export const Minor: Story = {
     slug: 'clash-of-multiverses',
     manifestTitle: '차원 격돌',
     folderLabel: '단역·카메오',
-    mainClassName: MAIN_CLS,
+    className: MAIN_CLS,
   },
 }
