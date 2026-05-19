@@ -130,8 +130,9 @@ function ThisChapterPanel({
         <p className="m-0 text-sm text-fg-3">절 정보 없음.</p>
       ) : (
         <ol className="m-0 p-0 list-none flex flex-col gap-1">
-          {sections.map((s, idx) => {
+          {sections.map((s) => {
             const active = s.id === activeSectionId
+            // s.text 가 이미 "1. 수료" 형태로 넘버링 포함 (markdown h2 원문) → 별도 인덱스 미표시 (중복 방지).
             return (
               <li key={s.id}>
                 <button type="button" onClick={() => onSectionClick(s.id)}
@@ -141,12 +142,9 @@ function ThisChapterPanel({
                             ? 'bg-bg-soft border-l-fg text-fg'
                             : 'border-l-transparent text-fg-2 hover:bg-bg-soft hover:text-fg'
                         }`}>
-                  <span className="inline-flex items-baseline gap-3">
-                    <span className="text-xs text-fg-3 tabular-nums">{idx + 1}</span>
-                    <span className="text-sm font-medium">{s.text}</span>
-                  </span>
+                  <span className="block text-sm font-medium">{s.text}</span>
                   {active && (
-                    <span className="block text-xs text-fg-3 mt-1 pl-7">
+                    <span className="block text-xs text-fg-3 mt-1">
                       읽는 중 · p.{currentPage}
                     </span>
                   )}

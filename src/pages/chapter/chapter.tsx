@@ -183,13 +183,18 @@ export function ChapterPage() {
     closeCurrentSection()
     return result
   })()
+  const epPad = String(data.index.episode).padStart(2, '0')
   const endHtml = `
 <aside class="book-end-cta book-end-page" id="__end__">
-  <p class="book-end-cta-label">2 화 끝</p>
-  <div class="book-end-cta-actions">
-    ${prev ? `<a href="${prevHref}" class="book-end-cta-link book-end-cta-prev">← 이전 화 · ep ${prev.episode} ${escTitle(prev.title)}</a>` : '<span></span>'}
-    ${next ? `<a href="${nextHref}" class="book-end-cta-link book-end-cta-next">다음 화 · ep ${next.episode} ${escTitle(next.title)} →</a>` : '<span class="book-end-cta-final">다음 화 미공개</span>'}
+  <div class="book-end-cta-mark">
+    <span class="book-end-cta-ep">EP ${epPad}</span>
+    <h2 class="book-end-cta-chapter">${escTitle(chapterTitleText)}</h2>
+    <p class="book-end-cta-fin">— 끝 —</p>
   </div>
+  <nav class="book-end-cta-nav" aria-label="회차 이동">
+    ${prev ? `<a href="${prevHref}" class="book-end-cta-link prev"><span class="book-end-cta-link-meta">← 이전 화 · EP ${String(prev.episode).padStart(2, '0')}</span><span class="book-end-cta-link-title">${escTitle(prev.title)}</span></a>` : ''}
+    ${next ? `<a href="${nextHref}" class="book-end-cta-link next"><span class="book-end-cta-link-meta">다음 화 · EP ${String(next.episode).padStart(2, '0')} →</span><span class="book-end-cta-link-title">${escTitle(next.title)}</span></a>` : '<p class="book-end-cta-final">다음 화 미공개</p>'}
+  </nav>
   <a href="${seriesUrl}?tab=chapters" class="book-end-cta-back">전체 회차 보기 →</a>
 </aside>
 `
@@ -199,7 +204,7 @@ export function ChapterPage() {
   return (
     <main className={MAIN_CLS}>
       <div
-        className="w-full max-w-400 mx-auto border border-rule rounded-lg overflow-hidden bg-surface shadow-soft">
+        className="w-full max-w-500 mx-auto border border-rule rounded-lg overflow-hidden bg-surface shadow-soft">
         <BookHeader
           seriesTitle={manifest.title}
           seriesSlug={slug}
@@ -250,13 +255,7 @@ export function ChapterPage() {
           )}
         </div>
 
-        <BookProgressBar
-          sections={sections}
-          activeSectionId={progress.activeSectionId}
-          page={progress.page}
-          totalPages={progress.totalPages}
-          onSectionClick={onSectionClick}
-        />
+        <BookProgressBar page={progress.page} totalPages={progress.totalPages}/>
 
         {/* 하단 이전화·다음화 nav + 중앙 페이지 인디케이터 — 3 영역 균등 분배 (좌 prev / 중 page / 우 next). */}
         <nav aria-label="회차 이동"

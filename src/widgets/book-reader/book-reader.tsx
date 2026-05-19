@@ -25,10 +25,10 @@ import './book-reader.css'
  *
  * **CSS columns paginated 패턴**:
  * - bodyHtml = chapter.tsx 가 합성 (book-cover-series + book-cover-chapter + section-cover N + 본문 + book-end-cta)
- * - 각 cover / section-cover = `break-before: column + height: 100%` → 한 column 다 차지 + 다음 element 가 다음 column 시작
+ * - 각 cover / section-cover = `break-after: column + height: 100%` → 한 column 다 차지 + 다음 element 가 다음 column 시작
  * - 본문 = column flow 자동 (한 절 본문 길면 여러 column 으로 흘러 넘김)
- * - frame `overflow: hidden` + JS scrollLeft (spread 단위 = 2 column 이동) — 사용자 스크롤 X
- * - 드래그·터치·키보드·화살표 button 만 페이지 넘김
+ * - 한 spread = 2 column 동시 표시 (`columnCount: 2`) — frame `overflow: hidden` + JS scrollLeft 로 spread 단위 horizontal 페이지네이션
+ * - 페이지 이동 = 키보드 ←/→/Home/End/PageUp/PageDown + 터치 swipe + 마우스 drag (화살표 버튼 X, 시각 노이즈 제거)
  */
 
 export interface BookSection {
@@ -95,16 +95,17 @@ const BOOK_FRAME_STYLE: CSSProperties = {
   position: 'relative',
   margin: '0 auto',
   width: '100%',
-  maxWidth: '780px',  // = 2 col (390) — gap 0
+  maxWidth: '1000px',
   boxSizing: 'border-box',
 }
 
 const BOOK_CONTENT_STYLE: CSSProperties = {
   height: '100%',
-  columnWidth: '400px',
+  columnCount: 2,
   columnGap: '0px',
   columnFill: 'auto',
-  columnRule: '1px solid var(--rule)',
+  // column-rule 제거 — `.book-frame::before` spine 이 가운데 세로선 담당 (column-rule 은 content 짧을 때 끊김).
+  // spine ::before 는 page 시작/끝/표지/본문 모두 동일 — 통일성 보장.
 }
 
 export function BookReader({
@@ -129,13 +130,24 @@ export function BookReader({
   }, [sections, onSectionsChange])
 
   // 페이지 수 측정 — CSS columns 의 scrollWidth ÷ clientWidth.
+  // resize / column-count 변경 시 column 들이 reflow → scrollLeft 가 spread 경계에서 벗어남 (페이지 가운데 걸침).
+  // 측정 후 현 spread 경계로 *재정렬* (= `cur * clientWidth` 로 scrollTo). 사용자 보이는 페이지가 항상 spread 단위로 정렬.
   const measure = useCallback(() => {
     const frame = frameRef.current
     if (!frame) return
-    const total = Math.max(1, Math.round(frame.scrollWidth / frame.clientWidth))
+    // scrollWidth / clientWidth 가 정확히 정수 아닐 수 있음 (브라우저 sub-pixel 반올림 / 마지막 group partial).
+    // `Math.ceil` = 마지막 partial group 도 1 spread 로 카운트 (End 버튼이 마지막 콘텐츠 닿게).
+    const total = Math.max(1, Math.ceil(frame.scrollWidth / frame.clientWidth))
+    const cur = Math.min(Math.max(0, Math.round(frame.scrollLeft / frame.clientWidth)), total - 1)
     setTotalPages(total)
-    const cur = Math.round(frame.scrollLeft / frame.clientWidth)
-    setPage(Math.min(cur, total - 1))
+    setPage(cur)
+    // 스크롤 재정렬 — reflow 후 scrollLeft 가 spread 경계 벗어났을 때만 (1px 이내는 그대로).
+    // 마지막 페이지에 clamp: scrollLeft_max 가 (total-1) * clientWidth 보다 작을 수 있어 max 와 비교 후 작은 값 사용.
+    const targetMax = frame.scrollWidth - frame.clientWidth
+    const target = Math.min(cur * frame.clientWidth, targetMax)
+    if (Math.abs(frame.scrollLeft - target) > 1) {
+      frame.scrollTo({left: target, behavior: 'auto'})
+    }
   }, [])
 
   useEffect(() => {
@@ -185,11 +197,8 @@ export function BookReader({
     frame.scrollTo({left: target * frame.clientWidth, behavior: 'smooth'})
   }, [totalPages])
 
-  // 한 spread = 2 column 동시 표시 (frame_inner 가 2 column fit). 한 spread 단위 이동 = page +/- 2.
-  const goPrev = useCallback(() => goToPage(page - 2), [goToPage, page])
-  const goNext = useCallback(() => goToPage(page + 2), [goToPage, page])
-  const canPrev = page > 0
-  const canNext = page < totalPages - 1
+  const goPrev = useCallback(() => goToPage(page - 1), [goToPage, page])
+  const goNext = useCallback(() => goToPage(page + 1), [goToPage, page])
 
   // scrollLeft 변경 감지 (smooth scroll 완료 후 page state 갱신).
   useEffect(() => {
@@ -203,7 +212,7 @@ export function BookReader({
     return () => frame.removeEventListener('scroll', onScroll)
   }, [])
 
-  // 키보드 네비 — ←/→/Home/End/PageUp/PageDown. 한 누름 = 한 spread (2 page) 이동.
+  // 키보드 네비 — ←/→/Home/End/PageUp/PageDown. 한 누름 = 한 spread (= 2 column 동시 표시 단위) 이동.
   const onKey = (e: ReactKeyboardEvent<HTMLDivElement>) => {
     externalOnKeyDown?.(e)
     if (e.defaultPrevented) return
@@ -224,16 +233,16 @@ export function BookReader({
   }
 
   // 외부 (헤더 / 목차) 에서 절 클릭 시 페이지 이동.
+  // `frame.clientWidth` = 한 spread 폭 (2 col 동시 표시) → `offsetLeft / clientWidth` = 그 절이 포함된 spread index.
+  // (이전 코드의 `% 2` 정렬은 page=column index 모델 잔재 — 현재 page=spread index 라 불필요. 잘못된 spread 로 jump 하던 원인.)
   const scrollToSection = useCallback((id: string) => {
     const content = contentRef.current
     const frame = frameRef.current
     if (!content || !frame) return
     const el = content.querySelector(`#${CSS.escape(id)}`) as HTMLElement | null
     if (!el) return
-    const targetPage = Math.floor(el.offsetLeft / frame.clientWidth)
-    // spread 시작 = 짝수 page index 정렬.
-    const spreadStart = targetPage - (targetPage % 2)
-    goToPage(spreadStart)
+    const targetSpread = Math.floor(el.offsetLeft / frame.clientWidth)
+    goToPage(targetSpread)
   }, [goToPage])
 
   useEffect(() => {
@@ -281,36 +290,14 @@ export function BookReader({
     else goNext()
   }
 
-  const singlePage = totalPages <= 1
-
   return (
     // section + aria-label = 자동 region landmark (role="region" 명시 불필요).
+    // 페이지 네비 = 키보드 (←/→/Home/End/PageUp/PageDown) + 터치 swipe + 마우스 drag — 화살표 버튼 X (시각 노이즈 제거).
     <section className={cn('relative', className)} aria-label="챕터 본문 (책 형태)"
              tabIndex={0} onKeyDown={onKey}
              onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
              onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseLeave={onMouseLeave}
              {...rest as HTMLAttributes<HTMLElement>}>
-      {!singlePage && (
-        <>
-          <button
-            type="button"
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-fg-3 hover:text-accent disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer border border-rule rounded-md bg-surface/80 backdrop-blur-sm transition-colors max-sm:w-8 max-sm:h-8 max-sm:text-sm"
-            aria-label="이전 페이지"
-            onClick={goPrev}
-            disabled={!canPrev}
-          >◀
-          </button>
-          <button
-            type="button"
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-fg-3 hover:text-accent disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer border border-rule rounded-md bg-surface/80 backdrop-blur-sm transition-colors max-sm:w-8 max-sm:h-8 max-sm:text-sm"
-            aria-label="다음 페이지"
-            onClick={goNext}
-            disabled={!canNext}
-          >▶
-          </button>
-        </>
-      )}
-
       <div
         ref={frameRef}
         className="book-frame"
