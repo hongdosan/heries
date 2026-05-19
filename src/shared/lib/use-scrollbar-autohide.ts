@@ -17,7 +17,8 @@ import { useEffect } from 'react'
 export function useScrollbarAutoHide(idleMs: number = 1200): void {
   useEffect(() => {
     const body = document.body
-    let timer: number | null = null
+    // setTimeout 반환형 = 환경 의존 (DOM = number, Node = NodeJS.Timeout). `ReturnType` 으로 환경 중립.
+    let timer: ReturnType<typeof globalThis.setTimeout> | null = null
 
     // 사용자 활동 감지 시 = class 부착 + idle 타이머 재시작.
     const show = (): void => {

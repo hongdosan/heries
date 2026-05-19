@@ -182,7 +182,7 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
   const lastSpawnRef = useRef<number>(0)
   const hitStopUntilRef = useRef<number>(0)
   const scoreTickRef = useRef<number>(0)
-  const timersRef = useRef<number[]>([])
+  const timersRef = useRef<Array<ReturnType<typeof globalThis.setTimeout>>>([])
   // score·combo·level 동기 ref — RAF deps 에서 제외 (재구독 차단). setState 호출 옆에서 .current 동기 갱신.
   const scoreRef = useRef<number>(0)
   const comboRef = useRef<number>(0)
