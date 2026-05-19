@@ -23,7 +23,7 @@ interface UseGameLoopOptions {
   readonly frameRef: RefObject<number | null>
   readonly keysRef: RefObject<KeysHeld>
   readonly scoreTickRef: RefObject<number>
-  readonly timersRef: RefObject<number[]>
+  readonly timersRef: RefObject<Array<ReturnType<typeof globalThis.setTimeout>>>
   // entity ref (mutable in-place) — Step 3b-1 전환.
   readonly playerRef: RefObject<Player>
   readonly enemiesRef: RefObject<Enemy[]>
