@@ -41,8 +41,14 @@
 - **근거**: specify init이 루트에 SPECKIT 스텁 생성. 기존 상세 instructions는 `.claude/CLAUDE.md`. 둘 다 로드됨.
 - **영향**: 루트는 SDD 운영 레이어만, 작품 규칙은 `.claude/CLAUDE.md` 우선.
 
+### 결정 7: 브랜치 정책 reconcile (2026-05-23 확정)
+- **결정**: 콘텐츠(마크다운)는 develop 직접 커밋(게이트 무관). 코드(`.ts/.tsx/.sh`)는 **`NNN-slug` feature 브랜치 off develop** → spec/plan → 게이트 통과 커밋 → `merge --no-ff`로 develop 합류 → release → main.
+- **근거**: 사용자 선택(Option A). 3-브랜치 구조 보존 + strict 게이트 보존 동시 달성. merge commit은 pre-commit 미발동이라 develop 합류 무마찰.
+- **대안**: develop 게이트 면제(strict 약화) / specs/develop 상시(feature 의미 약화) — 모두 기각.
+- **영향**: 반영처 — `.claude/harness/git-strategy.md` §2-1b, constitution §5, 메모리 [[3-branch-develop-release-main-commit]] + [[project_sdd_integration]].
+
 ### 미해결 / 사용자 확인 필요
-- **브랜치 정책 reconcile**: 메모리 "main만 + 사용자 직접 commit" + 3-브랜치(develop/release/main) ↔ SDD feature 브랜치(`NNN-slug`). 코드 작업 시 feature 브랜치 필요(spec/plan 경로). 콘텐츠는 무관. → 메모리 갱신 검토 필요.
+- (위 결정 7로 브랜치 정책 reconcile 해소됨)
 - **GitHub 보호 규칙**: CI 게이트 우회 불가는 main에 required-PR 브랜치 보호를 켰을 때만. 미설정 시 로컬 `--no-verify` 가능. (사용자 GitHub 설정 필요)
 - **karpathy-guidelines**: `/plugin marketplace add multica-ai/andrej-karpathy-skills` + `/plugin install` 필요(사용자 실행).
 

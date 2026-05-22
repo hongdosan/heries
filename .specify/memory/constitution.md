@@ -72,11 +72,16 @@ ENFORCEMENT_LEVEL = strict   # H-eries 고정 (우회 불가)
 > 마크다운 전용 커밋(챕터·카드·세계관)은 게이트가 *코드 파일만* 감지하므로 자유롭게 통과한다.
 > 게이트는 `.ts/.tsx/.sh/.sql/...` 등 구현 파일이 staged 될 때만 발동한다.
 
-## 5. 커밋·브랜치 정책 (메모리 정합)
+## 5. 커밋·브랜치 정책 (2026-05-23 reconcile 확정)
 
-- 코드 작업: SDD feature 브랜치(`NNN-slug`) → spec+plan → PR → main. **에이전트는 commit 하지 않음 — 사용자 직접.**
-- 콘텐츠 작업(마크다운): 게이트 무관, 기존 develop 흐름 유지 가능.
-- 기존 3-브랜치 전략(develop/release/main)과 SDD feature 브랜치는 코드 작업에서 reconcile 필요 (DECISION-LOG 참조).
+3-브랜치(develop/release/main)와 SDD feature 브랜치를 다음으로 reconcile한다:
+
+- **콘텐츠 작업(마크다운: 챕터·카드·세계관)**: 게이트 무관 → **develop 직접 커밋** (기존 흐름 유지).
+- **코드 작업(`.ts/.tsx/.sh` 등)**: develop 직접 X → **`NNN-slug` feature 브랜치 off develop** →
+  `/speckit-specify`+`/speckit-plan`(specs/<branch>/) → 게이트 통과 커밋 → `git merge --no-ff`로
+  develop 합류(merge commit은 pre-commit 미발동). 이후 develop → release → main 동일.
+- **commit 주체**: 에이전트 자동 commit X — 사용자 직접 (명시 요청 시 예외). main 배포는 별도 명시.
+- 상세 SSOT: [`.claude/harness/git-strategy.md`](../../.claude/harness/git-strategy.md) §2-1b.
 
 ## 6. 이 헌법이 하지 않는 것
 
