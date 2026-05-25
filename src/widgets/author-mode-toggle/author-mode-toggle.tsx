@@ -110,6 +110,7 @@ export function AuthorModeToggle() {
         ref={dialogRef}
         onClick={onBackdropClick}
         className="fixed inset-0 m-auto p-0 border-0 bg-transparent max-w-[440px] w-[calc(100%-32px)] max-h-[calc(100dvh-32px)] backdrop:bg-black/40 backdrop:backdrop-blur-sm"
+        aria-modal="true"
         aria-labelledby="author-mode-dialog-title"
       >
         <div
@@ -155,12 +156,14 @@ export function AuthorModeToggle() {
                   autoComplete="off"
                   spellCheck={false}
                   autoFocus
+                  aria-describedby={error ? 'author-mode-error' : undefined}
+                  aria-invalid={error ? true : undefined}
                   className="w-full px-3 py-2 pr-11 text-base font-mono bg-bg-soft text-fg border border-rule rounded-sm transition-[border-color,box-shadow] focus-visible:border-accent focus-visible:outline-none focus-visible:[box-shadow:0_0_0_2px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
                 />
                 <button
                   type="button"
                   onClick={() => setShowKey((v) => !v)}
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 text-fg-3 rounded-sm transition-[color,background-color] hover:text-fg hover:bg-bg-sunken cursor-pointer"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 text-fg-3 rounded-sm transition-[color,background] hover:text-fg hover:bg-bg-sunken cursor-pointer"
                   aria-label={showKey ? '비밀번호 가리기' : '비밀번호 표시'}
                   aria-pressed={showKey}
                   title={showKey ? '비밀번호 가리기' : '비밀번호 표시'}
@@ -169,7 +172,7 @@ export function AuthorModeToggle() {
                   {showKey ? <EyeOffIcon/> : <EyeIcon/>}
                 </button>
               </div>
-              {error && <p className="m-0 text-sm text-warn-fg" role="alert">{error}</p>}
+              {error && <p id="author-mode-error" className="m-0 text-sm text-warn-fg" role="alert">{error}</p>}
               <div className="flex gap-2 flex-wrap mt-2 justify-end">
                 <Button variant="secondary" type="button" onClick={close}>취소</Button>
                 <Button variant="primary" type="submit">잠금 해제</Button>

@@ -11,6 +11,10 @@ model: opus
 
 콘텐츠 → 정적 사이트 발행 사이클 전담. 콘텐츠 메타 (manifest/series.json), 빌드 검증, 시각 자산 (썸네일·이미지 압축), GitHub Pages 배포.
 
+**Workflow 면제** *(CLAUDE.md §12)*: 발행 = *최종 게이트* 라 별도 6 단계 workflow 미적용. 단, 검증 게이트 (`npm run typecheck`
++ `npm run build` + 마스킹 누수 0 + `check-secrets` OK) 통과 의무. manifest 신규 필드 추가 = SSOT 갱신 → workflow 강제 (
+worldsmith 와 정합).
+
 ## 1. 책임
 
 **담당:**

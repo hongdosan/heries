@@ -82,7 +82,7 @@ name: 우진혁
 origin: original
 role: protagonist
 first_appearance: tba              # 본문 첫 등장 챕터 (mob-pool 졸업 시점)
-reader_snapshot: tba               # 독자 절이 어느 챕터까지의 정보인지 (작가 검증용)
+reader_snapshot: tba               # 독자 절이 어느 챕터까지의 정보인지 — **UI 미노출** / continuity-reviewer 검증 + 작가 운영용. 사용자 측 stale 신호 노이즈 회피 (2026-05-19 결정)
 heries_arc: tba                    # 본 작품 소환 시점 (작가 마스킹)
 aliases: []
 summary: 한 줄 요약                 # 등장인물 탭 카드 + 상세 페이지 hero
@@ -138,7 +138,8 @@ summary: 한 줄 요약                 # 등장인물 탭 카드 + 상세 페�
 ## 8. 참고
 
 - 카드 작성 가이드: 본 문서
+- **카드 내 *세계관 사실* 정합 SSOT** *(2026-05-19 추가)*: [`./writing-principles.md`](./writing-principles.md) (§1-2 입대 동기 5종 / §1-3 부대 톤 / §1-4 비각성자 only + 잔류 예외 / §1-5 퇴소 사유 5종 / §2-3 다나까 정합) + [`./awakener-system.md`](./awakener-system.md) (각성·헌터·길드·협회·등급 측정·던전·마수)
 - 단역 풀: [`../characters/4-minor/_mob-pool.md`](../characters/4-minor/_mob-pool.md)
 - 마스킹 SSOT: [`../../../src/shared/lib/spoiler-patterns.json`](../../../src/shared/lib/spoiler-patterns.json)
 - 작가 모드 진입: [`/unlock`](https://hongdosan.github.io/heries/unlock)
-- CLAUDE.md §원칙 #9 (스포 분리), #13 (개인정보 X)
+- CLAUDE.md §원칙 #9 (스포 분리), #10 (작가 원칙 SSOT), #13 (개인정보 X)

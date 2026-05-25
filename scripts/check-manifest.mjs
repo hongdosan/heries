@@ -29,12 +29,12 @@ async function checkSeries(slug) {
 
   const hits = []
 
-  // 챕터 매칭
+  // 챕터 매칭 — `_` prefix 파일은 운영용 (단역 풀 / 메모 / 템플릿 등) 으로 매칭 제외.
   const declaredChapters = (manifest.chapters || []).map((c) => `${c.slug}.md`)
   let actualChapters = []
   try {
     actualChapters = (await readdir(join(dir, 'chapters')))
-      .filter((f) => f.endsWith('.md'))
+      .filter((f) => f.endsWith('.md') && !f.startsWith('_'))
   } catch {
     // chapters 디렉토리 없으면 declared 0 일 때 OK
   }
@@ -49,7 +49,7 @@ async function checkSeries(slug) {
     }
   }
 
-  // 캐릭터 매칭
+  // 캐릭터 매칭 — `_` prefix 파일은 운영용 (`_mob-pool.md` 등 단역 풀) 으로 매칭 제외.
   const declaredChars = (manifest.characters || []).map((c) => `${c.folder}/${c.id}.md`)
   let actualChars = []
   try {
@@ -57,7 +57,7 @@ async function checkSeries(slug) {
       .filter((e) => e.isDirectory())
     for (const folder of folders) {
       const files = (await readdir(join(dir, 'characters', folder.name)))
-        .filter((f) => f.endsWith('.md'))
+        .filter((f) => f.endsWith('.md') && !f.startsWith('_'))
       actualChars.push(...files.map((f) => `${folder.name}/${f}`))
     }
   } catch {

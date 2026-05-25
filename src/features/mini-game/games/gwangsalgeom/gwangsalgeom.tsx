@@ -1,32 +1,119 @@
-import {type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, useCallback, useEffect, useLayoutEffect, useRef, useState} from 'react'
+import {
+  type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState
+} from 'react'
 import './gwangsalgeom.css'
 import {
-  WORLD_W, WORLD_H, GROUND_Y,
-  PLAYER_W, PLAYER_H, PLAYER_MAX_HP, PLAYER_IFRAME_MS, PLAYER_HURT_KNOCKBACK, PLAYER_BOUND_PAD,
-  ENEMY_W, ENEMY_H, ENEMY_HIT_STUN_MS,
-  SLASH_COOLDOWN_MS, SLASH_FLASH_MS, SLASH_REACH, SLASH_NEAR, SLASH_W, SLASH_H, SLASH_OFFSET_Y, SLASH_KNOCKBACK,
-  QI_COOLDOWN_MS, QI_COST, QI_W, QI_OFFSET_NEAR, QI_OFFSET_Y,
-  DASH_COOLDOWN_MS, DASH_DURATION_MS, DASH_DISTANCE, DASH_VX, DASH_IFRAME_MS, DASH_COST, DASH_PATH_PAD_RATIO,
-  SCORE_PER_HIT, SCORE_PER_KILL, SCORE_PER_COMBO_5,
-  KI_PER_HIT, KI_PER_KILL, KI_PER_WHIFF, KI_MAX, KI_GWANGSAL, KI_GWANGSAL_LOSS, KI_HURT_LOSS,
-  PARTICLES_HIT, PARTICLES_KILL, PARTICLES_PLAYER_HURT,
-  HITSTOP_HIT_MS, HITSTOP_KILL_MS, HITSTOP_PLAYER_HURT_MS,
-  HURT_FLASH_MS, QI_CAST_POSE_MS, GWANGSAL_FX_MS, GWANGSAL_FX_CLEAR_MS, GWANGSAL_HITSTOP_MS,
-  EFFECT_IMPACT_LIFE_MS, EFFECT_DEATH_LIFE_MS, EFFECT_CAP,
-  COLOR_HIT_NORMAL, COLOR_KILL_NORMAL, COLOR_KILL_ELITE, COLOR_PLAYER_HURT,
-  JUDGE_FADE_MS, SHAKE_MS, SHAKE_KILL_MS,
-  STAGE_FIT_DESKTOP_BREAK, STAGE_FIT_DESKTOP_PAD, STAGE_FIT_DESKTOP_MAX_SCALE,
+  COLOR_HIT_NORMAL,
+  COLOR_KILL_ELITE,
+  COLOR_KILL_NORMAL,
+  COLOR_PLAYER_HURT,
+  DASH_COOLDOWN_MS,
+  DASH_COST,
+  DASH_DISTANCE,
+  DASH_DURATION_MS,
+  DASH_IFRAME_MS,
+  DASH_PATH_PAD_RATIO,
+  DASH_VX,
+  EFFECT_CAP,
+  EFFECT_DEATH_LIFE_MS,
+  EFFECT_IMPACT_LIFE_MS,
+  ENEMY_H,
+  ENEMY_HIT_STUN_MS,
+  ENEMY_W,
+  GROUND_Y,
+  GWANGSAL_FX_CLEAR_MS,
+  GWANGSAL_FX_MS,
+  GWANGSAL_HITSTOP_MS,
+  HITSTOP_HIT_MS,
+  HITSTOP_KILL_MS,
+  HITSTOP_PLAYER_HURT_MS,
+  HURT_FLASH_MS,
+  JUDGE_FADE_MS,
+  KI_GWANGSAL,
+  KI_GWANGSAL_LOSS,
+  KI_HURT_LOSS,
+  KI_MAX,
+  KI_PER_HIT,
+  KI_PER_KILL,
+  KI_PER_WHIFF,
+  PARTICLES_HIT,
+  PARTICLES_KILL,
+  PARTICLES_PLAYER_HURT,
+  PLAYER_BOUND_PAD,
+  PLAYER_H,
+  PLAYER_HURT_KNOCKBACK,
+  PLAYER_IFRAME_MS,
+  PLAYER_MAX_HP,
+  PLAYER_W,
+  QI_CAST_POSE_MS,
+  QI_COOLDOWN_MS,
+  QI_COST,
+  QI_OFFSET_NEAR,
+  QI_OFFSET_Y,
+  QI_W,
+  SCORE_PER_COMBO_5,
+  SCORE_PER_HIT,
+  SCORE_PER_KILL,
+  SHAKE_KILL_MS,
+  SHAKE_MS,
+  SLASH_COOLDOWN_MS,
+  SLASH_FLASH_MS,
+  SLASH_H,
+  SLASH_KNOCKBACK,
+  SLASH_NEAR,
+  SLASH_OFFSET_Y,
+  SLASH_REACH,
+  SLASH_W,
+  STAGE_FIT_DESKTOP_BREAK,
+  STAGE_FIT_DESKTOP_MAX_SCALE,
+  STAGE_FIT_DESKTOP_PAD,
+  WORLD_H,
+  WORLD_W,
 } from './constants.js'
 import type {
-  ActionKey, Effect, EffectKind, Enemy, Judge, JudgeTone, KeysHeld, Particle, Phase, Player, View, Wave,
+  ActionKey,
+  Effect,
+  EffectKind,
+  Enemy,
+  Judge,
+  JudgeTone,
+  KeysHeld,
+  Particle,
+  Phase,
+  Player,
+  View,
+  Wave,
 } from './types.js'
-import {actionOf, clamp, makeEnemy, makePlayer, makeWave, nextId, rectsOverlap, spawnParticles} from './lib.js'
+import {
+  actionOf,
+  clamp,
+  makeEnemy,
+  makePlayer,
+  makeWave,
+  nextId,
+  rectsOverlap,
+  spawnParticles
+} from './lib.js'
 import {useGameLoop} from './use-game-loop.js'
 import {
-  createEffectEl, createEnemyEl, createParticleEl, createWaveEl,
+  createEffectEl,
+  createEnemyEl,
+  createParticleEl,
+  createWaveEl,
   SPRITE_HERO,
   syncEntityLayer,
-  updateEffectEl, updateEnemyEl, updateParticleEl, updatePlayerEl, updateWaveEl,
+  updateEffectEl,
+  updateEnemyEl,
+  updateParticleEl,
+  updatePlayerEl,
+  updateWaveEl,
 } from './render.js'
 
 // 스프라이트 — vite ?url import. 빌드 시 자동 hash + dist/assets/ 통합.
@@ -38,7 +125,6 @@ import SPRITE_GWANGSAL from '../../../../shared/images/mini-game/stickman-murim/
 // 의존 0 (react 만). framer-motion / shadcn / tailwind 미사용.
 // 좌표계 SSOT = WORLD_W × WORLD_H. CSS scale 로 fit.
 // ─────────────────────────────────────────────────────────────────
-
 
 
 // ─── 컴포넌트 ─────────────────────────────────────────────────
@@ -68,7 +154,7 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
 
   // ─── DOM ref ───────────────────────────────────────────────
   const stageRef = useRef<HTMLDivElement | null>(null)
-  const padActiveRef = useRef<{id: number; ox: number} | null>(null)
+  const padActiveRef = useRef<{ id: number; ox: number } | null>(null)
   const padBaseRef = useRef<HTMLDivElement | null>(null)
   const padDotRef = useRef<HTMLDivElement | null>(null)
   // entity layer container — render() 가 createElement + appendChild 로 채움.
@@ -96,7 +182,7 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
   const lastSpawnRef = useRef<number>(0)
   const hitStopUntilRef = useRef<number>(0)
   const scoreTickRef = useRef<number>(0)
-  const timersRef = useRef<number[]>([])
+  const timersRef = useRef<Array<ReturnType<typeof globalThis.setTimeout>>>([])
   // score·combo·level 동기 ref — RAF deps 에서 제외 (재구독 차단). setState 호출 옆에서 .current 동기 갱신.
   const scoreRef = useRef<number>(0)
   const comboRef = useRef<number>(0)
@@ -581,7 +667,7 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
     <div className="mini-game-frame mini-game-frame--landscape sm-frame">
       <div
         ref={stageRef}
-        className={`sm-stage${  shake ? ' sm-shake' : ''}`}
+        className={`sm-stage${shake ? ' sm-shake' : ''}`}
         tabIndex={0}
         role="application"
         aria-label="광살검"
@@ -627,10 +713,10 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
           </div>
 
           {/* entity layer — render.ts 가 createElement + appendChild 로 채움 (React reconciliation 우회) */}
-          <div ref={waveLayerRef} className="sm-layer" aria-hidden="true" />
-          <div ref={enemyLayerRef} className="sm-layer" aria-hidden="true" />
-          <div ref={particleLayerRef} className="sm-layer" aria-hidden="true" />
-          <div ref={effectLayerRef} className="sm-layer" aria-hidden="true" />
+          <div ref={waveLayerRef} className="sm-layer" aria-hidden="true"/>
+          <div ref={enemyLayerRef} className="sm-layer" aria-hidden="true"/>
+          <div ref={particleLayerRef} className="sm-layer" aria-hidden="true"/>
+          <div ref={effectLayerRef} className="sm-layer" aria-hidden="true"/>
 
           {/* 광살 풀스크린 sprite — ki 가득 차 발동 시 ~450ms (단일 element, React JSX 유지) */}
           {gwangsalFx > 0 && (
@@ -671,7 +757,7 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
             <div className="sm-hud-card">
               <div className="sm-hud-bottom-labels">
                 <span>COMBO</span>
-                <span>내공 — 100% 광살(전체 적) · 장풍 6% · 이형환위 13%</span>
+                <span>내공 — 100% 광살(자동) · 장풍 6% · 이형환위 13%</span>
               </div>
               <div className="sm-hud-bottom-values">
                 <div className="sm-combo">{combo}</div>
@@ -692,7 +778,7 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
                 </button>
                 <button
                   type="button"
-                  className={`sm-pad-btn sm-pad-qi${  qiReady ? '' : ' is-disabled'}`}
+                  className={`sm-pad-btn sm-pad-qi${qiReady ? '' : ' is-disabled'}`}
                   aria-label="장풍"
                   aria-disabled={!qiReady}
                   disabled={!qiReady}
@@ -701,7 +787,7 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
                 </button>
                 <button
                   type="button"
-                  className={`sm-pad-btn sm-pad-dash${  dashReady ? '' : ' sm-pad-cd is-disabled'}`}
+                  className={`sm-pad-btn sm-pad-dash${dashReady ? '' : ' sm-pad-cd is-disabled'}`}
                   aria-label="이형환위"
                   aria-disabled={!dashReady}
                   disabled={!dashReady}
@@ -757,8 +843,8 @@ export function Gwangsalgeom({autoFocus = true}: GwangsalgeomProps) {
         {/* 모바일 가상 패드 — sm-world 밖 (transform: scale 영향 X), sm-stage 자식. */}
         {phase === 'playing' && !view.isDesktop && (
           <>
-            <div ref={padBaseRef} className="sm-pad-base" aria-hidden="true" />
-            <div ref={padDotRef} className="sm-pad-dot" aria-hidden="true" />
+            <div ref={padBaseRef} className="sm-pad-base" aria-hidden="true"/>
+            <div ref={padDotRef} className="sm-pad-dot" aria-hidden="true"/>
           </>
         )}
       </div>

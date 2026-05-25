@@ -1,6 +1,8 @@
+import type {HTMLAttributes} from 'react'
 import {AuthorModeToggle} from '../author-mode-toggle'
 import {HeaderContact} from '../header-contact'
 import {ThemeToggle} from '../theme-toggle'
+import {cn} from '../../shared/lib/cn.js'
 
 /**
  * 헤더 우측 액션 토글 그룹.
@@ -16,11 +18,13 @@ import {ThemeToggle} from '../theme-toggle'
  * - {@link ThemeToggle} — 라이트/다크/시스템 테마 순환
  * - {@link HeaderContact} — 작가 문의 (이메일 복사 / 메일 보내기 다이얼로그)
  */
-export function HeaderActions() {
+export type HeaderActionsProps = HTMLAttributes<HTMLDivElement>
+
+export function HeaderActions({className, ...rest}: HeaderActionsProps) {
   // role="group" 폐기 — jsx-a11y/prefer-tag-over-role 권장 semantic (details/fieldset/optgroup/address) 가 모두 의미 mismatch.
   // 시각 그룹화는 inline-flex+gap 으로 충분. screen reader 그룹 인식은 약화되나 각 토글이 자체 aria-label 보유.
   return (
-    <div className="inline-flex items-center gap-1" aria-label="페이지 액션">
+    <div className={cn('inline-flex items-center gap-1', className)} aria-label="페이지 액션" {...rest}>
       <ThemeToggle/>
       <HeaderContact/>
       <AuthorModeToggle/>

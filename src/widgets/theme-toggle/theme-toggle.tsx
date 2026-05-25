@@ -1,5 +1,6 @@
-import {useState} from 'react'
+import {type ButtonHTMLAttributes, useState} from 'react'
 import {getTheme, nextTheme, setTheme, type Theme} from '../../shared/lib/theme.js'
+import {cn} from '../../shared/lib/cn.js'
 
 /**
  * 헤더 내 테마 순환 토글 위젯.
@@ -55,7 +56,13 @@ const THEME_LABEL: Record<Theme, string> = {
   dark: '다크',
 }
 
-export function ThemeToggle() {
+/**
+ * 작성 5 원칙 §1 (레이아웃 외부 주입) — `className` + 모든 button HTML attribute 외부 주입.
+ * 내부 `onClick` (cycle) 가 default — 외부 onClick props 가 제공되면 spread 가 override.
+ */
+export type ThemeToggleProps = ButtonHTMLAttributes<HTMLButtonElement>
+
+export function ThemeToggle({className, ...rest}: ThemeToggleProps) {
   const [theme, setThemeState] = useState<Theme>(() => getTheme())
 
   const cycle = () => {
@@ -69,10 +76,14 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      className="inline-flex items-center justify-center px-2 py-1 text-fg-3 rounded-sm transition-[color,background] hover:text-accent hover:bg-accent-soft cursor-pointer"
       onClick={cycle}
-      aria-label={`테마: ${THEME_LABEL[theme]} (눌러서 전환)`}
-      title={`테마 — 현재: ${THEME_LABEL[theme]}`}
+      aria-label={`테마: ${THEME_LABEL[theme]}`}
+      title={`테마: ${THEME_LABEL[theme]}`}
+      {...rest}
+      className={cn(
+        'inline-flex items-center justify-center px-2 py-1 text-fg-3 rounded-sm transition-[color,background] hover:text-accent hover:bg-accent-soft cursor-pointer',
+        className,
+      )}
     >
       <Icon />
     </button>

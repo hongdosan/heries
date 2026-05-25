@@ -63,6 +63,7 @@ export function HeaderMobileMenu() {
         ref={dialogRef}
         onClick={onBackdropClick}
         className="fixed inset-0 m-auto p-0 border-0 bg-transparent max-w-[320px] w-[calc(100%-32px)] max-h-[calc(100dvh-32px)] backdrop:bg-black/40 backdrop:backdrop-blur-sm"
+        aria-modal="true"
         aria-labelledby="header-mobile-menu-title"
       >
         <div className="bg-surface border border-rule rounded-md p-5 flex flex-col gap-4 text-fg shadow-soft">

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Loading } from './loading'
 
 const meta: Meta<typeof Loading> = {
-  title: 'shared/ui/로딩 (Loading)',
+  title: 'atoms/로딩 (Loading)',
   component: Loading,
 }
 export default meta

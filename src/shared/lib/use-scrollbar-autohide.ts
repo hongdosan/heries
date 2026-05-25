@@ -17,7 +17,8 @@ import { useEffect } from 'react'
 export function useScrollbarAutoHide(idleMs: number = 1200): void {
   useEffect(() => {
     const body = document.body
-    let timer: number | null = null
+    // setTimeout 반환형 = 환경 의존 (DOM = number, Node = NodeJS.Timeout). `ReturnType` 으로 환경 중립.
+    let timer: ReturnType<typeof globalThis.setTimeout> | null = null
 
     // 사용자 활동 감지 시 = class 부착 + idle 타이머 재시작.
     const show = (): void => {
@@ -29,13 +30,8 @@ export function useScrollbarAutoHide(idleMs: number = 1200): void {
       }, idleMs)
     }
 
-    // passive: true = 스크롤 차단 X (모바일 성능 보장).
-    globalThis.addEventListener('scroll', show, { passive: true })
-    globalThis.addEventListener('wheel', show, { passive: true })
-    globalThis.addEventListener('touchmove', show, { passive: true })
-
     // 키보드 스크롤 키 (PageUp/Down, Space, Arrow, Home/End) 도 감지.
-    globalThis.addEventListener('keydown', (e) => {
+    const onKey = (e: KeyboardEvent): void => {
       if (
         e.key === 'PageUp' || e.key === 'PageDown' ||
         e.key === 'Home' || e.key === 'End' ||
@@ -44,15 +40,20 @@ export function useScrollbarAutoHide(idleMs: number = 1200): void {
       ) {
         show()
       }
-    })
+    }
+
+    // passive: true = 스크롤 차단 X (모바일 성능 보장).
+    globalThis.addEventListener('scroll', show, { passive: true })
+    globalThis.addEventListener('wheel', show, { passive: true })
+    globalThis.addEventListener('touchmove', show, { passive: true })
+    globalThis.addEventListener('keydown', onKey)
 
     return () => {
       if (timer != null) globalThis.clearTimeout(timer)
       globalThis.removeEventListener('scroll', show)
       globalThis.removeEventListener('wheel', show)
       globalThis.removeEventListener('touchmove', show)
-      // keydown 핸들러는 inline arrow function 이라 별도 ref 없이 정확 remove 어려움.
-      // 본 hook 은 app 진입점에서만 호출 (unmount = 페이지 새로고침) 이라 leak 영향 작음.
+      globalThis.removeEventListener('keydown', onKey)
       body.classList.remove('is-scrolling')
     }
   }, [idleMs])

@@ -11,6 +11,12 @@ model: opus
 
 `content/series/{slug}/chapters/ep-{NN}.md` 본문 집필 보조. **사용자 시놉시스를 사실화** — 받아적기 X, 캐릭터 톤·디테일·살붙이기 추가, 사건 순서·결과는 보존.
 
+**Workflow 강제** *(CLAUDE.md §12 / 2026-05-19 범위 확장)*: 모든 챕터 작성은 [
+`../workflow/workflow.md`](../workflow/workflow.md) 의 6 단계 흐름 (Context → Prompt QA → Roadmap → Tech Review →
+Adaptive Execution → Commit/Close) 강제. Context 단계에서 [
+`writing-principles.md`](../../content/series/clash-of-multiverses/worldbuilding/writing-principles.md) + 등장 카드 +
+`_series.md` Read 필수.
+
 ## 1. 책임
 
 **담당:**

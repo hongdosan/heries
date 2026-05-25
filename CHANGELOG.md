@@ -12,6 +12,131 @@ H-eries 의 *작품 + 코드* 모든 변경을 tag 단위로 기록한다.
 
 ## [Unreleased]
 
+### Added (BookReader v3 책 형태 paginated reader — 2026-05-19 야간 자율 / 사용자 명시 "퇴근 자율 진행 / develop only / bookreader 중점")
+
+- **BookReader v3 재설계** (CSS columns paginated 패턴) — 시안 img_2 정합:
+  - 좌 페이지 = 작품 cover (thumb + 시리즈명) / 우 페이지 = 챕터 cover (thumb + EP NN + 챕터명)
+  - 각 절 = section-cover (h2 + section thumb) + section-body (본문 column flow) — 한 spread = 좌(cover) + 우(본문 시작) 또는 본문 연속 spread
+  - 마지막 = book-end-cta (이전·다음 화 + 전체 회차 보기)
+  - column-gap 0 + column-rule (책 fold 시각) + columnWidth 390 / maxWidth 780 (정확 2 col fit, scrollLeft mismatch 회피)
+  - frame `overflow: hidden` + 드래그·터치·키보드·화살표 만 페이지 넘김 (스크롤 X)
+  - userSelect none (텍스트 드래그·복사 차단)
+- **chapter.tsx pages 합성** — DOMParser 로 markdown body 의 h2 단위 분할 + 각 절 section-cover (h2 + 첫 img thumb) + section-body wrapper. 작품 / 챕터 thumbnail = manifest.thumbnail / chapter.thumbnail (assetUrl 변환).
+- **모든 thumbnail 동일 시각 크기** — `max-width: 280px + aspect-ratio: 16/9 + margin: 0 auto + object-fit: cover`. cover / section thumb 자매 정합.
+- **BookHeader 정합** — Aa (글자 크기 sm/md/lg/xl 미리보기) + 가 (sans/serif 토글) + ≡ (목차) + ✕ (닫기). 페이지 인디케이터 = 하단 nav 중앙 (prev / 페이지 / next 3 영역 균등). 모든 button h-7 min-w-6 px-1.5 leading-none + flex items-center gap-0.5. SVG menu icon `-mt-0.5` (글리프 baseline 보정).
+- **BookProgressBar 양 끝 "표지" / "끝"** — special id (`__cover_series__` / `__end__`) 으로 첫 장 / 마지막 장 이동 가능.
+- **하단 nav 이전화·다음화** — 모든 페이지에서 회차 이동 가능 + SPA navigation.
+- **useBookSettings hook 신규** (`shared/lib/use-book-settings.ts`) — theme.ts 패턴 자매 정합. BookFontSize / BookFontFamily + localStorage 영속.
+- **마우스 drag swipe** — 기존 touch swipe 자매 정합 + 60px threshold + finishDrag 통합.
+- **목차 클릭 동작** — element offsetLeft 측정 → spread 시작 page 정렬.
+
+### Fixed (BookReader 다수 버그 정정 — 2026-05-19)
+
+- **column 잘림 / 다음 페이지 노출 버그** = column-gap 60 → 0 (spread 사이 gap 60px shift 로 다음 col 일부 노출되던 mismatch 해소).
+- **`closeCurrentSection` 닫기 태그 오류** = `</section>` → `</div>` 정정 (실제로는 `<div class="section-body">` 시작 — section / div nesting 깨져서 cover/section 동작 영향) — 데드 / 잘못된 로직 동시 해결.
+- **block element 사이 whitespace text node** = `.replace(/>\s+</g, '><')` 으로 합성 HTML 정규화 (multi-column 안 inline box 가 col 차지하는 버그 회피).
+- **display: flex → display: grid + align-content: center** (.book-cover / .section-cover / .book-end-cta) — multi-column 안 flex break 동작 불완전한 케이스 회피.
+- **break-before/after column 정책 단순화** = `break-after: column` 만 명시 + `break-inside: avoid` + `height: 100%` (이중 break 회피).
+- **section-body 자식만 padding-inline + break-inside** — `.book-content > *` 직접 적용 시 section-body 전체 break-inside avoid → column flow 깨지는 버그 회피.
+- **thumbnail 통합 규칙** — `.book-cover-thumb` / `.section-cover-thumb` 동일 규칙 (max-width 280 / aspect 16:9 / cover / margin auto).
+- **BookHeaderProps `export`** — file-local interface → `export interface` 정합 (IDE TS server stale 우회).
+- **root `<div role="region">` → `<section aria-label="...">`** (semantic 정합 + jsx-a11y 경고 해소).
+- **`pendingThumb` 데드 변수 제거** (chapter.tsx 의 transformedBody — 사용 안 함 + void 패턴).
+- **page indicator 위치** = BookReader 안 → wrapper 하단 nav 중앙 (3 영역 평행 정렬).
+- **wrapper / main 외부 공백 균형** — chapter wrapper max-w 변경 + main padding 균등 + footer mt 영향 안내.
+
+### Added (자율 진행 사이클 PM4 — 2026-05-19 / 사용자 명시 "보류하지말고 자율 진행해" "물어보지말고 계속 자율진행해")
+
+- **BookHeader 3 placeholder 활성화** — 글자 크기 (sm/md/lg/xl cycle, localStorage `heries:book-reader:font-size`) + 폰트 (sans/serif toggle, localStorage `heries:book-reader:font-family`) + 테마 (auto/light/dark cycle, `theme.ts` 전역 SSOT 재사용). BookHeader 의 disabled placeholder 3 종 모두 실제 동작.
+- **`shared/lib/use-book-settings.ts` 신규** — BookReader 사용자 설정 hook (BookFontSize / BookFontFamily / cycleX / localStorage 영속). theme.ts 패턴 자매 정합 (Theme / getTheme / setTheme / nextTheme).
+- **BookReader props 확장** — `fontSize` / `fontFamily` props. content 영역에 Tailwind utility class 동적 적용 (`text-sm/base/lg/xl` + `font-sans/serif`). font-size 변경 시 column re-layout 자동 발동 (measure() useEffect deps 에 fontSize/fontFamily 추가).
+- **chapter.tsx 통합** — `useBookSettings` hook + `theme.ts` state owner. BookHeader / BookReader 에 settings + cycle callback props 전달.
+
+### Changed (작성 5 원칙 §1 자매 정합 마이그레이션 — 2026-05-19 / 사용자 명시 "보류하지말고")
+
+- **molecules 3 + organisms 7 HTMLAttributes spread 적용** — Button 자매 정합. 사용처가 `className` + 모든 표준 HTML attribute (id / aria-* / data-* / event handlers) 외부 주입 가능.
+  - **molecules 3** (단일 root element): `HeaderBrand` (HTMLAttributes<HTMLDivElement>) / `ThemeToggle` (ButtonHTMLAttributes<HTMLButtonElement>) / `LockedCharacterCard` (HTMLAttributes<HTMLElement> — `mainClassName` props 폐기 + `className` 일반화 + 사용처 정정).
+  - **organisms 7** (단일 root element): `Header` / `HeaderNav` / `HeaderActions` / `Footer` / `HomeHero` / `CharacterList` / `BookReader` (`onKeyDown` 외부 handler chain 추가 — 외부 handler 가 `preventDefault` 시 내부 키 네비 skip).
+  - **보류 4** (Fragment `<>` root — wrapper 추가 시 layout 영향 위험): `AuthorModeToggle` / `HeaderContact` (button + dialog Fragment) / `HeaderMobileMenu` / `ChapterToc` (button + dialog Fragment). 의도된 Fragment 패턴 정합 유지.
+
+### Changed (자율 진행 사이클 PM3 — 2026-05-19 / 사용자 명시 "물어보지말고 계속 자율진행해")
+
+- **pages/{slice}/api/ segment 도입 (FSD bottom-up 정합)** — `loadSeries` / `loadChapter` / `loadCharacter` 3 loader 모두 *1 page only* 사용 (각각 `pages/series/series.tsx` / `pages/chapter/chapter.tsx` / `pages/character/character.tsx`) → FSD 원칙 "현재 어느 레이어까지 재사용되는가?" 기준 = `pages/{slice}/api/` 가 정합. 3 loader 를 entities → pages 로 이동:
+  - **신규**: `pages/series/api/load-series.ts` / `pages/chapter/api/load-chapter.ts` / `pages/character/api/load-character.ts`
+  - **삭제**: `entities/series/api/load-series.ts` / `entities/chapter/api/load-chapter.ts` / `entities/character/api/load-character.ts` + 빈 `entities/chapter/api/` / `entities/character/api/` 폴더
+  - **entities 책임 재정의**: 도메인 type SSOT (`series` / `chapter` / `character` 의 `model/types.ts`) + 다중 page 호출 fetch (`series/api/fetch-manifest.ts` — fetchSeriesIndex / fetchSeriesManifest / normalizeSeriesManifest) 만 남음. *loadX = page 책임*.
+  - **import 경로 정정**: 3 page (`series.tsx` / `chapter.tsx` / `character.tsx`) + 3 entities/index.ts (loadX export 제거).
+  - **타입 SSOT**: `SeriesPageData` / `ChapterPageData` / `CharacterPageData` 는 `entities/{slug}/model/types.ts` 유지 (도메인 type SSOT). page 의 loader 가 entities 의 type import.
+- **동기 갱신** (workflow §3 동기 갱신 원칙) — `src/README.md` §6 레이어 표 + §디렉토리 구조 트리 + §API 위치 결정 표 / `.claude/workflow/template/prompt-reference.md` §3 entities 표기.
+- **T7 molecules 5 일괄 HTMLAttributes spread 마이그레이션 = 보류 결정** — 비판적 평가 결과 *명목적 자매 정합* 일 뿐 실질 가치 0 (단일 사용 + props 0 패턴이 *현 자매 정합*). 일괄 spread = premature abstraction 의 변종. 실제 재사용 변형 발견 시 도입 정합.
+
+### 검증 (PM3 사이클)
+
+- 게이트: typecheck 0 / build OK 3.27s (bundle 67.63 KB gzip — 변경 거의 0) / build-storybook OK 3.55s / check-secrets 0
+- FSD bottom-up 정합 ↑ (entities = 도메인 type + 공통 fetch / pages/{slice}/api = page-only loader)
+- 응집도 ↑ (페이지가 자신의 데이터 로직 소유)
+
+### Changed (보류 사이클 자율 진행 — 2026-05-19 / 사용자 명시 "보류도 자율 진행해")
+
+- **shared/ui atom 자매 정합 (작성 5 원칙 §1 적용)** — `Empty` / `Loading` 의 `Props` interface 를 `extends Omit<HTMLAttributes<HTMLParagraphElement>, 'children'>` + `{...rest}` spread 패턴으로 갱신 (Button 자매 정합). 사용처 외부에서 `id` / `aria-*` / `data-*` 등 표준 HTML attribute 주입 가능. 기존 사용처 (Empty 8 곳 / Loading 6 곳) = `children` + `className` 만 사용 — 회귀 0. atom 의 작성 5 원칙 §1 (레이아웃 외부 주입) 정합 회복.
+- **src/README §디렉토리 구조 stale 정정** — `shared/api/` 안 stale 표기 `manifest.ts (fetchSeriesIndex / fetchSeriesManifest / fetchMarkdown / normalizeSeriesManifest)` → 실제 `markdown.ts (fetchMarkdown raw text)` 만. `fetchSeriesIndex` / `fetchSeriesManifest` / `normalizeSeriesManifest` = `entities/series/api/fetch-manifest.ts` (이전 사이클 이동). `shared/lib/` 목록에 `use-dialog` 추가.
+- **src/README §API 위치 결정 표 정정** — `shared/lib/manifest.ts` (존재 X) → `shared/api/markdown.ts` 로 정정 + entities 예시 = `entities/series/api/fetch-manifest.ts` 정합 (시리즈 도메인 IO / 여러 widget·page 호출). 전역 공통 절에 *도메인 무관* 명시 + pure 변환 함수 (`renderMarkdown` 등) `shared/lib/` 정합 보강.
+
+### 검증 (보류 사이클)
+
+- `entities/{series, chapter, character}/{api, model, index.ts}` segment 분리 정합 ✓ (변경 불필요)
+- `shared/api/` (도메인 무관 IO) ↔ `shared/lib/` (pure 변환) ↔ `entities/{slug}/api/` (도메인 IO) 경계 정합 ✓ (책임 분리 명확 — 통합 X)
+- BookReader compound 패턴 = *보류* (현 사용처 1곳 — `pages/chapter/chapter.tsx`만. 작성 5 원칙 §2 "2+ 변형 발견 시" 미충족 — premature abstraction 회피)
+- 게이트: typecheck 0 / build OK 1.83s (bundle 67.63 KB gzip) / build-storybook OK 2.78s / check-secrets 0
+
+### Added (Atomic Design 가이드라인 도입 — 2026-05-19 사이클 / 사용자 명시 *workflow 6 단계 강제 + 비판적·상세 자율 진행*)
+
+- **Atomic Design 5 단계 공존 (v3.5, 2026-05-19)** — FSD 6 레이어 위에 atoms / molecules / organisms / templates / pages 5 단계를 *논리적 분류* 로 공존. **디렉토리는 FSD 유지** (Atomic 디렉토리 신설 X). Atomic = *Storybook 사이드바 + 컴포넌트 작성 멘탈 모델 + 작성 5 원칙* 으로만 적용.
+  - **분류 기준 = 컨텍스트 유무**: atoms (shared/ui — 비즈니스 로직 0 + HTML element 수준) / molecules (SRP + 컨텍스트 X + UI 네이밍 — `IconButton`) / organisms (컨텍스트 ○ + 도메인 네이밍 + 명확한 영역 — `Header`, `BookReader`) / templates (별도 슬라이스 X — pages 직접 레이아웃) / pages (실제 콘텐츠).
+  - **모호 시 organism 시작** → Bottom-Up 재사용 발견 시 molecule 추출 (premature abstraction 회피).
+  - **컴포넌트 작성 5 원칙 정립** — (1) 레이아웃 스타일 외부 주입 (`HTMLAttributes<>` spread) (2) Compound 컴포넌트 패턴 (큰 organism — 2+ 변형 시 도입) (3) UI 상태 / 이벤트 핸들러 = props 주입 (presentational) (4) SRP (5) 네이밍 = molecule UI / organism 도메인.
+  - **영향 문서**: `src/README.md` §Atomic Design 전면 작성 (5 단계 정의 + FSD ↔ Atomic 매핑 표 + Storybook title 컨벤션 + 의사결정 트리 + 작성 5 원칙 + Molecules 분리 후보) / `.claude/CLAUDE.md` §4 (FSD + Atomic 공존 + 13 widget 정정 + Bottom-Up widgets 보충 + 신규 Atomic 5 단계 sub-bullet) + §하네스 트리거 표 / `.claude/workflow/template/prompt-reference.md` §2 (런타임 ↔ dev 분리 정합 / Tailwind dev 도구 명시) + §3 (widgets 13 / pages 9 / features mini-game / Atomic 공존 표) + §7 (컴포넌트 작성 5 원칙) / `.claude/agents/heries-frontend-engineer.md` §0 + §2 (원칙 9, 10 신규 + Atomic 분류 + 5 원칙) + §5 (체크리스트 4 항 추가) + §6 (트리거 키워드 확장) + frontmatter / `.claude/skills/heries-orchestrator/SKILL.md` (라우팅 표 트리거 확장).
+  - **Storybook title 컨벤션 적용 (20 stories)** — `atoms/{한글} ({Pascal})` (4) / `molecules/{한글} ({Pascal})` (5) / `organisms/{한글} ({Pascal})` (11). 한글 제목 보존 + Pascal 명 병기. shared/ui (4) / widgets/소형 (4) / pages/character (1) / widgets/합성 (9) / features/mini-game (2).
+  - **계획서 SSOT**: `.claude/workflow/plan/atomic-fsd/01-context.md` ~ `04-tech-review.md` (Step 01~04 산출물).
+  - **코드 영향 0** — 디렉토리 변경 X / FSD 격리 영향 0 / TS strict 영향 0 / 마스킹 정책 영향 0. 게이트 통과: typecheck 0 / build OK / build-storybook OK (title 충돌 0) / check-secrets 0.
+
+### Added (Phase 12 + 던전 SSOT 사용자 명시 — 2026-05-19 추가 사이클)
+- **dungeon.md v2** *(사용자 명시 통합)* — §2 발생 패턴 (랜덤 발생 / 마수 지구 유입 = 사람 해침 = 시급 클리어) + §3 폐쇄 메커니즘 (보스 처치 = 유일 폐쇄) + §4 자원 / 경제 시스템 (지구에 없는 자원 + 마수 시체 = 돈 + 헌터 수익원 4종 + 등급별 격차) + §5 작전 분담 표 (협회 매입 시장 추가) + §7 TBD 갱신.
+- **awakener-system.md v3** (dungeon v2 정합 동기화) — §2-2-1 헌터 = 직업 = 던전 부산물 수익 신규 + §5-3-1 마수 시체 = 돈 신규 + §5-4 던전 절 전면 갱신 + §6 SSOT 누적 표 #12~#16 5 항목 추가.
+- **writing-principles.md v2.1** — §2-1 *...* 강조 *내면 사고 X* 명시 + *한 명사 단독 끊김* 명시 / §2-2 *주어 mismatch / 목적어 누락 / 띄어쓰기* 3 패턴 신규 추가.
+- **harness/harness.md** — 인덱스 표에 git-strategy + private-config 추가 + 진입 순서에 콘텐츠 SSOT cross-link.
+
+### Fixed (Phase 12 추가 사이클)
+- **챕터 본문 작가 영역 정정 5 곳** — ep-02 §1 *각성자 한 명 식별* 한 줄 + ep-02 §4 진혁 *돈* 동기 발화 + 코치 *정예 부대 수료자 적음 / 너 같은 애가* 응답 + ep-01 §3 60→35행 압축 + 대화 컷 6줄 삽입 + ep-04 §4 진혁 *떨립니다. 안 보일 뿐이에요* 답 + ep-03 §2 측정관/면접관 *탈인간급 / 인원 부족* 톤 보강.
+- **자체 재검토 추가 정정** — ep-02 §4 *너 같은 신체가* → *너 같은 애가* (주어 mismatch) + ep-01 §3 *어머니의 어깨가 진혁을 밀고* → *어머니가 진혁의 어깨를 밀고* (원본 복원) + *체육 선생이 육상부에* → *체육 선생이 진혁을 육상부에* (목적어 보충) + ep-02 §1 *그 사람.* 단독 시구 합치기.
+- **카드 잔여 위반** — woo-jin-hyeok.md *재등급 심사* → *재등급 측정* + *한 박자 어색한 웃음* → *살짝 어색한 웃음*.
+- **shared/lib** — use-scrollbar-autohide keydown 핸들러 leak 정정 (cleanup 정확 제거).
+- **CSS dead rule 제거** — layout.css `main.page-about` + `.about-meta` (about.tsx Tailwind 마이그레이션 후 잔존) + responsive.css `.series-card / .scroll-nav-btn / .chapter-nav-link` hover (Tailwind v4 마이그레이션 후 잔존).
+- **widgets 자매 정합** — author-mode-toggle / header-contact transition 일관 (`[color,background-color]` → `[color,background]`) + chapter-toc SortBtn focus-visible ring + character-list locked card role="group" + launcher dialog aria-modal="true".
+- **a11y MAJOR 3** — header-nav focus-visible underline + theme-toggle aria-label 단순화 + author-mode input aria-describedby 연결.
+- **series-list FilterTab** — WAI-ARIA tabs 키보드 네비 (Arrow/Home/End + roving tabindex + id) + `<time dateTime>` 추가 (자매 series.tsx TabNav 정합).
+- **not-found.tsx** — `<main>` className + `<h1>` 추가 (자매 정합) / **about.tsx** — `max-w-reader` → `max-w-page` 통일.
+- **CSS 토큰** — `--shadow-md` 신규 추가 (3 곳 dark variant) + chapter-toc 토큰화.
+
+### Internal (Phase 6~8)
+- **worldbuilding 신규** — dungeon.md / _mob-pool.md (단역 풀 SSOT character-doctrine §2-6 정합).
+- **scripts** — check-secrets.mjs 미사용 param 제거 + check-manifest.mjs `_` prefix 운영 파일 제외 로직.
+- **TS strict 강화** — `exactOptionalPropertyTypes` + `allowUnreachableCode` + `allowUnusedLabels` 3 옵션 활성.
+
+### Added (작가 원칙 SSOT v2 + a11y + 코드 검토 — 2026-05-19 사이클)
+- **writing-principles.md v2** — §1-4 *부대 = 비각성자 only + 임무 중 각성 시 퇴소 (예외 잔류 사유 명시)* 신규 / §1-5 *퇴소 사유 5종 (사망 최다 / 불구 / PTSD / 자의 탈진 / 자의 목표)* 신규 / §2-2 *한국어 문법 정합* 신규 (주어·서술어·조사·시제 + 어색 신조 금지) / §1-3 *탈인간급·인원 부족* 톤 강화 / 번호 재정렬 + §4-2 자체 검증 v2.
+- **CLAUDE.md §10** = 한국어 문법 / 부대 구성 / 퇴소 사유 3 항목 신규. **§12 + workflow.md §0** = workflow 강제 범위 확장 (모든 챕터 / 신규 기능 / 개선 / SSOT 갱신).
+- **6 agents** — workflow 강제 + Required Read (writing-principles.md) 명시. **continuity-reviewer §5** = 검증 체크리스트 v2 (신규 SSOT 3종 추가).
+- **shadow 토큰 신규** (`--shadow-md` — root + dark prefers + dark data-theme 3 곳) + chapter-toc 토큰화.
+- **TypeScript strict 강화** — `exactOptionalPropertyTypes` + `allowUnreachableCode` + `allowUnusedLabels` 3 옵션 활성 (typecheck 0 에러). `fetch-manifest.ts` started/thumbnail conditional assign 정합.
+- **a11y (WCAG 2.1 AA)** — TabNav 키보드 네비 (Arrow/Home/End + roving tabindex) + Series heading 계층 (Synopsis/Lore Notes/Cast/Latest → h2) + 3 dialog `aria-modal="true"` (header-mobile-menu / author-mode-toggle / header-contact) + main div `tabIndex={-1}`.
+- **manifest 신규 필드** — `categories: string[]` + `loreNotes: LoreNote[]` + Series 페이지 SeriesHeader / TabNav / OverviewPanel / CastSection / LatestChaptersSection / CharactersSpoilerAlert 재작성 (시안 img_2.png 정합).
+
+### Fixed
+- **챕터 본문 SSOT 위반 21 곳 정정** — ep-01 (5) / ep-02 (6) / ep-03 (6) / ep-04 (4): *한 박자* 8 곳 + *…* 강조 (내면 사고) 6 곳 + 시구 패턴 (한 줄 / 한 발, 다시) 2 곳 + 띄어쓰기 (두 마리 / 죽일 겁니다) 2 곳 + 단조 종결어 합치기 1 곳 + 카드 인용 정합 (ep-03 진혁 *돈* 동기) 1 곳 + ep-04 선아 *고2*→*고1* (시점 정합) 1 곳 + ep-03 *각성 측정*→*각성 확인* 1 곳.
+- **캐릭터 카드 6 곳** — *한 박자* 5 곳 + 트라우마 앵커 1 곳. 우선아 카드 ep-04 학년 SSOT *고1* 확정 (TBD → 확정) + 앵커 기술 정합.
+- **문서 stale 정정** — README + CLAUDE.md + prompt-reference.md = Vite 6→7 / Storybook 8→9 / *tba*→*연재 중*. src/README.md widgets 리스트 12개 정확 반영 (HeaderNav / HeaderMobileMenu / HomeHero 신규 추가 / SeriesList 삭제 반영) + features mini-game 명시.
+
 ### Added (홈/시리즈 디자인 개선 — 2026-05-19 시안 정합)
 - **홈 페이지 Hero 재작성** (`widgets/home-hero/home-hero.tsx`) — *H-eries · Multi-verse Collection* 캡션 + 큰 헤드라인 *서로 다른 세계가 / 하나의 상상으로 연결됩니다.* + 부제 2줄 + *시리즈 보러 가기* CTA (검정 둥근 버튼) + *H-eries 소개* 보조 링크. 헤드라인 = clamp(36px, 6vw, 72px). 시안 img.png 정합.
 - **시리즈 목록 페이지 신규** (`/series`) — Breadcrumb + 페이지 헤더 + 통계 (전체/연재 중/완결) + 필터 탭 (URL ?filter=ongoing|done) + 가로형 카드 (썸네일 + 메타 + 자세히 CTA) + Coming soon placeholder. 시안 img_1.png 정합.

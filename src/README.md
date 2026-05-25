@@ -13,11 +13,11 @@
 | 레이어 | 책임 | 의존 가능 (↓ 만) |
 |---|---|---|
 | `app/` | 글로벌 진입점 — `main.tsx` (`createRoot` + `StrictMode` + `BrowserRouter` + `Routes`) | pages, widgets, features, entities, shared |
-| `pages/` | URL 단위 페이지 — `useParams` + `useAsync` + 페이지별 hero | widgets, features, entities, shared |
-| `widgets/` | 페이지 구성 블록 (Header/HeaderBrand/HeaderActions/HeaderContact/AuthorModeToggle/ThemeToggle/Footer/SeriesList/ChapterToc/CharacterList) — props-only | features, entities, shared |
-| `features/` | 사용자 시나리오 (zero-state, 추후 검색·테마 토글·북마크 등) | entities, shared |
-| `entities/` | 도메인 데이터 로더 (`loadSeries`/`loadChapter`/`loadCharacter`) — fetch + frontmatter + markdown + 스포 마스킹 합성 | shared |
-| `shared/` | 도메인 무지 유틸 — `lib/` (env·spoiler·use-async·markdown·frontmatter·manifest·types), `styles/` | (없음) |
+| `pages/` | URL 단위 페이지 — `useParams` + `useAsync` + 페이지별 hero. **page-only loader 는 `pages/{slice}/api/`** (`loadSeries` / `loadChapter` / `loadCharacter` — 1 page only, 2026-05-19 이동). | widgets, features, entities, shared |
+| `widgets/` | 페이지 구성 블록 (Header/HeaderBrand/HeaderNav/HeaderActions/HeaderContact/HeaderMobileMenu/AuthorModeToggle/ThemeToggle/Footer/HomeHero/ChapterToc/CharacterList/BookReader) — props-only | features, entities, shared |
+| `features/` | 사용자 시나리오 (mini-game launcher 등) | entities, shared |
+| `entities/` | 도메인 데이터 **type** + **공통 fetch** — `series` (`api/fetch-manifest` + `model`) / `chapter` (`model` only) / `character` (`model` only). 도메인 type SSOT + 다중 page 호출 fetch 함수만 남음. | shared |
+| `shared/` | 도메인 무지 유틸 — `api/` (fetchMarkdown) · `lib/` (env·spoiler·use-async·markdown·frontmatter·types 등) · `config/` (spoiler-patterns) · `ui/` (atoms) · `styles/` · `images/` | (없음) |
 
 > **격리 규칙**: 동일 레이어 슬라이스 간 직접 import 금지. 다른 슬라이스를 사용하려면 그 슬라이스의 Public API (`index.ts`) 만 통과.
 
@@ -83,22 +83,23 @@ widgets/header/
 src/
 ├── README.md
 ├── app/main.tsx                                    # createRoot + BrowserRouter + Routes
-├── pages/{home,series,chapter,character,about,notice,unlock,not-found}/
+├── pages/{home,series,series-list,chapter,character,about,notice,unlock,not-found}/
 │   ├── *.tsx                                       # useParams + useAsync + 페이지 hero
-│   ├── {sub-component}.tsx                         # 페이지 내부 분리 컴포넌트 (chapter-outline / locked-character-card 등)
+│   ├── {sub-component}.tsx                         # 페이지 내부 분리 컴포넌트 (locked-character-card 등)
+│   ├── api/load-*.ts                               # page-only loader (series / chapter / character — 1 page only 라 page segment 정합, 2026-05-19 entities → pages 이동)
 │   └── index.ts                                    # Public API
-├── widgets/{header,header-brand,header-actions,header-contact,author-mode-toggle,theme-toggle,footer,series-list,chapter-toc,character-list}/
+├── widgets/{header,header-brand,header-nav,header-actions,header-contact,header-mobile-menu,author-mode-toggle,theme-toggle,footer,home-hero,chapter-toc,character-list,book-reader}/
 │   ├── *.tsx                                       # 컴포넌트
 │   └── index.ts                                    # Public API
-├── features/                                       # zero-state
+├── features/mini-game/                             # in-page launcher + games (lazy chunk)
 ├── entities/{series,chapter,character}/
-│   ├── api/load-*.ts                               # 데이터 로더 (스포 마스킹 합성)
-│   ├── model/types.ts                              # 페이지 데이터 형 (SeriesPageData 등)
-│   └── index.ts                                    # Public API (re-export api + model)
+│   ├── api/fetch-manifest.ts                       # 다중 page 호출 fetch (series only — fetchSeriesIndex / fetchSeriesManifest / normalizeSeriesManifest)
+│   ├── model/types.ts                              # 도메인 type SSOT (SeriesFrontmatter / SeriesManifest / SeriesPageData / ChapterFrontmatter / ChapterPageData / CharacterFrontmatter / CharacterPageData 등)
+│   └── index.ts                                    # Public API (type re-export + series 만 api re-export)
 └── shared/
-    ├── api/                                        # fetch / 정규화 — manifest.ts (fetchSeriesIndex / fetchSeriesManifest / fetchMarkdown / normalizeSeriesManifest)
+    ├── api/                                        # 도메인 무관 fetch — markdown.ts (fetchMarkdown raw text)
     ├── config/                                     # 설정 파일 — spoiler-patterns.json (마스킹 헤더 SSOT)
-    ├── lib/                                        # types·frontmatter·markdown·env·spoiler·use-async·cn·use-img-fallback·use-document-title·use-author-mode·use-scrollbar-autohide·theme
+    ├── lib/                                        # types·frontmatter·markdown(renderMarkdown)·env·spoiler·use-async·cn·use-img-fallback·use-document-title·use-author-mode·use-scrollbar-autohide·use-dialog·theme
     ├── ui/                                         # button·empty·loading·error-boundary (정책 #11 stories 동반)
     ├── images/                                     # thumbnail-placeholder.webp (= H-eries 컬렉션 hero) / heries-mark.webp / favicon.webp / mini-game/sprites
     └── styles/                                     # 전역 CSS — tokens·base·typography·layout·utilities·author-mode·responsive·article·tailwind
@@ -135,10 +136,10 @@ src/
 ### 4. API 위치 결정 (재사용 범위 기준)
 | 사용 범위 | 위치 | 예시 (H-eries) |
 |---|---|---|
-| 1 page 만 사용 | `pages/{slice}/api/` | (현재 H-eries 의 load* = entities 위치 — pages 가 더 정합, **검토 영역**) |
-| 1 도메인 안 여러 features | `features/{slice}/api/` | features/mini-game/ |
-| 여러 도메인 재사용 | `entities/{domain}/api/` | (다른 widget 도 entity 호출 시 entities 정합) |
-| 전역 공통 | `shared/api/` (또는 lib) | shared/lib/manifest.ts (fetchSeriesIndex / fetchSeriesManifest) |
+| 1 page 만 사용 | `pages/{slice}/api/` | `pages/series/api/load-series.ts` / `pages/chapter/api/load-chapter.ts` / `pages/character/api/load-character.ts` (2026-05-19 entities → pages 이동 완료). |
+| 1 도메인 안 여러 features | `features/{slice}/api/` | features/mini-game/ (도메인 데이터 없음 — 미사용) |
+| 여러 도메인 재사용 | `entities/{domain}/api/` | `entities/series/api/fetch-manifest.ts` (fetchSeriesIndex / fetchSeriesManifest / normalizeSeriesManifest) — 시리즈 도메인 IO. 여러 widget·page 호출. |
+| 전역 공통 (도메인 무관) | `shared/api/` | `shared/api/markdown.ts` (fetchMarkdown raw text — 도메인 무관 IO). pure 변환 함수 (`renderMarkdown` 등) 은 `shared/lib/` 정합. |
 
 ### 5. Bottom-Up 작업 흐름
 신규 코드 작업 시 다음 순서:
@@ -150,9 +151,131 @@ src/
 ### 6. 격리 규칙 (ESLint 자동 강제)
 `eslint.config.js` 의 `no-restricted-imports` per-layer 패턴 — 상위 레이어 import 금지. 동일 레이어 다른 슬라이스 = `index.ts` 만 통과.
 
+## Atomic Design (FSD 와 공존, 2026-05-19)
+
+본 프로젝트는 **FSD = 책임 격리** (디렉토리 구조 / import 방향 / Public API) 와 **Atomic Design = UI 위계 멘탈 모델** (Storybook 사이드바 그룹화 / 컴포넌트 합성 위계 / 작성 원칙) 을 *공존* 시킨다. 두 분류는 *직교* 관계 — FSD 는 *코드 조직*, Atomic 은 *UI 위계*. **디렉토리는 FSD 유지**, Atomic 은 멘탈 모델 + Storybook + 작성 원칙 으로만 적용한다 (Atomic 디렉토리 신설 X).
+
+### 5 단계 정의 (H-eries 운용 기준)
+
+| 단계 | 정의 | 핵심 기준 | H-eries 위치 |
+|---|---|---|---|
+| **Atoms** | 더 이상 분해 불가 + HTML element 수준 + 비즈니스 로직 0 + 컨텍스트 0 | props 로 모든 variant 제어 / 단일 책임 | `shared/ui/` 만 |
+| **Molecules** | atoms 2~3 의 작은 조합 + **SRP** + **컨텍스트 X** + **UI 네이밍** (예: `IconButton`) | "한 가지 일" | `widgets/` 소형 / `pages/{slice}/sub` / `shared/ui/` (조합 시) |
+| **Organisms** | atoms / molecules / organisms 의 합성 + **컨텍스트 ○** + **도메인 네이밍** (예: `Header`) + 명확한 영역 | "한 명확한 책임 영역" | `widgets/` 합성 / `features/{slice}/` |
+| **Templates** | 페이지 레이아웃 골격 + 콘텐츠 X | 와이어프레임 | 별도 슬라이스 X — `pages/{slice}.tsx` 가 직접 hero + section 구성 |
+| **Pages** | template 인스턴스 + 실제 데이터 + 콘텐츠 | URL 단위 진입점 | `pages/` 레이어 |
+
+**Molecule ↔ Organism 경계의 핵심 = *컨텍스트 유무*.** UI 네이밍 + SRP = molecule / 도메인 네이밍 + 명확한 영역 = organism. *모호 시 organism 으로 시작* → Bottom-Up 으로 재사용 발견 시 molecule 추출.
+
+### FSD ↔ Atomic 매핑 표
+
+| FSD 위치 | Atomic | 예시 (현 H-eries) |
+|---|---|---|
+| `app/` | (외부) | `main.tsx` (Routes / Provider) |
+| `pages/` 진입점 | **Pages** | `HomePage` / `SeriesPage` / `ChapterPage` / `CharacterPage` 등 9개 |
+| `pages/{slice}/{sub}.tsx` | **Molecules** 또는 **Organisms** | `LockedCharacterCard` (Molecule) |
+| `widgets/` 소형 | **Molecules** | `HeaderBrand` / `ThemeToggle` / `AuthorModeToggle` / `HeaderContact` |
+| `widgets/` 합성 | **Organisms** | `Header` / `HeaderNav` / `HeaderActions` / `HeaderMobileMenu` / `Footer` / `HomeHero` / `ChapterToc` / `CharacterList` / `BookReader` |
+| `features/{slice}/` | **Organisms** | `mini-game/games/Gwangsalgeom` / `SwordsmanSurvival` |
+| `entities/{domain}/` | (Atomic 외) | `series` / `chapter` / `character` (api + model) |
+| `shared/ui/` | **Atoms** (대부분) | `Button` / `Loading` / `Empty` / `ErrorBoundary` |
+| `shared/lib/` · `shared/api/` · `shared/styles/` · `shared/config/` · `shared/images/` | (Atomic 외) | 비-UI 공통 자산 |
+
+### Storybook title 컨벤션
+
+Storybook 사이드바 = **Atomic 분류 우선**. FSD 위치는 디렉토리 경로 / 파일 명에 그대로 남는다. 한글 제목 보존 + Pascal 명 병기:
+
+```ts
+// shared/ui/button/button.stories.tsx
+title: 'atoms/버튼 (Button)'
+
+// widgets/header-brand/header-brand.stories.tsx
+title: 'molecules/헤더 브랜드 (HeaderBrand)'
+
+// widgets/header/header.stories.tsx
+title: 'organisms/헤더 (Header)'
+
+// features/mini-game/games/gwangsalgeom/gwangsalgeom.stories.tsx
+title: 'organisms/mini-game/광살검 (Gwangsalgeom)'
+
+// pages/character/locked-character-card.stories.tsx
+title: 'molecules/잠금 캐릭터 카드 (LockedCharacterCard)'
+```
+
+### 신규 컴포넌트 분류 의사결정 트리
+
+```
+신규 컴포넌트
+    ↓
+비즈니스 로직 0 + HTML element 1~2 ?
+    YES → Atom (shared/ui/)
+    NO  ↓
+컨텍스트 ○ + 도메인 네이밍 ?
+    YES → Organism (widgets/ 합성 또는 features/{slice}/)
+    NO  ↓
+SRP + UI 네이밍 ?
+    YES → Molecule
+         - 여러 widget/page 재사용 → shared/ui/
+         - 단일 widget 결합     → widgets/{name}/
+         - 단일 page 결합       → pages/{slice}/{sub}.tsx
+    NO  → 의도 모호 — organism 으로 시작 + 재사용 발견 시 molecule 추출
+```
+
+**premature abstraction 금지** — 1곳 사용 시 절대 위 레이어 X. *현재 어느 레이어까지 재사용되는가?* 만 기준.
+
+### 컴포넌트 작성 5 원칙
+
+1. **레이아웃 스타일 외부 주입** — `interface Props extends HTMLAttributes<HTMLElement>` 패턴 + `{ ...props }` spread. `margin` / `padding` / `width` 등 레이아웃 스타일은 컴포넌트 내부 hardcode 금지. 사용처가 `className` / `style` 로 주입. 재사용 시 사용처별 변형을 props 폭증 없이 처리.
+
+    ```ts
+    // ✓ 권장
+    interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+      variant?: 'solid' | 'outline'
+    }
+
+    function Button({ variant = 'solid', children, className, ...props }: ButtonProps) {
+      return (
+        <button className={cn('btn', `btn-${variant}`, className)} {...props}>
+          {children}
+        </button>
+      )
+    }
+
+    // 사용처에서 레이아웃 주입
+    <Button className="mt-4 w-full">제출</Button>
+    ```
+
+2. **Compound 컴포넌트 패턴** — 큰 organism (BookReader 등) 의 부분 노출 시 `<X.Header />` / `<X.Toc />` 식 compound 도입. props 폭증 / 약간 다른 organism 의 중복 방지. *도입 시점 = 2+ 변형 발견 시*.
+
+    ```ts
+    <BookReader>
+      <BookReader.Header onClose={...} />
+      <BookReader.Progress sections={...} />
+      <BookReader.Content body={...} />
+      <BookReader.Toc episodes={...} />
+    </BookReader>
+    ```
+
+3. **UI 상태 / 이벤트 핸들러 = props 주입** — 비즈니스 로직 / 도메인 상태는 부모 (page / widget) 에서 처리. 컴포넌트 = presentational. Storybook 에서 모든 상태·동작 한눈 검증 — 재사용성·테스트성 ↑.
+
+4. **SRP (Single Responsibility)** — molecule = 한 가지 일 / organism = 한 명확한 영역. props 폭증 = 분할 또는 compound 신호.
+
+5. **네이밍 = 의도 반영** — molecule = UI 네이밍 (`IconButton` / `Tag` / `Pill` — 컨텍스트 X) / organism = 도메인 네이밍 (`Header` / `BookReader` / `ChapterToc` — 컨텍스트 ○). 모호 시 organism 으로 시작 → 재사용 발견 시 molecule 추출.
+
+### Molecules 신규 분리 후보 (점진 도입)
+
+다음 영역은 *현재 Organism 내부에 포함* 되어 있으나 향후 재사용 발견 시 Molecule 슬라이스로 분리 검토:
+
+- **BookHeader 아이콘 그룹** (글자 크기 / 폰트 / 테마 / 목차 4 아이콘 버튼) — `book-reader/` 내부 → `widgets/icon-button-group/` 분리 후보
+- **시리즈 카드 메타 블록** (제목 + 상태 pill + 시작일) — `pages/home/` 내부 카드 → `widgets/series-card-meta/` 분리 후보
+- **CTA + 부제 조합** (HomeHero 의 "지금 보기" + 부제 / 챕터 끝 CTA) — `widgets/cta-block/` 분리 후보
+
+도입 시점 = 2+ 곳 재사용 발견 시 (Bottom-Up).
+
 ## 관련 문서
 
-- [`/.claude/CLAUDE.md`](../.claude/CLAUDE.md) — 핵심 원칙 9개 (§3 최소 의존, §5 TS+JSX, §9 스포일러 분리)
+- [`/.claude/CLAUDE.md`](../.claude/CLAUDE.md) — 핵심 원칙 13개 (§3 최소 의존, §4 FSD + Atomic 공존, §5 TS+JSX, §9 스포일러 분리, §12 workflow 강제)
+- [`/.claude/workflow/template/prompt-reference.md`](../.claude/workflow/template/prompt-reference.md) — H-eries SSOT (의존·아키텍처·게이트·작성 원칙)
 - [`/tsconfig.json`](../tsconfig.json) — `jsx: react-jsx`, `strict`, `moduleResolution: Bundler`
 - [`/vite.config.ts`](../vite.config.ts) — `publicDir: false` + `cp -R content dist/content` 후처리
-- [`/package.json`](../package.json) — 의존 7개 (react·react-dom·react-router-dom + vite·@vitejs/plugin-react·typescript + @types/react·@types/react-dom)
+- [`/package.json`](../package.json) — 런타임 의존 3개 (react / react-dom / react-router-dom)

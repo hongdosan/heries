@@ -22,7 +22,7 @@ static (`.nojekyll`) 로 발행.
     - **자작 명명 SSOT** — 신규 캐릭터·세계관 도입 시: (a) *닌자·무협 (정파·사파·혈교·천마신교 등)·각성자·회귀자·환생자·판타지* 등 *장르 원형·일반
       명사* 는 사용 가능 (b) 고유 호칭·기술명·진영명은 작가 자작 명명을 lorekeeper / worldsmith SSOT 에 등록 후 사용 (c) 본문은 SSOT
       등록 명명만 사용. NOTICE.md 의 모든 정책은 운영 SSOT.
-3. **최소 의존 — 런타임은 React 19 + React Router 7 + Vite 6 만** (2026-05-14 정책 v3). 본 의존 외 *런타임* 외부
+3. **최소 의존 — 런타임은 React 19 + React Router 7 + Vite 7 만** (2026-05-14 정책 v3 / 2026-05-19 Vite 7 stable). 본 의존 외 *런타임* 외부
    라이브러리·UI
    키트·상태 관리 라이브러리 도입 시 사용자 확인 필수. *의존 추가의 정신* = "코드만 있으면 어디서든 실행 가능" — 특정 빌드 시스템·SaaS·플랫폼에 묶이는 *런타임*
    의존 금지. **dev 도구는 별도** — Storybook, ESLint 9 + plugins (typescript / react / react-hooks /
@@ -31,17 +31,22 @@ static (`.nojekyll`) 로 발행.
    *dist 산출물에 0~수 KB 영향* 인 devDependencies 는 허용
    (단, package.json `dependencies` vs `devDependencies` 구분 엄수). React Compiler 는
    `compilationMode: 'infer'` 권장 — `'all'` 모드는 plain utility 함수까지 컴파일해 `useMemoCache` hook fail 야기.
-4. **FSD 아키텍처** — 프론트엔드 코드는 `src/` 6 레이어 (`app/pages/widgets/features/entities/shared`). 상위 레이어 → 하위
+4. **FSD 아키텍처 + Atomic Design 공존** *(2026-05-19 Atomic 도입)* — 프론트엔드 코드는 `src/` 6 레이어 (`app/pages/widgets/features/entities/shared`). 상위 레이어 → 하위
    레이어만 import (격리). 슬라이스 외부에서는 `index.ts` (Public API) 만 import. ESLint `no-restricted-imports`
    per-layer 자동 강제. 가이드: [
    `../src/README.md`](../src/README.md)
-    - **Bottom-Up 작업 흐름** — 신규 코드 = pages 부터 시작. 다른 page 재사용 발견 시 features → entities → shared 순으로 위
-      레이어 이동. 처음부터 entities/shared 에 두지 X (premature abstraction 회피).
+    - **Bottom-Up 작업 흐름** — 신규 코드 = pages 부터 시작. 다른 page 재사용 발견 시 widgets → features → entities → shared
+      순으로 위 레이어 이동. 처음부터 entities/shared 에 두지 X (premature abstraction 회피).
     - **Segment 네이밍** = 기술적 *목적* (`ui` / `api` / `model` / `lib` / `config`). 성격 (`components` /
       `hooks`) X.
-    - **widgets/ 활용** — H-eries 는 헤더 SoC 분리 + 페이지 조각 (12 widget) 으로 widgets 적극 활용 (재사용 가치 명확).
+    - **widgets/ 활용** — H-eries 는 헤더 SoC 분리 + 페이지 조각 (13 widget) 으로 widgets 적극 활용 (재사용 가치 명확).
     - **Slice grouping** 미사용 — 단일 작품 도메인 (*차원 격돌*) 단계. 신규 시리즈 추가 시 `pages/{slice-group}/{slice}` 그룹
       검토.
+    - **Atomic Design 5 단계 공존** *(2026-05-19)* — atoms (`shared/ui/`) / molecules (`widgets/` 소형·`pages/{slice}/sub` —
+      컨텍스트 X + UI 네이밍) / organisms (`widgets/` 합성·`features/{slice}/` — 컨텍스트 ○ + 도메인 네이밍) / templates
+      (별도 슬라이스 X — pages 직접 레이아웃) / pages (`pages/` 레이어). Atomic = *Storybook 사이드바 + 멘탈 모델 + 작성 5 원칙* 만 —
+      디렉토리는 FSD 유지. 분류 의사결정 + 컴포넌트 작성 5 원칙 (레이아웃 외부 주입 / compound / props 주입 / SRP / 네이밍) =
+      [`../src/README.md`](../src/README.md) §Atomic Design.
 5. **TypeScript strict + JSX** — `tsconfig.json` 의 `strict: true` 유지. `.tsx` 소스만 git 커밋, 빌드 산출물 (
    `dist/`) 은 `.gitignore`. 빌드 = `npm run build` (Vite). 개발 = `npm run dev`.
 6. **단일 작가 가정** — 다인 협업·코드 리뷰 분기 미적용.
@@ -72,6 +77,12 @@ static (`.nojekyll`) 로 발행.
     - **자연 한국어**. *유도 동기* / *첫 손이 간다* / *진하게 가다* / *119 있다가 왔다* 류 어색 신조 X.
     - **다나까 존대 정합**. 같은 계급 자대 첫 만남 = 다나까. 분대장 → 신참 = 반말.
     - **"결" 단어** 절대 X.
+    - **한국어 문법 정합** *(2026-05-19 신설)*. 주어·서술어 호응, 조사 오용 X, 시제 일관. *유도 동기 / 첫 손이 간다 / 진하게 / 119 있다가
+      왔다* 류 어색 신조 / 직역 / 잘못된 합성어 절대 X. 한 번 읽고 어색 = 정정.
+    - **부대 구성 = 비각성자 only** *(2026-05-19 신설)*. 본 부대는 *각성하지 못한 인간* 의 정예 특수부대. **임무 중 각성 시 = 보통 퇴소** (
+      각성자는 헌터 + 길드·협회 별도 조직). 예외 = 본인 의지로 잔류 (책임감·멘토링·가치관) — 분기 절 격리 또는 사유 명확 표기.
+    - **퇴소 사유 5 종** *(2026-05-19 신설)*. (a) 사망 (통계 최다) (b) 불구·중상 (의병) (c) PTSD / 정신 붕괴 (d) 자의 (
+      탈진) (e) 자의 (목표 달성). *실전 中 죽어서 퇴소가 다수* 가 부대 톤. 잔잔한 평화 군대 톤 X.
     - **캐릭터 카드 스포일러 = 분기 절** (`## H-eries 분기 — 차원 격돌 변형`) 으로만. 사망·미래 사건·핵심 반전은 *공개 절* / role /
       summary 절대 노출 X.
     - **나이 = 한국 나이** (고졸 직후 입대 = 만 20세).
@@ -79,13 +90,14 @@ static (`.nojekyll`) 로 발행.
 11. **공통 컴포넌트 (`shared/ui/`) 스토리북 강제** (2026-05-14 신설) — `src/shared/ui/{name}/` 신규 컴포넌트 추가 시 동일
     슬라이스에 `{name}.stories.tsx` **반드시** 함께 작성. 누락 = 정책 위반. 스토리는 의미 있는 variant 최소 2 개 + 정상 케이스 1 개 (=
     최소 3 스토리). `widgets/`, `features/` 슬라이스는 권장 (강제 X). `pages/` 는 라우팅 의존이라 미적용.
-12. **AI 개발 흐름 강제** (2026-05-14 신설) — auto-mode (자율 진행) 또는 3 파일 이상 변경 / 신규 슬라이스 도입 / 콘텐츠 SSOT 갱신 시 [
-    `./workflow/workflow.md`](./workflow/workflow.md) 의 6 단계 흐름 (Context → Prompt QA → Roadmap →
-    Tech Review → Adaptive Execution → Commit/Close) 강제. 트랙별 프롬프트 템플릿: [
-    `develop`](./workflow/template/prompt-template-develop.md) / [
+12. **AI 개발 흐름 강제 — 범용 적용** *(2026-05-14 신설 / 2026-05-19 범위 확장)* — **모든 챕터 작성 / 신규 기능 / 개선 작업 /
+    SSOT 갱신 / auto-mode 자율 진행** 시 [`./workflow/workflow.md`](./workflow/workflow.md) 의 6 단계 흐름 (Context →
+    Prompt QA → Roadmap → Tech Review → Adaptive Execution → Commit/Close) 강제. *글 작성 (챕터·카드·세계관)* 도
+    예외 없음 — Context 단계에서 SSOT (writing-principles.md / 등장 카드 / _series.md) Read + Tech Review 에서 자체 검증.
+    트랙별 프롬프트 템플릿: [`develop`](./workflow/template/prompt-template-develop.md) / [
     `improvement`](./workflow/template/prompt-template-improvement.md) / [
     `review`](./workflow/template/prompt-template-review.md). 단일 기준점: [
-    `prompt-reference.md`](./workflow/template/prompt-reference.md).
+    `prompt-reference.md`](./workflow/template/prompt-reference.md). 단순 단일 파일 1줄 정정·검색·읽기는 면제.
 13. **개인 정보 / 시크릿 절대 비공개** *(2026-05-14 신설)* — 다음 데이터는 **코드 / git / dist 에 절대 포함 금지**: (a) 개인 식별
     정보 — 실주소·실전화·실생년월일·실명 (이메일 `contact_hongdosan@naver.com` 은 공개 채널이라 예외) (b) API 키·토큰·시크릿 (c) DB
     비밀번호·인증 정보 (d) 작가 모드 키 (`VITE_AUTHOR_KEY` — `.env.local` + GitHub Secret 만, hardcoded X) (e)
@@ -135,7 +147,7 @@ H-eries 작업은 **`H-eries-orchestrator` 스킬** ([
 | "세계관 추가", "연표 갱신", "용어집", "`_series.md`", "페이즈 구조"                | `H-eries-worldsmith`                   | [`./agents/H-eries-worldsmith.md`](./agents/H-eries-worldsmith.md)                   |
 | "챕터 작성", "ep-NN 작성", "본문 집필", "시놉시스 받아", "떡밥 매설"                  | `H-eries-author` (→ 자동 reviewer 파이프라인) | [`./agents/H-eries-author.md`](./agents/H-eries-author.md)                           |
 | "정합성 감사", "연속성 검증", "챕터 검수", "SSOT 정합", "떡밥 추적"                   | `H-eries-continuity-reviewer`          | [`./agents/H-eries-continuity-reviewer.md`](./agents/H-eries-continuity-reviewer.md) |
-| "컴포넌트 추가/수정", "렌더러", "UX 개선", "FSD", "빌드 스크립트", "타입 에러", "마스킹 로직" | `H-eries-frontend-engineer`            | [`./agents/H-eries-frontend-engineer.md`](./agents/H-eries-frontend-engineer.md)     |
+| "컴포넌트 추가/수정", "렌더러", "UX 개선", "FSD", "Atomic Design", "atoms / molecules / organisms", "Storybook title", "컴포넌트 작성 원칙", "빌드 스크립트", "타입 에러", "마스킹 로직" | `H-eries-frontend-engineer`            | [`./agents/H-eries-frontend-engineer.md`](./agents/H-eries-frontend-engineer.md)     |
 | "사이트 빌드", "GitHub 배포", "manifest 갱신", "썸네일 프롬프트", "이미지 압축", "발행"  | `H-eries-publisher`                    | [`./agents/H-eries-publisher.md`](./agents/H-eries-publisher.md)                     |
 
 **실행 모드:** 서브 에이전트 기본 + 챕터 작성은 author → continuity-reviewer 파이프라인 (하이브리드). 팀 모드는 사용자 명시 요청 시에만.

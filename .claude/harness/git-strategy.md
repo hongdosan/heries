@@ -28,17 +28,37 @@ develop ────●────●────●────●  (일상 �
                                                             └─ GitHub Pages 자동 배포
 ```
 
-### 2-1. 일상 작업 (대다수)
+### 2-1. 콘텐츠 작업 (챕터·카드·세계관 — 대다수)
 
 ```bash
 git checkout develop
-# … 챕터 작성 / 코드 변경 / mini-game 정정 …
+# … 챕터 작성 / 카드 정정 / 세계관 / mini-game 콘텐츠 …
 git add (specific files)
 git commit -m "type(scope): 한글 본문"
 git push origin develop
 ```
 
-`develop` push = 배포 X. 빌드 CI 만 통과 확인.
+`develop` push = 배포 X. 빌드 CI 만 통과 확인. **마크다운 콘텐츠는 SDD 게이트 무관** — develop 직접 커밋.
+
+### 2-1b. 코드 작업 (SDD 게이트 대상 — `.ts/.tsx/.sh` 등) *(2026-05-23 reconcile)*
+
+SDD strict 게이트가 코드 커밋에 `specs/<branch>/spec.md`+`plan.md`를 요구하므로,
+**코드 작업은 develop 직접 커밋 X → feature 브랜치 off develop**:
+
+```bash
+git checkout develop
+git checkout -b 012-reader-fix          # NNN-slug (specs/<branch>/ 경로가 됨)
+# sdd-conductor → /speckit-specify → /speckit-plan (specs/012-reader-fix/ 생성)
+# 코드 구현 …
+git add (specific files)
+git commit -m "feat(scope): 한글 본문"   # pre-commit 게이트: spec+plan+typecheck/lint (strict)
+git checkout develop
+git merge --no-ff 012-reader-fix         # merge commit은 pre-commit 미발동 → develop 통과
+git push origin develop
+```
+
+이후 develop → release → main 흐름은 §2-2 동일. 콘텐츠와 코드가 한 사이클에 섞이면
+코드만 feature 브랜치에서 처리 후 develop에 합류시킨다.
 
 ### 2-2. Release 사이클 (milestone 단위)
 
@@ -160,4 +180,4 @@ git commit -m "chore(release): vX.Y.Z 버전 정합"
 - 본 문서 SSOT: `.claude/harness/git-strategy.md`
 - 변경 이력: `CHANGELOG.md`
 - 운영 자동화: `.github/workflows/deploy.yml`
-- 정책 합의: [메모리 `feedback_main_only_user_commits.md`](file:///Users/hongdosan/.claude/projects/-Users-hongdosan-onion-workspace-heries/memory/feedback_main_only_user_commits.md) → 본 문서로 갱신
+- 정책 합의: 메모리 `feedback_main_only_user_commits.md` (LLM 세션 영구 메모리) → 본 문서로 갱신
