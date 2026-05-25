@@ -37,9 +37,7 @@
    해결 = 모바일에서는 column 폐기 + 직계 자식 (cover / section-cover / section-body / book-end-cta)
    을 flex row 100vw 강제. JS scrollLeft pagination 그대로 작동. 본 페이지 안 본문은 세로 스크롤. */
 @media (max-width: 640px) {
-  /* frame = 가로 스크롤 + 세로는 페이지 안 본문 자체가 결정 (auto height).
-     이전 (011) `overflow-y: hidden + height: clamp(420, 58vh, 560)` (inline) 조합으로
-     페이지 안 본문이 frame height 초과 시 *짤려서 나옴* 회귀. height 제한 풀고 본문 흐름에 맞춤. */
+  /* frame = 가로 스크롤 + 세로는 페이지 안 본문 자체가 결정. */
   .book-frame {
     height: auto !important;
     max-height: none !important;
@@ -52,13 +50,16 @@
   .book-frame::before {
     display: none;
   }
+  /* width: max-content (011) 제거 — flex parent intrinsic width 자동 = flex items 합.
+     이전 max-content 가 자식 <p> 의 한국어 line wrap 을 부모에 전파 → flex item width: 100vw 무시되고
+     line 이 viewport 초과 → 우측 텍스트 잘림 (013). */
   .book-content {
     column-count: unset !important;
     column-width: unset !important;
     column-fill: unset !important;
     display: flex !important;
     flex-direction: row !important;
-    width: max-content !important;
+    width: auto !important;
     height: auto !important;
     align-items: flex-start !important;
   }
@@ -69,9 +70,18 @@
     height: auto !important;
     min-height: 100vh;
     overflow: visible !important;
+    box-sizing: border-box !important;
     scroll-snap-align: start !important;
     break-after: unset !important;
     break-before: unset !important;
+  }
+  /* 한국어 line wrap 강제 — overflow-wrap: break-word 로 긴 단어/구두점도 viewport 안에서 break. */
+  .book-content > * > *,
+  .section-body > * {
+    box-sizing: border-box !important;
+    overflow-wrap: break-word !important;
+    word-break: keep-all;
+    max-width: 100% !important;
   }
 }
 
