@@ -50,5 +50,12 @@
     }
   ],
   "chapters": [
+    {
+      "episode": 1,
+      "slug": "ep-01",
+      "title": "한별 단지의 밤",
+      "published": "2026-05-25",
+      "thumbnail": "thumbnails/ep-01/ep-01.webp"
+    }
   ]
 }
