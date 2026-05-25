@@ -168,21 +168,17 @@ export function renderMarkdown(src: string): string {
   return out.join('\n')
 }
 
-// 한국어 인식 paragraph join — IDE / linter 가 자동 wrap 한 단락을 원래 텍스트로 복원.
-// 인접한 두 줄의 *끝 / 시작* 문자가 모두 한글 (또는 둘 중 하나가 구두점) 이면 공백 없이 연결,
-// 영문·숫자 등 *서구 텍스트* 간 wrap 은 공백 보존.
+// paragraph join — IDE / linter 가 자동 wrap 한 단락을 원래 텍스트로 복원.
+// 줄바꿈 = 기본 공백 인서트 (한국어·영문 무관). 다음 줄이 *구두점* 으로 시작 시 공백 없음 (구두점 자연 정합).
+// 2026-05-25 정정 — 이전 *한국어 양쪽 = 공백 없음* 가정은 한국어 자연 띄어쓰기 위반 (예: *동생 우선아의\n학생증* → *우선아의학생증* 버그).
 function joinParagraphLines(lines: string[]): string {
   if (lines.length === 0) return ''
   let out = lines[0] ?? ''
   for (let k = 1; k < lines.length; k++) {
     const next = lines[k] ?? ''
-    const prevCh = out.slice(-1)
     const nextCh = next.charAt(0)
-    const isKoreanOrCJK = (ch: string) => /[가-힯぀-ヿ一-鿿]/.test(ch)
     const isPunct = (ch: string) => /[.,!?;:)\]}」』"'…—–-]/.test(ch)
-    const sep = (isKoreanOrCJK(prevCh) && isKoreanOrCJK(nextCh)) || isPunct(nextCh)
-      ? ''
-      : ' '
+    const sep = isPunct(nextCh) ? '' : ' '
     out += sep + next
   }
   return out
