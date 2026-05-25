@@ -4,11 +4,8 @@ import {MemoryRouter} from 'react-router-dom'
 import {BookHeader, BookProgressBar, BookReader, BookToc} from './index.js'
 
 // language=HTML
+// (시리즈 cover 페이지는 2026-05-25 부로 제거 — 첫 페이지 = 챕터 cover 부터. specs/003-book-reader-skip-series-cover/)
 const SAMPLE_BODY_HTML = `
-  <section class="book-cover" id="__cover_series__">
-    <p class="book-cover-series-sub">H-eries · Original Series</p>
-    <h1 class="book-cover-series">차원 격돌</h1>
-  </section>
   <section class="book-cover" id="__cover_chapter__">
     <p class="book-cover-ep">EP 04</p>
     <h2 class="book-cover-title">자대</h2>

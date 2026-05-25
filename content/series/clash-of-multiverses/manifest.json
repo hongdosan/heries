@@ -19,7 +19,7 @@
       "body": "각성하지 못한 인간 중 신체·정신 평가를 통과한 정예를 모은 군 조직. 마수 사냥은 헌터의 책임이고, 부대는 민간인 피난·동선 차단·잔존 마수 견제를 맡는다."
     },
     {
-      "term": "각성자 협회",
+      "term": "헌터협회",
       "body": "각성자 헌터들의 길드를 관할하는 자치 정부. 마수 출몰 신고·헌터 팀 출동·등급 측정을 모두 주관한다."
     }
   ],
@@ -53,30 +53,9 @@
     {
       "episode": 1,
       "slug": "ep-01",
-      "title": "마수의 등장",
-      "published": "2026-05-15",
+      "title": "한별 단지의 밤",
+      "published": "2026-05-25",
       "thumbnail": "thumbnails/ep-01/ep-01.webp"
-    },
-    {
-      "episode": 2,
-      "slug": "ep-02",
-      "title": "마수와 사람 사이",
-      "published": "2026-05-15",
-      "thumbnail": "thumbnails/ep-02/ep-02.webp"
-    },
-    {
-      "episode": 3,
-      "slug": "ep-03",
-      "title": "입소",
-      "published": "2026-05-16",
-      "thumbnail": "thumbnails/ep-03/ep-03.webp"
-    },
-    {
-      "episode": 4,
-      "slug": "ep-04",
-      "title": "자대",
-      "published": "2026-05-18",
-      "thumbnail": "thumbnails/ep-04/ep-04.webp"
     }
   ]
 }

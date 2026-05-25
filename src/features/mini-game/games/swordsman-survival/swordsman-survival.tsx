@@ -2,100 +2,34 @@ import {type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPoin
 import SLASH_SPRITE from '../../../../shared/images/mini-game/swordsman-survival/slash.webp?url'
 import IMPACT_ELITE_SPRITE from '../../../../shared/images/mini-game/swordsman-survival/impact-amber.webp?url'
 import IMPACT_NORMAL_SPRITE from '../../../../shared/images/mini-game/swordsman-survival/impact-crimson.webp?url'
+import {
+  WORLD_W, WORLD_H,
+  PLAYER_SIZE, PLAYER_SPEED, PLAYER_MAX_HP, PLAYER_IFRAME_MS,
+  ENEMY_SIZE, ELITE_SIZE, ENEMY_BASE_SPEED, ENEMY_WAVE_INCREMENT, ENEMY_HP, ELITE_HP, SCORE_NORMAL, SCORE_ELITE,
+  BULLET_SIZE, BULLET_SPEED, BULLET_LIFE, FIRE_COOLDOWN_FRAMES,
+  WAVE_DURATION_FRAMES, SPAWN_BASE_FRAMES, SPAWN_MIN_FRAMES, SPAWN_WAVE_REDUCTION,
+  ITEM_SIZE, ITEM_LIFE_FRAMES, ITEM_DROP_NORMAL, ITEM_DROP_ELITE, ITEM_SCORE_BONUS, ITEM_HP_HEAL,
+  IMPACT_FADE_MS,
+  SKILL_CD_FRAMES, SKILL_DURATION_FRAMES, SKILL_PUSH_RADIUS, SKILL_PUSH_STRENGTH,
+  COLOR_HIT_NORMAL, COLOR_HIT_ELITE, COLOR_KILL_NORMAL, COLOR_KILL_ELITE, COLOR_PLAYER_HIT, COLOR_ITEM_HEART, COLOR_ITEM_GEM,
+  PARTICLES_HIT_NORMAL, PARTICLES_HIT_ELITE, PARTICLES_KILL, PARTICLES_PLAYER_HIT, PARTICLES_ITEM_PICKUP, PARTICLES_SKILL_ACTIVATE,
+  ITEM_BLINK_THRESHOLD_FRAMES, ITEM_BLINK_INTERVAL_FRAMES,
+  PARTICLE_FRICTION, PARTICLE_LIFE_FRAMES, PARTICLE_SPEED_MIN, PARTICLE_SPEED_RANGE,
+  SPAWN_JITTER_FRAMES,
+  PLAYER_OPACITY_BLINK_INTERVAL, PLAYER_OPACITY_BLINK_DUTY,
+  SKILL_RING_BASE_SCALE, SKILL_RING_SCALE_DELTA,
+  ANNOUNCE_FADE_MS, FLASH_FADE_MS,
+  DT_BASE_MS, DT_SCALE_MIN, DT_SCALE_MAX,
+  RAW_HIT_PADDING_PX,
+  BEST_KEY,
+} from './constants.js'
 
 // ─────────────────────────────────────────────────────────────────
 // 검기생존록 — 무협 아이작풍 탄막 슈터 (H-eries 메인 페이지 미니 게임)
 // 의존 0 (react 만). framer-motion / shadcn / tailwind 미사용.
 // 게임 좌표계 SSOT = WORLD_W × WORLD_H. 박스 안에서 CSS scale 로 fit.
+// 게임 튜닝 상수 SSOT = ./constants.ts (gwangsalgeom 정합).
 // ─────────────────────────────────────────────────────────────────
-
-// 월드 상수 (게임 SSOT 좌표계)
-const WORLD_W = 360
-const WORLD_H = 640
-
-// 플레이어
-const PLAYER_SIZE = 30
-const PLAYER_SPEED = 3.2
-const PLAYER_MAX_HP = 3
-const PLAYER_IFRAME_MS = 900
-
-// 적 — 초반 난이도 완화 (사용자 피드백 = 처음부터 너무 빠름)
-const ENEMY_SIZE = 28
-const ELITE_SIZE = 40
-const ENEMY_BASE_SPEED = 0.65    // 1.05 → 0.65 (38% 완화, 첫 wave 여유)
-const ENEMY_WAVE_INCREMENT = 0.12 // wave 별 +0.12 (이전 0.18 → 33% 완화)
-const ENEMY_HP = 1
-const ELITE_HP = 3
-const SCORE_NORMAL = 10
-const SCORE_ELITE = 45
-
-// 총알
-const BULLET_SIZE = 10
-const BULLET_SPEED = 7.4
-const BULLET_LIFE = 72
-const FIRE_COOLDOWN_FRAMES = 12
-
-// 파상 (wave) — 시간 진행에 따른 난이도 곡선
-const WAVE_DURATION_FRAMES = 60 * 22  // 약 22초/파상 (60fps 가정)
-const SPAWN_BASE_FRAMES = 110         // 70 → 110 (첫 wave spawn 간격 약 1.8s)
-const SPAWN_MIN_FRAMES = 20           // 최소 간격 18 → 20
-const SPAWN_WAVE_REDUCTION = 8        // wave 별 -8 frames
-
-// 아이템 — 적 처치 시 확률 drop
-const ITEM_SIZE = 22
-const ITEM_LIFE_FRAMES = 60 * 8       // 8초 후 자동 소멸
-const ITEM_DROP_NORMAL = 0.08         // 일반 적 8% drop
-const ITEM_DROP_ELITE = 0.35          // 엘리트 적 35% drop
-const ITEM_SCORE_BONUS = 30
-const ITEM_HP_HEAL = 1
-
-// 무협 액션 sprite — BASE_URL prefix 위해 assetUrl 헬퍼.
-// JSX 의 inline style 에서 backgroundImage 로 적용.
-// sprite 상수 = top of file vite ?url import 으로 대체됨.
-const IMPACT_FADE_MS = 280
-
-// 스킬 — 검막 (Active, Shift / 상단 우측 버튼)
-const SKILL_CD_FRAMES = 60 * 8        // 8초 쿨다운
-const SKILL_DURATION_FRAMES = 60      // 1초 발동 (무적 + push)
-const SKILL_PUSH_RADIUS = 100         // 100px 반경
-const SKILL_PUSH_STRENGTH = 34        // 적 밀어내기 강도
-
-// 파티클 색상 — 게임 톤 (모두 hex). CSS var 와 분리된 이유 = JS 안에서
-// 동적 매개변수로 spawnParticles 에 전달. CSS 변수는 stylesheet 한정.
-const COLOR_HIT_NORMAL = '#fda4af'    // 일반 적 피격 파티클
-const COLOR_HIT_ELITE = '#f59e0b'     // 엘리트 적 피격 파티클
-const COLOR_KILL_NORMAL = '#fecaca'   // 일반 적 처치 폭발 파티클
-const COLOR_KILL_ELITE = '#fbbf24'    // 엘리트 적 처치 폭발 파티클
-const COLOR_PLAYER_HIT = '#7dd3fc'    // 플레이어 피격 파티클 (스킬 ring 색과 동일)
-const COLOR_ITEM_HEART = '#fca5a5'    // HP 회복 아이템 픽업 파티클
-const COLOR_ITEM_GEM = '#fde68a'      // 점수 아이템 픽업 파티클
-
-// 파티클 개수 — 적 피격/처치 시 spawn 개수
-const PARTICLES_HIT_NORMAL = 5
-const PARTICLES_HIT_ELITE = 8
-const PARTICLES_KILL = 10
-const PARTICLES_PLAYER_HIT = 8
-const PARTICLES_ITEM_PICKUP = 12
-const PARTICLES_SKILL_ACTIVATE = 20
-
-// 게임 진행 기타 임계
-const ITEM_BLINK_THRESHOLD_FRAMES = 120  // 마지막 2초 (60fps) 깜빡임
-const ITEM_BLINK_INTERVAL_FRAMES = 12    // 깜빡임 주기
-const PARTICLE_FRICTION = 0.92           // 파티클 마찰 계수 (frame 마다)
-const PARTICLE_LIFE_FRAMES = 28          // 파티클 수명
-const PARTICLE_SPEED_MIN = 1
-const PARTICLE_SPEED_RANGE = 2.6
-const SPAWN_JITTER_FRAMES = 8            // spawn 간격 랜덤 편차
-const PLAYER_OPACITY_BLINK_INTERVAL = 6  // 무적 시 깜빡임 주기 (frame)
-const PLAYER_OPACITY_BLINK_DUTY = 3      // 깜빡임 듀티
-const SKILL_RING_BASE_SCALE = 0.6
-const SKILL_RING_SCALE_DELTA = 1.6
-const ANNOUNCE_FADE_MS = 1100
-const FLASH_FADE_MS = 180
-const DT_BASE_MS = 16.67                 // 60fps 기준
-const DT_SCALE_MIN = 0.5
-const DT_SCALE_MAX = 2.5
-const RAW_HIT_PADDING_PX = 20            // 총알이 stage 밖으로 나가는 임계
 
 // ─── 타입 ──────────────────────────────────────────────────────
 interface Vec {
@@ -512,7 +446,7 @@ function spawnParticles(out: Particle[], x: number, y: number, color: string, n:
 }
 
 // ─── best-score 보존 (localStorage) ──────────────────────
-const BEST_KEY = 'heries:mini-game:best-score'
+// BEST_KEY = './constants.js' 임포트
 
 function readBestScore(): number {
   try {

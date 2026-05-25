@@ -1,5 +1,12 @@
 /* H-eries — Book Reader (CSS columns paginated reader) — 2026-05-19 v3 재설계 */
 
+/* 모바일 터치 swipe — 가로는 우리(JS)가 처리, 세로 스크롤 + 핀치 줌은 브라우저.
+   `touch-action: pan-y pinch-zoom` 로 가로 swipe 시 브라우저 기본 가로 스크롤·overscroll
+   동작 차단 → "화면 자체가 움직이는" 진동 제거. 2026-05-25 신설 (specs/004-). */
+.book-reader-root {
+  touch-action: pan-y pinch-zoom;
+}
+
 .book-frame {
   scrollbar-width: none;
   -ms-overflow-style: none;

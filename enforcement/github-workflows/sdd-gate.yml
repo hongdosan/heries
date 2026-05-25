@@ -1,0 +1,115 @@
+name: SDD Gate
+
+# Enforces the SDD constitution at the merge boundary.
+# Local hooks can be skipped (--no-verify); this CI gate cannot — it is the
+# backstop that makes "advisory → enforced" actually true for shared branches.
+# (Non-bypassable ONLY if you enable required-PR branch protection on the default branch.)
+# (기본 브랜치에 required-PR 브랜치 보호를 켰을 때에만 우회 불가입니다.)
+#
+# Install: copy to .github/workflows/sdd-gate.yml and set SDD_TEST_CMD below.
+#
+# Flow (steps run in order) / 흐름 (단계는 순서대로):
+#   1. Detect implementation changes (code-file extensions in the PR diff).
+#      구현 변경 감지 (PR diff에 코드 파일 확장자가 있는가).
+#   2. R1/R2 (only if impl): require specs/<head_ref>/spec.md (non-trivial) + plan.md,
+#      keyed to THIS PR's source branch — not "any spec anywhere".
+#      R1/R2 (구현일 때만): 이 PR의 소스 브랜치 기준 specs/<head_ref>/spec.md(비자명) + plan.md 필수.
+#   3. Detect production signals → enforcement level strict (R6).
+#      운영 시그널 감지 → 강제 레벨 strict (R6).
+#   4. R3 (only if impl): SDD_TEST_CMD must be set, not a no-op; then run it (must pass).
+#      R3 (구현일 때만): SDD_TEST_CMD 설정 + no-op 아님 + 실행 통과.
+#   5. R7: run sync-check (docs ↔ SPEC.yml).
+#      R7: sync-check 실행 (문서 ↔ SPEC.yml).
+#   6. Summary (always).
+#      요약 (항상).
+
+on:
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  sdd-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect implementation changes
+        id: impl
+        run: |
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+          CHANGED="$(git diff --name-only "$BASE" "$HEAD")"
+          if echo "$CHANGED" | grep -qE '\.(py|js|ts|tsx|jsx|go|rs|java|rb|php|c|cc|cpp|h|hpp)$'; then
+            echo "impl=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "impl=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: R1/R2 — this PR's feature must have a spec + plan
+        if: steps.impl.outputs.impl == 'true'
+        run: |
+          # spec-kit names the feature branch NNN-slug with specs/<branch>/.
+          # Tie the check to THIS PR's source branch, not "any spec anywhere".
+          BRANCH="${{ github.head_ref }}"
+          SPEC="specs/$BRANCH/spec.md"; PLAN="specs/$BRANCH/plan.md"
+          if [ ! -f "$SPEC" ]; then
+            echo "⛔ SDD GATE (R1): implementation changes but $SPEC is missing for branch '$BRANCH'."
+            echo "   Run /speckit.specify on the feature branch. See .specify/memory/constitution.md."
+            exit 1
+          fi
+          if [ "$(wc -w < "$SPEC")" -lt 20 ]; then
+            echo "⛔ SDD GATE (R1): $SPEC is effectively empty."
+            exit 1
+          fi
+          if [ ! -f "$PLAN" ]; then
+            echo "⛔ SDD GATE (R2): implementation changes but $PLAN is missing. Run /speckit.plan."
+            exit 1
+          fi
+
+      - name: Detect production strictness (R6)
+        id: level
+        run: |
+          if ls .env.production .env.prod docker-compose.prod.* 2>/dev/null | grep -q . \
+             || find . -maxdepth 2 \( -name 'Dockerfile.prod*' -o -name '*.tf' -o -name 'Chart.yaml' \) 2>/dev/null | grep -q . \
+             || ls -d k8s kubernetes helm 2>/dev/null | grep -q .; then
+            echo "level=strict" >> "$GITHUB_OUTPUT"
+          else
+            echo "level=standard" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: R3 — verification must pass
+        if: steps.impl.outputs.impl == 'true'
+        env:
+          # Set this to your project's test command.
+          SDD_TEST_CMD: ${{ vars.SDD_TEST_CMD }}
+        run: |
+          if [ -z "$SDD_TEST_CMD" ]; then
+            echo "⛔ SDD GATE (R3): repository variable SDD_TEST_CMD is not set."
+            echo "   Define it in Settings → Secrets and variables → Actions → Variables."
+            exit 1
+          fi
+          case "$(printf '%s' "$SDD_TEST_CMD" | tr -d ' ')" in
+            true|:|echo*|exit0)
+              echo "⛔ SDD GATE (R3): SDD_TEST_CMD looks like a no-op ('$SDD_TEST_CMD')."
+              exit 1 ;;
+          esac
+          echo "Running: $SDD_TEST_CMD"
+          eval "$SDD_TEST_CMD"
+
+      - name: R7 — document synchronization
+        run: |
+          if [ -f enforcement/sync-check.sh ]; then
+            bash enforcement/sync-check.sh .
+          else
+            echo "⛔ SDD GATE (R7): enforcement/sync-check.sh missing."
+            exit 1
+          fi
+
+      - name: Gate summary
+        if: always()
+        run: |
+          echo "Enforcement level: ${{ steps.level.outputs.level }}"
+          echo "Implementation changes: ${{ steps.impl.outputs.impl }}"
+          echo "This gate is the non-bypassable backstop for the SDD constitution."
