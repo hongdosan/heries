@@ -107,20 +107,13 @@ export function ChapterPage() {
   const nextHref = next ? `${seriesUrl}/chapter/${next.episode}` : ''
   const chapterTitleText = data.frontmatter.title || data.index.title
 
-  // bodyHtml 합성 — book-cover-series + book-cover-chapter + 각 절 section-cover (h2 + thumb) + 본문 + end.
+  // bodyHtml 합성 — book-cover-chapter + 각 절 section-cover (h2 + thumb) + 본문 + end.
   // 각 cover element = `break-before/after: column + height: 100%` → 한 column 다 차지 (정확히 한 페이지).
   // 본문 (p / blockquote 등) = column flow 자동 (긴 본문 = 여러 column).
-  const seriesThumbSrc = manifest.thumbnail ? assetUrl(`content/series/${slug}/${manifest.thumbnail}`) : ''
+  // (시리즈 cover 페이지는 2026-05-25 부로 제거 — 첫 페이지 = 챕터 cover 부터. 시리즈 식별은 리스트·홈에서. specs/003-book-reader-skip-series-cover/)
   const chapterThumbSrc = data.index.thumbnail ? assetUrl(`content/series/${slug}/${data.index.thumbnail}`) : ''
   const escTitle = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   const escAttr = (s: string) => s.replace(/"/g, '&quot;')
-  const coverSeriesHtml = `
-<section class="book-cover book-cover-series-page" id="__cover_series__">
-  ${seriesThumbSrc ? `<img class="book-cover-thumb" src="${escAttr(seriesThumbSrc)}" alt="" />` : ''}
-  <p class="book-cover-series-sub">H-eries · Original Series</p>
-  <h1 class="book-cover-series">${escTitle(manifest.title)}</h1>
-</section>
-`
   const coverChapterHtml = `
 <section class="book-cover book-cover-chapter-page" id="__cover_chapter__">
   ${chapterThumbSrc ? `<img class="book-cover-thumb" src="${escAttr(chapterThumbSrc)}" alt="" />` : ''}
@@ -199,7 +192,7 @@ export function ChapterPage() {
 </aside>
 `
   // block element 사이 whitespace text node 제거 — multi-column 안 inline box 가 col 차지하는 버그 회피.
-  const fullBodyHtml = (coverSeriesHtml + coverChapterHtml + transformedBody + endHtml).replace(/>\s+</g, '><')
+  const fullBodyHtml = (coverChapterHtml + transformedBody + endHtml).replace(/>\s+</g, '><')
 
   return (
     <main className={MAIN_CLS}>
