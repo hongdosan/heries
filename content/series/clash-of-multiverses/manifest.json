@@ -50,33 +50,5 @@
     }
   ],
   "chapters": [
-    {
-      "episode": 1,
-      "slug": "ep-01",
-      "title": "마수의 등장",
-      "published": "2026-05-15",
-      "thumbnail": "thumbnails/ep-01/ep-01.webp"
-    },
-    {
-      "episode": 2,
-      "slug": "ep-02",
-      "title": "마수와 사람 사이",
-      "published": "2026-05-15",
-      "thumbnail": "thumbnails/ep-02/ep-02.webp"
-    },
-    {
-      "episode": 3,
-      "slug": "ep-03",
-      "title": "입소",
-      "published": "2026-05-16",
-      "thumbnail": "thumbnails/ep-03/ep-03.webp"
-    },
-    {
-      "episode": 4,
-      "slug": "ep-04",
-      "title": "자대",
-      "published": "2026-05-18",
-      "thumbnail": "thumbnails/ep-04/ep-04.webp"
-    }
   ]
 }
