@@ -25,7 +25,7 @@ const MAIN_CLS = 'flex-1 w-full max-w-page mx-auto pt-7 px-[clamp(16px,4vw,32px)
 /**
  * 작품 상세 페이지 (`/series/:slug`).
  *
- * **디자인 정합** (2026-05-19 시안 img_2.png):
+ * **디자인 정합** (2026-05-19 시안 ep-01-3.webp):
  * - Breadcrumb (H-eries / 시리즈 / 작품명)
  * - 헤더 = 좌측 16:9 thumbnail + 우측 메타 (캡션 / 제목 / 카테고리 / 메타 표 / CTA 2종)
  * - CTA = *1화부터 읽기* (검정 둥근) + *최신화로* (보조)
@@ -71,7 +71,8 @@ export function SeriesPage() {
 
       <SeriesHeader slug={slug} manifest={manifest} coverSrc={coverSrc} onError={cover.onError}/>
 
-      <TabNav tab={tab} setTab={setTab} chapterCount={chapterCount} characterCount={characterCount} isAuthor={isAuthor}/>
+      <TabNav tab={tab} setTab={setTab} chapterCount={chapterCount} characterCount={characterCount}
+              isAuthor={isAuthor}/>
 
       {tab === 'overview' && (
         <OverviewPanel slug={slug} manifest={manifest} bodyHtml={bodyHtml} setTab={setTab}/>
@@ -99,8 +100,8 @@ export function SeriesPage() {
 // ─── 헤더 (시안 정합) ─────────────────────────────────────
 
 function SeriesHeader({
-  slug, manifest, coverSrc, onError,
-}: Readonly<{
+                        slug, manifest, coverSrc, onError,
+                      }: Readonly<{
   slug: string
   manifest: SeriesManifest
   coverSrc: string | null
@@ -112,20 +113,24 @@ function SeriesHeader({
   const latestEp = manifest.chapters.at(-1)?.episode
 
   return (
-    <header className="pt-2 pb-8 mb-6 grid grid-cols-[1fr_1fr] gap-10 items-start max-md:grid-cols-1 max-md:gap-6">
+    <header
+      className="pt-2 pb-8 mb-6 grid grid-cols-[1fr_1fr] gap-10 items-start max-md:grid-cols-1 max-md:gap-6">
       {coverSrc ? (
         <div className="aspect-video rounded-md overflow-hidden bg-bg-soft border border-rule">
-          <img src={coverSrc} alt="" loading="eager" onError={onError} className="w-full h-full object-cover block"/>
+          <img src={coverSrc} alt="" loading="eager" onError={onError}
+               className="w-full h-full object-cover block"/>
         </div>
       ) : (
-        <div className="aspect-video rounded-md bg-[linear-gradient(135deg,var(--bg-soft),var(--bg-sunken))] border border-rule"/>
+        <div
+          className="aspect-video rounded-md bg-[linear-gradient(135deg,var(--bg-soft),var(--bg-sunken))] border border-rule"/>
       )}
 
       <div className="flex flex-col gap-5 min-w-0">
         <p className="m-0 text-xs sm:text-sm font-medium tracking-[0.24em] uppercase text-fg-3">
           Series 01 · Multi-verse Collection
         </p>
-        <h1 className="m-0 text-[clamp(32px,4.5vw,52px)] font-bold tracking-[-0.02em] leading-[1.1]">
+        <h1
+          className="m-0 text-[clamp(32px,4.5vw,52px)] font-bold tracking-[-0.02em] leading-[1.1]">
           {manifest.title}
         </h1>
         {manifest.categories && manifest.categories.length > 0 && (
@@ -134,10 +139,13 @@ function SeriesHeader({
           </p>
         )}
 
-        <dl className="m-0 grid grid-cols-[max-content_1fr] gap-y-2 gap-x-6 text-sm border-t border-rule pt-4 [&>dt]:text-fg-3 [&>dd]:m-0 [&>dd]:text-fg-2 [&>dd]:text-right [&>dd]:tabular-nums">
+        <dl
+          className="m-0 grid grid-cols-[max-content_1fr] gap-y-2 gap-x-6 text-sm border-t border-rule pt-4 [&>dt]:text-fg-3 [&>dd]:m-0 [&>dd]:text-fg-2 [&>dd]:text-right [&>dd]:tabular-nums">
           <dt>상태</dt>
           <dd className="inline-flex items-center justify-end gap-1.5">
-            <span className={`inline-block w-1.5 h-1.5 rounded-full ${ongoing ? 'bg-emerald-500' : 'bg-fg-4'}`} aria-hidden/>
+            <span
+              className={`inline-block w-1.5 h-1.5 rounded-full ${ongoing ? 'bg-emerald-500' : 'bg-fg-4'}`}
+              aria-hidden/>
             <span>{manifest.status}</span>
           </dd>
 
@@ -147,7 +155,9 @@ function SeriesHeader({
           {recent && (
             <>
               <dt>최근 업데이트</dt>
-              <dd><time dateTime={recent}>{recent}</time></dd>
+              <dd>
+                <time dateTime={recent}>{recent}</time>
+              </dd>
             </>
           )}
 
@@ -183,8 +193,8 @@ function SeriesHeader({
 // ─── 탭 nav ──────────────────────────────────────────────
 
 function TabNav({
-  tab, setTab, chapterCount, characterCount, isAuthor,
-}: Readonly<{
+                  tab, setTab, chapterCount, characterCount, isAuthor,
+                }: Readonly<{
   tab: Tab
   setTab: (next: Tab) => void
   chapterCount: number
@@ -207,9 +217,9 @@ function TabNav({
     const idx = tabs.indexOf(tab)
     const nextIdx =
       key === 'ArrowLeft' ? (idx - 1 + tabs.length) % tabs.length
-      : key === 'ArrowRight' ? (idx + 1) % tabs.length
-      : key === 'Home' ? 0
-      : tabs.length - 1
+        : key === 'ArrowRight' ? (idx + 1) % tabs.length
+          : key === 'Home' ? 0
+            : tabs.length - 1
     const nextTab = tabs[nextIdx]
     if (!nextTab) return
     setTab(nextTab)
@@ -217,22 +227,26 @@ function TabNav({
   }
 
   return (
-    <div className="flex gap-2 border-b border-rule mb-8 relative flex-wrap" role="tablist" aria-label="시리즈 섹션"
+    <div className="flex gap-2 border-b border-rule mb-8 relative flex-wrap" role="tablist"
+         aria-label="시리즈 섹션"
          onKeyDown={onKey}>
       <button role="tab" id="tab-overview" aria-controls="panel-overview"
-              aria-selected={tab === 'overview'} tabIndex={tab === 'overview' ? 0 : -1} className={tabBtnCls}
+              aria-selected={tab === 'overview'} tabIndex={tab === 'overview' ? 0 : -1}
+              className={tabBtnCls}
               style={tabBtnStyle(tab === 'overview')}
               onClick={() => setTab('overview')}>개요
       </button>
       <button role="tab" id="tab-chapters" aria-controls="panel-chapters"
-              aria-selected={tab === 'chapters'} tabIndex={tab === 'chapters' ? 0 : -1} className={tabBtnCls}
+              aria-selected={tab === 'chapters'} tabIndex={tab === 'chapters' ? 0 : -1}
+              className={tabBtnCls}
               style={tabBtnStyle(tab === 'chapters')}
               onClick={() => setTab('chapters')}>
         챕터<span className="text-xs ml-2 tabular-nums"
                 style={{color: tab === 'chapters' ? 'var(--accent)' : 'var(--fg-4)'}}>{chapterCount}</span>
       </button>
       <button role="tab" id="tab-characters" aria-controls="panel-characters"
-              aria-selected={tab === 'characters'} tabIndex={tab === 'characters' ? 0 : -1} className={tabBtnCls}
+              aria-selected={tab === 'characters'} tabIndex={tab === 'characters' ? 0 : -1}
+              className={tabBtnCls}
               style={tabBtnStyle(tab === 'characters')}
               onClick={() => setTab('characters')}>
         등장인물<span className="text-xs ml-2 tabular-nums"
@@ -240,7 +254,8 @@ function TabNav({
       </button>
       {isAuthor && (
         <button role="tab" id="tab-author" aria-controls="panel-author"
-                aria-selected={tab === 'author'} tabIndex={tab === 'author' ? 0 : -1} className={tabBtnCls}
+                aria-selected={tab === 'author'} tabIndex={tab === 'author' ? 0 : -1}
+                className={tabBtnCls}
                 style={tabBtnStyle(tab === 'author')}
                 onClick={() => setTab('author')}>
           작가 전용<span className="author-only-badge">AUTHOR</span>
@@ -253,25 +268,29 @@ function TabNav({
 // ─── 개요 탭 (2 컬럼 + CAST + LATEST) ─────────────────────
 
 function OverviewPanel({
-  slug, manifest, bodyHtml, setTab,
-}: Readonly<{
+                         slug, manifest, bodyHtml, setTab,
+                       }: Readonly<{
   slug: string
   manifest: SeriesManifest
   bodyHtml: string
   setTab: (next: Tab) => void
 }>) {
   return (
-    <section role="tabpanel" id="panel-overview" aria-labelledby="tab-overview" className="flex flex-col gap-12">
+    <section role="tabpanel" id="panel-overview" aria-labelledby="tab-overview"
+             className="flex flex-col gap-12">
       <div className="grid grid-cols-[2fr_1fr] gap-10 max-lg:grid-cols-1 max-lg:gap-8">
         <article>
-          <h2 className="m-0 mb-4 text-xs font-medium tracking-[0.24em] uppercase text-fg-3">Synopsis</h2>
+          <h2
+            className="m-0 mb-4 text-xs font-medium tracking-[0.24em] uppercase text-fg-3">Synopsis</h2>
           <div className="article article-wiki" dangerouslySetInnerHTML={{__html: bodyHtml}}/>
         </article>
 
         {manifest.loreNotes && manifest.loreNotes.length > 0 && (
           <aside>
-            <h2 className="m-0 mb-4 text-xs font-medium tracking-[0.24em] uppercase text-fg-3">Lore Notes</h2>
-            <dl className="m-0 flex flex-col gap-5 [&>div]:border-t [&>div]:border-rule [&>div]:pt-4">
+            <h2 className="m-0 mb-4 text-xs font-medium tracking-[0.24em] uppercase text-fg-3">Lore
+              Notes</h2>
+            <dl
+              className="m-0 flex flex-col gap-5 [&>div]:border-t [&>div]:border-rule [&>div]:pt-4">
               {manifest.loreNotes.map((note) => (
                 <div key={note.term}>
                   <dt className="font-semibold text-fg mb-1.5">{note.term}</dt>
@@ -300,16 +319,16 @@ const FOLDER_LABEL: Record<string, string> = {
 }
 
 function CastSection({
-  slug, characters, setTab,
-}: Readonly<{
+                       slug, characters, setTab,
+                     }: Readonly<{
   slug: string
   characters: SeriesManifest['characters']
   setTab: (next: Tab) => void
 }>) {
   // 핵심 = 1-protagonist + 2-major-supporting 우선, 폴더 정렬 순.
   const top = [...characters]
-    .filter((c) => c.folder === '1-protagonist' || c.folder === '2-major-supporting')
-    .slice(0, 3)
+  .filter((c) => c.folder === '1-protagonist' || c.folder === '2-major-supporting')
+  .slice(0, 3)
 
   if (top.length === 0) return null
 
@@ -317,7 +336,8 @@ function CastSection({
     <section>
       <div className="flex items-baseline justify-between mb-4 gap-4">
         <div>
-          <h2 className="m-0 mb-1 text-xs font-medium tracking-[0.24em] uppercase text-fg-3">Cast</h2>
+          <h2
+            className="m-0 mb-1 text-xs font-medium tracking-[0.24em] uppercase text-fg-3">Cast</h2>
           <h2 className="m-0 text-xl font-semibold">핵심 인물</h2>
         </div>
         <button
@@ -329,7 +349,8 @@ function CastSection({
         </button>
       </div>
 
-      <p className="m-0 mb-5 text-xs text-warn-fg bg-warn-bg border-l-[3px] border-l-warn-rule px-3 py-2 rounded-r-md">
+      <p
+        className="m-0 mb-5 text-xs text-warn-fg bg-warn-bg border-l-[3px] border-l-warn-rule px-3 py-2 rounded-r-md">
         등장인물 정보는 본 작품의 전개와 관련된 스포일러를 포함할 수 있습니다.
       </p>
 
@@ -348,8 +369,10 @@ function CastSection({
               </div>
               <div className="min-w-0">
                 <div className="flex items-baseline gap-3 flex-wrap mb-1">
-                  <span className="text-md font-semibold text-fg group-hover:text-accent transition-colors">{c.name}</span>
-                  <span className="text-xs font-mono tracking-[0.12em] text-fg-4">{FOLDER_LABEL[c.folder] ?? c.folder}</span>
+                  <span
+                    className="text-md font-semibold text-fg group-hover:text-accent transition-colors">{c.name}</span>
+                  <span
+                    className="text-xs font-mono tracking-[0.12em] text-fg-4">{FOLDER_LABEL[c.folder] ?? c.folder}</span>
                 </div>
                 {c.summary && (
                   <p className="m-0 text-sm text-fg-2 leading-[1.55] break-keep">{c.summary}</p>
@@ -366,8 +389,8 @@ function CastSection({
 // ─── LATEST 최근 챕터 ────────────────────────────────────
 
 function LatestChaptersSection({
-  slug, chapters, setTab,
-}: Readonly<{
+                                 slug, chapters, setTab,
+                               }: Readonly<{
   slug: string
   chapters: SeriesManifest['chapters']
   setTab: (next: Tab) => void
@@ -381,7 +404,8 @@ function LatestChaptersSection({
     <section>
       <div className="flex items-baseline justify-between mb-4 gap-4">
         <div>
-          <h2 className="m-0 mb-1 text-xs font-medium tracking-[0.24em] uppercase text-fg-3">Latest</h2>
+          <h2
+            className="m-0 mb-1 text-xs font-medium tracking-[0.24em] uppercase text-fg-3">Latest</h2>
           <h2 className="m-0 text-xl font-semibold">최근 챕터</h2>
         </div>
         <button
@@ -403,11 +427,14 @@ function LatestChaptersSection({
                 to={`/series/${slug}/chapter/${c.episode}`}
                 className="grid grid-cols-[max-content_1fr_max-content] gap-5 items-baseline py-4 -mx-2 px-2 rounded-md hover:bg-bg-soft transition-colors group"
               >
-                <span className="font-mono text-sm font-semibold tracking-[0.12em] text-accent">EP&nbsp;{String(c.episode).padStart(2, '0')}</span>
-                <span className="text-md text-fg group-hover:text-accent transition-colors min-w-0 truncate">{c.title}</span>
+                <span
+                  className="font-mono text-sm font-semibold tracking-[0.12em] text-accent">EP&nbsp;{String(c.episode).padStart(2, '0')}</span>
+                <span
+                  className="text-md text-fg group-hover:text-accent transition-colors min-w-0 truncate">{c.title}</span>
                 <span className="text-xs text-fg-3 tabular-nums flex items-baseline gap-2">
                   <time dateTime={c.published}>{dateLabel}</time>
-                  {isNew && <span className="text-accent font-semibold tracking-[0.1em]">· NEW</span>}
+                  {isNew &&
+                    <span className="text-accent font-semibold tracking-[0.1em]">· NEW</span>}
                 </span>
               </Link>
             </li>
@@ -420,20 +447,23 @@ function LatestChaptersSection({
 
 // ─── 작가 전용 (보존) ─────────────────────────────────────
 
-function AuthorPanel({slug}: Readonly<{slug: string}>) {
+function AuthorPanel({slug}: Readonly<{ slug: string }>) {
   return (
     <section role="tabpanel" id="panel-author" aria-labelledby="tab-author" className="mt-5">
-      <p className="m-0 mb-5 p-3 px-4 border-l-[3px] border-l-warn-rule bg-bg-soft text-fg-2 text-sm rounded-r-md">
+      <p
+        className="m-0 mb-5 p-3 px-4 border-l-[3px] border-l-warn-rule bg-bg-soft text-fg-2 text-sm rounded-r-md">
         본 탭은 <span className="author-only-badge">AUTHOR</span> 모드 빌드에서만 노출되는
         작가 전용 자료 인덱스입니다. 시놉시스·세계관·연표·용어집·캐릭터 카드의 <em className="text-accent not-italic">H-eries
         분기</em> 절은 reader 빌드에서 마스킹되므로, 본 탭에서 한곳에 모아 추적합니다.
       </p>
-      <ul className="list-disc pl-6 m-0 mb-5 text-sm leading-[1.8] text-fg-2 [&_strong]:text-fg [&_strong]:font-semibold [&_code]:bg-code-bg [&_code]:py-px [&_code]:px-1.5 [&_code]:rounded-sm [&_code]:font-mono [&_code]:text-[0.88em] [&_em]:text-accent [&_em]:not-italic">
+      <ul
+        className="list-disc pl-6 m-0 mb-5 text-sm leading-[1.8] text-fg-2 [&_strong]:text-fg [&_strong]:font-semibold [&_code]:bg-code-bg [&_code]:py-px [&_code]:px-1.5 [&_code]:rounded-sm [&_code]:font-mono [&_code]:text-[0.88em] [&_em]:text-accent [&_em]:not-italic">
         <li><strong>시놉시스</strong> — 개요 탭의 <em>## 시놉시스</em> 절</li>
         <li><strong>세계관</strong> — <code>content/series/{slug}/worldbuilding/</code></li>
         <li><strong>연표</strong> — <code>content/series/{slug}/timeline/</code></li>
         <li><strong>용어집</strong> — <code>content/series/{slug}/glossary/</code></li>
-        <li><strong>캐릭터 H-eries 분기</strong> — 각 캐릭터 페이지의 <em>## H-eries 분기 ~</em> 절 + frontmatter <code>heries_arc</code></li>
+        <li><strong>캐릭터 H-eries 분기</strong> — 각 캐릭터 페이지의 <em>## H-eries 분기 ~</em> 절 +
+          frontmatter <code>heries_arc</code></li>
       </ul>
     </section>
   )
@@ -443,8 +473,10 @@ function AuthorPanel({slug}: Readonly<{slug: string}>) {
 
 function CharactersSpoilerAlert() {
   return (
-    <p className="m-0 mb-6 text-sm text-warn-fg bg-warn-bg border-l-[3px] border-l-warn-rule px-4 py-3 rounded-r-md">
-      <strong>주의</strong> · 등장인물 정보는 본 작품의 전개와 관련된 <em className="not-italic font-semibold">스포일러</em>를 포함할 수 있습니다.
+    <p
+      className="m-0 mb-6 text-sm text-warn-fg bg-warn-bg border-l-[3px] border-l-warn-rule px-4 py-3 rounded-r-md">
+      <strong>주의</strong> · 등장인물 정보는 본 작품의 전개와 관련된 <em
+      className="not-italic font-semibold">스포일러</em>를 포함할 수 있습니다.
     </p>
   )
 }
@@ -453,8 +485,8 @@ function CharactersSpoilerAlert() {
 
 function latestPublished(manifest: SeriesManifest): string | undefined {
   const dates = manifest.chapters
-    .map((c) => c.published)
-    .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
-    .sort((a, b) => a.localeCompare(b))
+  .map((c) => c.published)
+  .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
+  .sort((a, b) => a.localeCompare(b))
   return dates.at(-1)
 }

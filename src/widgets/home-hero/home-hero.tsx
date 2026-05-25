@@ -8,7 +8,7 @@ const HERO_ALT = 'H-eries — 홍도산의 오리지널 웹 시리즈 컬렉션'
 /**
  * 홈 페이지 히어로 영역 — 큰 헤드라인 + 부제 + CTA + 컬렉션 hero 이미지 (배경).
  *
- * **디자인 정합** (2026-05-19 시안 img.png + 사용자 명시 배경 이미지):
+ * **디자인 정합** (2026-05-19 시안 ep-01-1.webp + 사용자 명시 배경 이미지):
  * - `thumbnail-placeholder.webp` (= H-eries 컬렉션 hero) = section 배경 (우측 mask gradient, 가독성)
  * - 텍스트 = 좌측 (relative z-10) — 큰 헤드라인 + 부제 + CTA
  *
@@ -18,7 +18,8 @@ export type HomeHeroProps = HTMLAttributes<HTMLElement>
 
 export function HomeHero({className, ...rest}: HomeHeroProps) {
   return (
-    <section className={cn('relative py-[clamp(48px,10vh,128px)] overflow-hidden', className)} {...rest}>
+    <section
+      className={cn('relative py-[clamp(48px,10vh,128px)] overflow-hidden', className)} {...rest}>
       {/* 배경 이미지 — 우측 절반 fade-in, 좌측은 bg 색 (텍스트 가독성).
           mask-image gradient 로 우측 → 좌측 fade.
           aria-hidden 장식 이미지 (alt 무관). */}

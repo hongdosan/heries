@@ -18,7 +18,7 @@ type ManifestMap = ReadonlyMap<string, SeriesManifest>
 /**
  * 시리즈 목록 페이지 (`/series`).
  *
- * **디자인 정합** (2026-05-19 시안 img_1.png):
+ * **디자인 정합** (2026-05-19 시안 ep-01-4.webp):
  * - Breadcrumb (H-eries / 시리즈)
  * - 페이지 헤더 (MULTI-VERSE COLLECTION 캡션 + 시리즈 타이틀 + 통계)
  * - 필터 탭 (전체 / 연재 중 / 완결)
@@ -87,9 +87,9 @@ function SeriesListContent({items, metas}: Readonly<{ items: SeriesIndex[]; meta
     const idx = filterList.indexOf(filter)
     const nextIdx =
       key === 'ArrowLeft' ? (idx - 1 + filterList.length) % filterList.length
-      : key === 'ArrowRight' ? (idx + 1) % filterList.length
-      : key === 'Home' ? 0
-      : filterList.length - 1
+        : key === 'ArrowRight' ? (idx + 1) % filterList.length
+          : key === 'Home' ? 0
+            : filterList.length - 1
     const next = filterList[nextIdx]
     if (!next) return
     setFilter(next)
