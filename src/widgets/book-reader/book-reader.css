@@ -29,18 +29,40 @@
   z-index: 1;
 }
 
-/* book-content = 한 spread = 2 column. 모바일 (≤ 640px) 은 한 페이지씩 = 1 column 너비 = 100%.
-   이전 `column-count: 1` 만으로는 column 이 1 개만 생성되어 본문이 세로 stack → frame.scrollWidth 가
-   clientWidth 와 같아져 JS scrollLeft 페이지네이션이 *페이지 1 개* 로 인식되는 회귀 발생 (v0.5.2 이후
-   사용자 보고). 2026-05-26 010 핫픽스: `column-width: 100%` + `column-fill: auto` 로 가로 N column 강제. */
+/* 모바일 (≤ 640px) — CSS columns 패턴 폐기 + flex row + scroll-snap.
+   배경: v0.5.2 (008) touch-action revert 후에도 모바일에서 챕터 cover 한 장만 보이고 본문 §1~§N
+   pagination 누락 → 사용자 보고 (1/1 페이지만 존재). v0.5.4 (010) `column-width: 100%` +
+   `column-fill: auto` 시도도 iOS Safari 에서 column-fill: auto / break-after: column 이 무시되어
+   효과 없음. 근본 = CSS columns 가 `book-frame { overflow: hidden }` 부모 너비 안에서만 column 생성.
+   해결 = 모바일에서는 column 폐기 + 직계 자식 (cover / section-cover / section-body / book-end-cta)
+   을 flex row 100vw 강제. JS scrollLeft pagination 그대로 작동. 본 페이지 안 본문은 세로 스크롤. */
 @media (max-width: 640px) {
-  .book-content {
-    column-count: unset !important;
-    column-width: 100% !important;
-    column-fill: auto !important;
+  .book-frame {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory;
   }
   .book-frame::before {
     display: none;
+  }
+  .book-content {
+    column-count: unset !important;
+    column-width: unset !important;
+    column-fill: unset !important;
+    display: flex !important;
+    flex-direction: row !important;
+    width: max-content !important;
+    height: 100% !important;
+  }
+  .book-content > * {
+    flex: 0 0 100vw !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    scroll-snap-align: start !important;
+    break-after: unset !important;
+    break-before: unset !important;
   }
 }
 
