@@ -29,11 +29,15 @@
   z-index: 1;
 }
 
-/* book-content = 한 spread = 2 column. 모바일 (≤ 640px) 은 한 페이지씩 = 1 column 강제.
-   inline `BOOK_CONTENT_STYLE` 의 `columnCount: 2` 가 desktop 기본 — 본 media override 가 mobile 우선 적용. */
+/* book-content = 한 spread = 2 column. 모바일 (≤ 640px) 은 한 페이지씩 = 1 column 너비 = 100%.
+   이전 `column-count: 1` 만으로는 column 이 1 개만 생성되어 본문이 세로 stack → frame.scrollWidth 가
+   clientWidth 와 같아져 JS scrollLeft 페이지네이션이 *페이지 1 개* 로 인식되는 회귀 발생 (v0.5.2 이후
+   사용자 보고). 2026-05-26 010 핫픽스: `column-width: 100%` + `column-fill: auto` 로 가로 N column 강제. */
 @media (max-width: 640px) {
   .book-content {
-    column-count: 1 !important;
+    column-count: unset !important;
+    column-width: 100% !important;
+    column-fill: auto !important;
   }
   .book-frame::before {
     display: none;
