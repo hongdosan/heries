@@ -1,11 +1,9 @@
 /* H-eries — Book Reader (CSS columns paginated reader) — 2026-05-19 v3 재설계 */
 
-/* 모바일 터치 swipe — 가로는 우리(JS)가 처리, 세로 스크롤 + 핀치 줌은 브라우저.
-   `touch-action: pan-y pinch-zoom` 로 가로 swipe 시 브라우저 기본 가로 스크롤·overscroll
-   동작 차단 → "화면 자체가 움직이는" 진동 제거. 2026-05-25 신설 (specs/004-). */
-.book-reader-root {
-  touch-action: pan-y pinch-zoom;
-}
+/* SDD 004 의 `touch-action: pan-y pinch-zoom` 은 2026-05-26 v0.5.2 핫픽스에서 제거 —
+   모바일 사이트에서 책 본문이 첫 페이지만 보이고 그 다음 페이지 전환이 안 되는 회귀 발생.
+   추정 원인: pan-y 가 cascading 영향으로 book-content 의 가로 column 스크롤·페이지 전환
+   인식을 모바일 브라우저에서 차단한 것으로 보임. SDD 008 핫픽스 참조. */
 
 .book-frame {
   scrollbar-width: none;

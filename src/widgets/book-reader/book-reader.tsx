@@ -257,48 +257,22 @@ export function BookReader({
   }, [scrollToSection, goToPage])
 
   // 모바일 터치 swipe + 데스크탑 마우스 drag.
-  // 모바일: passive:false touchmove listener 로 가로 swipe 시 브라우저 기본 스크롤 차단 (axis lock).
-  // CSS `touch-action: pan-y pinch-zoom` 와 함께 작동 — 세로 스크롤·핀치 줌은 브라우저 처리.
+  // 2026-05-26 v0.5.2 핫픽스: SDD 004 의 passive:false touchmove + axis lock + preventDefault 가
+  // 모바일 사이트에서 책 본문 페이지 전환을 막는 회귀 (첫 페이지 한 장만 보임) 야기 → 일단 제거.
+  // CSS `touch-action: pan-y pinch-zoom` 도 함께 제거됨 (book-reader.css 참조).
+  // 임계 완화 (dy*1.0) 는 유지 = 자연 사선 swipe 인식. SDD 008 핫픽스 참조.
   const dragStartRef = useRef<{ x: number; y: number } | null>(null)
-  const axisLockRef = useRef<'h' | 'v' | null>(null)  // 첫 5px 이동 후 가로/세로 결정.
-  const rootRef = useRef<HTMLElement>(null)
   const onTouchStart = (e: ReactTouchEvent<HTMLDivElement>): void => {
     const t = e.touches[0]
-    if (t) {
-      dragStartRef.current = {x: t.clientX, y: t.clientY}
-      axisLockRef.current = null
-    }
+    if (t) dragStartRef.current = {x: t.clientX, y: t.clientY}
   }
   const onTouchEnd = (e: ReactTouchEvent<HTMLDivElement>): void => {
     const start = dragStartRef.current
-    axisLockRef.current = null
     if (!start) return
     const t = e.changedTouches[0]
     if (!t) return
     finishDrag(start, t.clientX, t.clientY)
   }
-  // passive:false touchmove — 가로 우세 시 preventDefault 로 브라우저 가로 스크롤·overscroll 차단.
-  // useEffect 로 네이티브 addEventListener 등록 (React synthetic event 는 passive 강제).
-  useEffect(() => {
-    const root = rootRef.current
-    if (!root) return
-    const onTouchMoveNative = (e: TouchEvent): void => {
-      const start = dragStartRef.current
-      const t = e.touches[0]
-      if (!start || !t) return
-      const dx = t.clientX - start.x
-      const dy = t.clientY - start.y
-      // 시작 직후 5px 임계 — axis 결정.
-      if (axisLockRef.current === null) {
-        if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return
-        axisLockRef.current = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v'
-      }
-      // 가로 우세 = 페이지 swipe → 브라우저 기본 스크롤·overscroll 차단.
-      if (axisLockRef.current === 'h') e.preventDefault()
-    }
-    root.addEventListener('touchmove', onTouchMoveNative, {passive: false})
-    return () => root.removeEventListener('touchmove', onTouchMoveNative)
-  }, [])
   const onMouseDown = (e: ReactMouseEvent<HTMLDivElement>): void => {
     if (e.button !== 0) return
     dragStartRef.current = {x: e.clientX, y: e.clientY}
@@ -324,7 +298,7 @@ export function BookReader({
   return (
     // section + aria-label = 자동 region landmark (role="region" 명시 불필요).
     // 페이지 네비 = 키보드 (←/→/Home/End/PageUp/PageDown) + 터치 swipe + 마우스 drag — 화살표 버튼 X (시각 노이즈 제거).
-    <section ref={rootRef} className={cn('relative book-reader-root', className)}
+    <section className={cn('relative', className)}
              aria-label="챕터 본문 (책 형태)"
              tabIndex={0} onKeyDown={onKey}
              onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
