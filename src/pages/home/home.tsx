@@ -10,8 +10,8 @@ const MiniGameLauncher = lazy(() =>
 /**
  * 홈 페이지 (`/`) — Hero CTA 중심.
  *
- * **디자인 정합** (2026-05-19 시안 img.png): 큰 헤드라인 + 부제 + *시리즈 보러 가기* CTA.
- * 작품 목록 = `/series` 페이지로 분리 (img_1.png 시안 정합).
+ * **디자인 정합** (2026-05-19 시안 ep-01-1.webp): 큰 헤드라인 + 부제 + *시리즈 보러 가기* CTA.
+ * 작품 목록 = `/series` 페이지로 분리 (ep-01-4.webp 시안 정합).
  */
 export function HomePage() {
   useDocumentTitle('')

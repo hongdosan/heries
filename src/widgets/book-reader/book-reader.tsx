@@ -21,7 +21,7 @@ import {cn} from '../../shared/lib/cn.js'
 import './book-reader.css'
 
 /**
- * 책 형태 paginated reader — 시안 ep-01-3.webp / ep-01-2.webp 정합 (2026-05-19 v3 재설계).
+ * 책 형태 paginated reader — 시안 ep-01-4.webp / ep-01-3.webp 정합 (2026-05-19 v3 재설계).
  *
  * **CSS columns paginated 패턴**:
  * - bodyHtml = chapter.tsx 가 합성 (book-cover-series + book-cover-chapter + section-cover N + 본문 + book-end-cta)
@@ -324,7 +324,8 @@ export function BookReader({
   return (
     // section + aria-label = 자동 region landmark (role="region" 명시 불필요).
     // 페이지 네비 = 키보드 (←/→/Home/End/PageUp/PageDown) + 터치 swipe + 마우스 drag — 화살표 버튼 X (시각 노이즈 제거).
-    <section ref={rootRef} className={cn('relative book-reader-root', className)} aria-label="챕터 본문 (책 형태)"
+    <section ref={rootRef} className={cn('relative book-reader-root', className)}
+             aria-label="챕터 본문 (책 형태)"
              tabIndex={0} onKeyDown={onKey}
              onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
              onMouseDown={onMouseDown} onMouseUp={onMouseUp} onMouseLeave={onMouseLeave}
