@@ -4,9 +4,9 @@ name: 최기준
 role: 진혁의 첫 자대 1 분대 1 조 선임 (일병)
 origin: original
 affiliation: 비각성자 정예 특수부대 / 서울 북부 부대 / 1 분대 1 조 / 일병
-first_appearance: ep-04
-heries_arc: ep-04 첫 출동
-reader_snapshot: ep-04
+first_appearance: tba
+heries_arc: tba (v1 archive — v2 시놉시스 미등장. 후속 화 등장 가능성 보류.)
+reader_snapshot: archived
 aliases: [ 기준 일병, 기준 둘 ]
 summary: 진혁의 첫 자대 1 분대 1 조 일병 선임. 어깨 두꺼운 평이한 톤. 신참 인계 + 무전 콜사인 가르침.
 ---
