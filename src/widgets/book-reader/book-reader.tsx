@@ -120,6 +120,28 @@ export function BookReader({
   const [totalPages, setTotalPages] = useState(1)
   const [page, setPage] = useState(0)
 
+  // 모바일 ≤640px 감지 — matchMedia (브라우저 창 resize 실시간).
+  const [isMobile, setIsMobile] = useState<boolean>(() =>
+    typeof globalThis.matchMedia === 'function' ? globalThis.matchMedia('(max-width: 640px)').matches : false,
+  )
+  useEffect(() => {
+    if (typeof globalThis.matchMedia !== 'function') return
+    const mq = globalThis.matchMedia('(max-width: 640px)')
+    const onChange = (e: MediaQueryListEvent): void => setIsMobile(e.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  // 모바일 JS 본문 분할 (SDD 020) — iOS Safari column-fill: auto 미지원 우회.
+  // mobilePages === null = 측정 단계 (단일 dangerouslySetInnerHTML, column-count: 1).
+  // mobilePages = string[] = 분할 완료, flex row pagination.
+  const [mobilePages, setMobilePages] = useState<readonly string[] | null>(null)
+
+  // bodyHtml / fontSize / fontFamily / isMobile 변경 시 = 측정 reset.
+  useEffect(() => {
+    setMobilePages(null)
+  }, [bodyHtml, fontSize, fontFamily, isMobile])
+
   // h2 추출 = 절 목록 (BookToc / BookProgressBar 호환).
   const sections = useMemo<BookSection[]>(
     () => extractOutline(bodyHtml, 2).map((h) => ({id: h.id, text: h.text})),
@@ -154,6 +176,79 @@ export function BookReader({
       frame.scrollTo({left: target, behavior: 'auto'})
     }
   }, [])
+
+  // 모바일 JS 본문 분할 — 측정 단계 (mobilePages === null + isMobile) 에서 element offsetTop 기반 page chunk.
+  // CSS columns 의 column-fill: auto 가 iOS Safari 17.4 미만에서 미지원 → 모든 본문이 1 column 안 압축 → 1/1 회귀.
+  // 우회 = JS 가 element 단위로 페이지 분할 + flex row pagination (column-fill 의존 X).
+  useLayoutEffect(() => {
+    if (!isMobile || mobilePages !== null) return
+    const frame = frameRef.current
+    const content = contentRef.current
+    if (!frame || !content) return
+
+    // 측정 시점 cover/section-cover/book-end-cta 의 height: 100% + break-after: column 임시 무력화 →
+    // 자연 element 높이 측정 가능 (위 element 들은 분할 로직에서 각자 1 페이지 강제 처리).
+    const covers = content.querySelectorAll<HTMLElement>('.book-cover, .section-cover, .book-end-cta')
+    const original = new Map<HTMLElement, { h: string; ba: string }>()
+    covers.forEach((c) => {
+      original.set(c, {h: c.style.height, ba: c.style.breakAfter})
+      c.style.height = 'auto'
+      c.style.breakAfter = 'auto'
+    })
+    // force reflow
+    void content.offsetHeight
+
+    const pageHeight = Math.max(200, frame.clientHeight - 8)
+    const contentRect = content.getBoundingClientRect()
+    const children = Array.from(content.children) as HTMLElement[]
+
+    type Page = { sectionBody: boolean; els: HTMLElement[] }
+    const pages: Page[] = []
+    let pageStart = 0
+    const newPage = (sectionBody: boolean, topRef: number): void => {
+      pages.push({sectionBody, els: []})
+      pageStart = topRef
+    }
+    const cur = (): Page => pages[pages.length - 1]!
+
+    for (const child of children) {
+      const cTop = child.getBoundingClientRect().top - contentRect.top
+      if (child.classList.contains('section-body')) {
+        if (pages.length === 0 || cur().els.length > 0) newPage(true, cTop)
+        else cur().sectionBody = true
+        const inners = Array.from(child.children) as HTMLElement[]
+        for (const inner of inners) {
+          const iTop = inner.getBoundingClientRect().top - contentRect.top
+          const iBottom = iTop + inner.offsetHeight
+          if (iBottom - pageStart > pageHeight && cur().els.length > 0) {
+            newPage(true, iTop)
+          }
+          cur().els.push(inner)
+        }
+      } else {
+        // cover / section-cover / book-end-cta = 각자 1 페이지 강제
+        if (pages.length === 0 || cur().els.length > 0) newPage(false, cTop)
+        else cur().sectionBody = false
+        cur().els.push(child)
+      }
+    }
+
+    // 복원
+    covers.forEach((c) => {
+      const o = original.get(c)
+      if (o) {
+        c.style.height = o.h
+        c.style.breakAfter = o.ba
+      }
+    })
+
+    const chunks: string[] = pages.map((p) =>
+      p.sectionBody
+        ? `<div class="section-body">${p.els.map((e) => e.outerHTML).join('')}</div>`
+        : p.els.map((e) => e.outerHTML).join(''),
+    )
+    setMobilePages(chunks)
+  }, [isMobile, mobilePages, bodyHtml, fontSize, fontFamily])
 
   // useLayoutEffect = paint 전 동기 실행. measure() 가 첫 paint 전에 `--page-w` 설정 →
   // 모바일 flex item width 가 첫 페인트부터 정확한 frame.clientWidth (scrollbar/부모 container 차감 포함).
@@ -315,16 +410,28 @@ export function BookReader({
              {...rest as HTMLAttributes<HTMLElement>}>
       <div
         ref={frameRef}
-        className="book-frame max-sm:flex-1 max-sm:min-h-0"
+        className={cn('book-frame max-sm:flex-1 max-sm:min-h-0', isMobile && mobilePages && 'book-frame-paged')}
         style={BOOK_FRAME_STYLE}
         aria-live="polite"
       >
-        <div
-          ref={contentRef}
-          className={cn('book-content article-prose', BOOK_FONT_FAMILY_CLASS[fontFamily])}
-          style={{...BOOK_CONTENT_STYLE, ...FONT_SIZE_TOKENS[fontSize]}}
-          dangerouslySetInnerHTML={{__html: bodyHtml}}
-        />
+        {isMobile && mobilePages ? (
+          <div
+            ref={contentRef}
+            className={cn('book-content book-content-paged article-prose', BOOK_FONT_FAMILY_CLASS[fontFamily])}
+            style={{...FONT_SIZE_TOKENS[fontSize]}}
+          >
+            {mobilePages.map((html, i) => (
+              <div key={i} className="book-page" dangerouslySetInnerHTML={{__html: html}}/>
+            ))}
+          </div>
+        ) : (
+          <div
+            ref={contentRef}
+            className={cn('book-content article-prose', BOOK_FONT_FAMILY_CLASS[fontFamily])}
+            style={{...BOOK_CONTENT_STYLE, ...FONT_SIZE_TOKENS[fontSize]}}
+            dangerouslySetInnerHTML={{__html: bodyHtml}}
+          />
+        )}
       </div>
     </section>
   )
