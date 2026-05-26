@@ -254,6 +254,9 @@ export function BookReader({
   // 모바일 flex item width 가 첫 페인트부터 정확한 frame.clientWidth (scrollbar/부모 container 차감 포함).
   // 이전 useEffect 는 paint 후 실행이라 첫 페인트 = fallback `100vw` (= viewport 너비, 부모 container 너비 초과) →
   // 우측 잘림 (014 회귀). Vite SPA = SSR 없음 → useLayoutEffect warning 무관.
+  // dep 에 mobilePages 포함 — JS 분할 후 chunks render 시 content DOM 자체 교체 (dangerouslySetInnerHTML →
+  // children map). ResizeObserver 가 새 content 자동 트리거 안 하는 케이스 대비 → mobilePages 변경 시
+  // 명시적 재측정 + observer 재생성. PC 좁힘 (mobile media + JS 분할) 1/1 회귀 해소 (020 후속).
   useLayoutEffect(() => {
     measure()
     const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure)
@@ -264,7 +267,7 @@ export function BookReader({
       ro?.disconnect()
       globalThis.removeEventListener('resize', measure)
     }
-  }, [measure, bodyHtml, fontSize, fontFamily])
+  }, [measure, bodyHtml, fontSize, fontFamily, mobilePages])
 
   // 활성 절 = 현 spread 안 첫 h2 element.
   const activeSectionId = useMemo<string | null>(() => {
