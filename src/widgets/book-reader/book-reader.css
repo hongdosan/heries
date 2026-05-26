@@ -84,9 +84,12 @@
     align-items: stretch !important;
   }
 
+  /* flex-basis/width 명시 px (014 의 --page-w = frame.clientWidth px, JS measure() 가 set).
+     iOS Safari + parent `.book-content-paged width: auto` + 자식 `flex-basis: 100%` 가
+     circular reference 로 0 평가되는 케이스 회피 (024 1/1 회귀 진단). */
   .book-content-paged > .book-page {
-    flex: 0 0 100% !important;
-    width: 100% !important;
+    flex: 0 0 var(--page-w, 100%) !important;
+    width: var(--page-w, 100%) !important;
     height: 100% !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
