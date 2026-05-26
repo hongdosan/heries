@@ -164,6 +164,8 @@ export function BookReader({
     // 모바일 selector 에서 flex item width 를 100vw 대신 var(--page-w) 로 → scrollbar 너비만큼 viewport 초과해
     // 우측 잘리는 버그 (014) 해소. 데스크탑은 CSS columns 라 영향 X.
     frame.style.setProperty('--page-w', `${frame.clientWidth}px`)
+    // force layout — setProperty 후 CSS recalc 강제 + scrollWidth 정확 측정 (iOS Safari 대비).
+    void frame.offsetWidth
     const total = Math.max(1, Math.ceil(frame.scrollWidth / frame.clientWidth))
     const cur = Math.min(Math.max(0, Math.round(frame.scrollLeft / frame.clientWidth)), total - 1)
     setTotalPages(total)
