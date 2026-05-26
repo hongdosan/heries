@@ -289,6 +289,8 @@ export function ChapterPage() {
   )
 }
 
-// 모바일 (≤640px): items-stretch + book container h-full → book container 가 main 영역 풀 차지 → 안 BookReader frame `height: 100%` 가 가용 공간 자동 stretch.
-// 데스크탑 (>640px): items-center 그대로 (책 frame clamp height 가운데 정렬).
-const MAIN_CLS = 'flex-1 w-full max-w-page mx-auto flex items-stretch justify-center sm:items-center min-h-[calc(100vh-160px)] px-[clamp(8px,2vw,16px)]'
+// 모바일 (≤640px): main `h-[calc(100dvh-160px)]` 명시 height + items-stretch → 자식 stretch chain
+//   (book container → BookReader wrapper flex-1 → frame height: 100%) 가 *명시 부모 height* 에 grounded.
+//   `min-h` 만 있으면 content (= 본문 가장 긴 페이지) 따라 main 늘어남 → frame 모니터 풀까지 김 (016 사용자 보고).
+// 데스크탑 (>640px): items-center 그대로 + min-h (책 frame clamp height 가운데 정렬, content 따라 자연 늘어남).
+const MAIN_CLS = 'flex-1 w-full max-w-page mx-auto flex items-stretch justify-center sm:items-center h-[calc(100dvh-160px)] sm:h-auto sm:min-h-[calc(100vh-160px)] px-[clamp(8px,2vw,16px)]'
