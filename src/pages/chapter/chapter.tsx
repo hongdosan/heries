@@ -197,7 +197,7 @@ export function ChapterPage() {
   return (
     <main className={MAIN_CLS}>
       <div
-        className="w-full max-w-500 mx-auto border border-rule rounded-lg overflow-hidden bg-surface shadow-soft">
+        className="w-full max-w-500 mx-auto border border-rule rounded-lg overflow-hidden bg-surface shadow-soft max-sm:flex max-sm:flex-col">
         <BookHeader
           seriesTitle={manifest.title}
           seriesSlug={slug}
@@ -211,7 +211,7 @@ export function ChapterPage() {
           onCycleFontFamily={cycleFontFamily}
         />
 
-        <div className="relative" onClick={onContentClick}>
+        <div className="relative max-sm:flex-1 max-sm:min-h-0 max-sm:flex max-sm:flex-col" onClick={onContentClick}>
           <BookReader
             bodyHtml={fullBodyHtml}
             onSectionsChange={setSections}
@@ -289,4 +289,6 @@ export function ChapterPage() {
   )
 }
 
-const MAIN_CLS = 'flex-1 w-full max-w-page mx-auto flex items-center justify-center min-h-[calc(100vh-160px)] px-[clamp(8px,2vw,16px)]'
+// 모바일 (≤640px): items-stretch + book container h-full → book container 가 main 영역 풀 차지 → 안 BookReader frame `height: 100%` 가 가용 공간 자동 stretch.
+// 데스크탑 (>640px): items-center 그대로 (책 frame clamp height 가운데 정렬).
+const MAIN_CLS = 'flex-1 w-full max-w-page mx-auto flex items-stretch justify-center sm:items-center min-h-[calc(100vh-160px)] px-[clamp(8px,2vw,16px)]'

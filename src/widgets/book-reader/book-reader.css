@@ -8,6 +8,9 @@
 .book-frame {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  /* 모바일 selector 의 flex item width 가 참조 (var(--page-w)). JS measure() 가 런타임에
+     frame.clientWidth (px) 값으로 덮어씀. 정적 선언 = IDE lint 만족 + 측정 전 첫 paint 안전값. */
+  --page-w: 100%;
 }
 
 .book-frame::-webkit-scrollbar {
@@ -37,14 +40,22 @@
    해결 = 모바일에서는 column 폐기 + 직계 자식 (cover / section-cover / section-body / book-end-cta)
    을 flex row 100vw 강제. JS scrollLeft pagination 그대로 작동. 본 페이지 안 본문은 세로 스크롤. */
 @media (max-width: 640px) {
-  /* frame = 가로 스크롤 + 세로는 페이지 안 본문 자체가 결정. */
+  /* frame = 모바일 viewport 풀 사용 (85dvh). 데스크탑처럼 frame 안에 페이지 N 개 가로 정렬 → JS scrollLeft 페이지 전환.
+     이전 (012~014) `height: auto + min-height: 100vh + overflow: visible` 패턴은 *각 페이지가 본문 길이만큼 늘어남*
+     → 페이지마다 height 다름 + scroll-snap mandatory 와 충돌 → 페이지 전환 시 흔들림 (015 사용자 보고).
+     해결 = frame height fixed (85dvh) + 자식 height: 100% + 페이지 안 본문 세로 스크롤 (overflow-y: auto). */
+  /* frame height = 부모 (BookReader root section, chapter container) 가 flex-1 로 결정한 가용 영역.
+     `height: 100%` + `max-sm:flex-1 max-sm:min-h-0` (Tailwind utility) 조합 →
+     chapter MAIN_CLS `items-stretch` + book container `max-sm:flex-col` + BookReader wrapper `flex-1` →
+     frame = viewport 안 사이트 header/footer + book header + progress bar 빼고 남는 영역 자동 fill. */
   .book-frame {
-    height: auto !important;
+    height: 100% !important;
     max-height: none !important;
-    min-height: 100vh;
+    min-height: 0 !important;
     overflow-x: auto !important;
-    overflow-y: visible !important;
-    scroll-snap-type: x mandatory;
+    overflow-y: hidden !important;
+    /* mandatory → proximity — 흔들림 완화 (mandatory 는 미세 swipe 도 강제 snap → jitter). */
+    scroll-snap-type: x proximity;
     -webkit-overflow-scrolling: touch;
   }
   .book-frame::before {
@@ -60,16 +71,20 @@
     display: flex !important;
     flex-direction: row !important;
     width: auto !important;
-    height: auto !important;
-    align-items: flex-start !important;
+    height: 100% !important;
+    align-items: stretch !important;
   }
+  /* width = JS measure 가 frame.style 에 set 한 `--page-w` (= frame.clientWidth, scrollbar 제외).
+     이전 100vw 는 데스크탑 좁힘·일부 모바일 브라우저에서 *vertical scrollbar 너비 포함* → flex item 이
+     viewport content area 초과 → 우측 텍스트 잘림 (014). fallback 100% = .book-frame { --page-w: 100% }. */
   .book-content > * {
-    flex: 0 0 100vw !important;
-    width: 100vw !important;
-    max-width: 100vw !important;
-    height: auto !important;
-    min-height: 100vh;
-    overflow: visible !important;
+    flex: 0 0 var(--page-w, 100%) !important;
+    width: var(--page-w, 100%) !important;
+    max-width: var(--page-w, 100%) !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
     box-sizing: border-box !important;
     scroll-snap-align: start !important;
     break-after: unset !important;
