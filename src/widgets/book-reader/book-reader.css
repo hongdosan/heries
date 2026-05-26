@@ -49,20 +49,64 @@
   .book-frame {
     height: 100% !important;
     max-height: none !important;
-    min-height: 0 !important;
+    /* min-height 360 — 부모 book container max-sm:min-h-[600px] 와 함께 자식 겹침 방지 + frame 최소 가시 영역. */
+    min-height: 360px !important;
     overflow: hidden !important;
     -webkit-overflow-scrolling: touch;
   }
+
   .book-frame::before {
     display: none;
   }
-  .book-content {
-    /* 데스크탑 BOOK_CONTENT_STYLE inline `column-count: 2 + column-gap: 0 + column-fill: auto + height: 100%` 그대로 두고
-       column-count 만 override. column-fill: auto + column-gap: 0 + height: 100% 는 inline 으로 적용됨. */
+
+  /* 측정 단계 (mobilePages === null) — column-count: 1 = 1 column 안 자식 자연 stack → JS 가 element offsetTop 측정. */
+  .book-content:not(.book-content-paged) {
     column-count: 1 !important;
   }
-  /* `.section-body > *`, `.book-cover`, `.section-cover`, `.book-end-cta` 의 break-* / padding-inline 등은
-     기본 (상단 통합 selector) 그대로 적용 — column flow 자동. */
+
+  /* 분할 완료 단계 (mobilePages 있음) — flex row pagination. iOS Safari column-fill: auto 미지원 우회 (020).
+     scroll-snap-type: none — proximity 도 smooth scroll 중 jitter 잔존 사용자 보고 (023).
+     drag/swipe 후 명시 goToPage 가 페이지 정렬 보장 → snap 불필요. */
+  .book-frame.book-frame-paged {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: none;
+  }
+
+  .book-content-paged {
+    column-count: unset !important;
+    column-fill: unset !important;
+    column-gap: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    width: auto !important;
+    height: 100% !important;
+    align-items: stretch !important;
+  }
+
+  /* flex-basis/width 명시 px (014 의 --page-w = frame.clientWidth px, JS measure() 가 set).
+     iOS Safari + parent `.book-content-paged width: auto` + 자식 `flex-basis: 100%` 가
+     circular reference 로 0 평가되는 케이스 회피 (024 1/1 회귀 진단). */
+  /* overflow: hidden → overflow-y: auto — 분할 부정확 시 page 안 element 가 page 보다 클 때
+     cut-off 방어막 (027). 정상 분할 시 사용자 인지 X (page 안 다 들어감). */
+  .book-content-paged > .book-page {
+    flex: 0 0 var(--page-w, 100%) !important;
+    width: var(--page-w, 100%) !important;
+    height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    box-sizing: border-box !important;
+    scroll-snap-align: start;
+  }
+
+  /* book-page 안 본문 한국어 줄바꿈 + max-width 안전 — viewport 우측 잘림 방지 (014 패턴 정합). */
+  .book-content-paged > .book-page > *,
+  .book-content-paged .section-body > * {
+    box-sizing: border-box !important;
+    overflow-wrap: break-word !important;
+    word-break: keep-all;
+    max-width: 100% !important;
+  }
 }
 
 /* column-gap 0 패턴 — book-content 의 직계 자식 중 *section-body 의 자식* (p / blockquote 등) 에만 padding-inline + break-inside.
@@ -110,9 +154,11 @@
   object-fit: cover;
   border-radius: var(--r-md);
 }
+
 .book-cover-thumb {
   margin: 0 auto;
 }
+
 .section-cover-thumb {
   margin: 0;
 }
@@ -227,7 +273,7 @@
 
 .book-end-cta-chapter {
   margin: 0;
-  font-size: 22px;  /* fixed — 글자크기 버튼 영향 X (제목 정책 정합). */
+  font-size: 22px; /* fixed — 글자크기 버튼 영향 X (제목 정책 정합). */
   font-weight: 700;
   color: var(--fg);
   letter-spacing: -0.01em;
@@ -298,7 +344,7 @@
 
 .book-end-cta-back {
   display: block;
-  justify-self: end;  /* grid item — 우측 정렬 (부모 text-align: center 무시) */
+  justify-self: end; /* grid item — 우측 정렬 (부모 text-align: center 무시) */
   margin-top: var(--s-2);
   font-size: var(--fs-xs);
   color: var(--fg-3);
