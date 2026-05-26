@@ -180,74 +180,79 @@ export function BookReader({
   // 모바일 JS 본문 분할 — 측정 단계 (mobilePages === null + isMobile) 에서 element offsetTop 기반 page chunk.
   // CSS columns 의 column-fill: auto 가 iOS Safari 17.4 미만에서 미지원 → 모든 본문이 1 column 안 압축 → 1/1 회귀.
   // 우회 = JS 가 element 단위로 페이지 분할 + flex row pagination (column-fill 의존 X).
+  // requestAnimationFrame — iOS Safari 에서 useLayoutEffect 시점 flex layout 미완료 케이스 대비.
+  // raf = next paint frame → layout 완료 보장 → 측정 정확 (023 1/1 회귀 대응).
   useLayoutEffect(() => {
     if (!isMobile || mobilePages !== null) return
-    const frame = frameRef.current
-    const content = contentRef.current
-    if (!frame || !content) return
+    const raf = requestAnimationFrame(() => {
+      const frame = frameRef.current
+      const content = contentRef.current
+      if (!frame || !content) return
 
-    // 측정 시점 cover/section-cover/book-end-cta 의 height: 100% + break-after: column 임시 무력화 →
-    // 자연 element 높이 측정 가능 (위 element 들은 분할 로직에서 각자 1 페이지 강제 처리).
-    const covers = content.querySelectorAll<HTMLElement>('.book-cover, .section-cover, .book-end-cta')
-    const original = new Map<HTMLElement, { h: string; ba: string }>()
-    covers.forEach((c) => {
-      original.set(c, {h: c.style.height, ba: c.style.breakAfter})
-      c.style.height = 'auto'
-      c.style.breakAfter = 'auto'
-    })
-    // force reflow
-    void content.offsetHeight
+      // 측정 시점 cover/section-cover/book-end-cta 의 height: 100% + break-after: column 임시 무력화 →
+      // 자연 element 높이 측정 가능 (위 element 들은 분할 로직에서 각자 1 페이지 강제 처리).
+      const covers = content.querySelectorAll<HTMLElement>('.book-cover, .section-cover, .book-end-cta')
+      const original = new Map<HTMLElement, { h: string; ba: string }>()
+      covers.forEach((c) => {
+        original.set(c, {h: c.style.height, ba: c.style.breakAfter})
+        c.style.height = 'auto'
+        c.style.breakAfter = 'auto'
+      })
+      // force reflow
+      void content.offsetHeight
 
-    const pageHeight = Math.max(200, frame.clientHeight - 8)
-    const contentRect = content.getBoundingClientRect()
-    const children = Array.from(content.children) as HTMLElement[]
+      const pageHeight = Math.max(200, frame.clientHeight - 8)
+      const contentRect = content.getBoundingClientRect()
+      const children = Array.from(content.children) as HTMLElement[]
 
-    type Page = { sectionBody: boolean; els: HTMLElement[] }
-    const pages: Page[] = []
-    let pageStart = 0
-    const newPage = (sectionBody: boolean, topRef: number): void => {
-      pages.push({sectionBody, els: []})
-      pageStart = topRef
-    }
-    const cur = (): Page => pages[pages.length - 1]!
+      type Page = { sectionBody: boolean; els: HTMLElement[] }
+      const pages: Page[] = []
+      let pageStart = 0
+      const newPage = (sectionBody: boolean, topRef: number): void => {
+        pages.push({sectionBody, els: []})
+        pageStart = topRef
+      }
+      const cur = (): Page => pages[pages.length - 1]!
 
-    for (const child of children) {
-      const cTop = child.getBoundingClientRect().top - contentRect.top
-      if (child.classList.contains('section-body')) {
-        if (pages.length === 0 || cur().els.length > 0) newPage(true, cTop)
-        else cur().sectionBody = true
-        const inners = Array.from(child.children) as HTMLElement[]
-        for (const inner of inners) {
-          const iTop = inner.getBoundingClientRect().top - contentRect.top
-          const iBottom = iTop + inner.offsetHeight
-          if (iBottom - pageStart > pageHeight && cur().els.length > 0) {
-            newPage(true, iTop)
+      for (const child of children) {
+        const cTop = child.getBoundingClientRect().top - contentRect.top
+        if (child.classList.contains('section-body')) {
+          if (pages.length === 0 || cur().els.length > 0) newPage(true, cTop)
+          else cur().sectionBody = true
+          const inners = Array.from(child.children) as HTMLElement[]
+          for (const inner of inners) {
+            const iTop = inner.getBoundingClientRect().top - contentRect.top
+            const iBottom = iTop + inner.offsetHeight
+            if (iBottom - pageStart > pageHeight && cur().els.length > 0) {
+              newPage(true, iTop)
+            }
+            cur().els.push(inner)
           }
-          cur().els.push(inner)
+        } else {
+          // cover / section-cover / book-end-cta = 각자 1 페이지 강제
+          if (pages.length === 0 || cur().els.length > 0) newPage(false, cTop)
+          else cur().sectionBody = false
+          cur().els.push(child)
         }
-      } else {
-        // cover / section-cover / book-end-cta = 각자 1 페이지 강제
-        if (pages.length === 0 || cur().els.length > 0) newPage(false, cTop)
-        else cur().sectionBody = false
-        cur().els.push(child)
       }
-    }
 
-    // 복원
-    covers.forEach((c) => {
-      const o = original.get(c)
-      if (o) {
-        c.style.height = o.h
-        c.style.breakAfter = o.ba
-      }
+      // 복원
+      covers.forEach((c) => {
+        const o = original.get(c)
+        if (o) {
+          c.style.height = o.h
+          c.style.breakAfter = o.ba
+        }
+      })
+
+      const chunks: string[] = pages.map((p) =>
+        p.sectionBody
+          ? `<div class="section-body">${p.els.map((e) => e.outerHTML).join('')}</div>`
+          : p.els.map((e) => e.outerHTML).join(''),
+      )
+      if (chunks.length > 0) setMobilePages(chunks)
     })
-
-    const chunks: string[] = pages.map((p) =>
-      p.sectionBody
-        ? `<div class="section-body">${p.els.map((e) => e.outerHTML).join('')}</div>`
-        : p.els.map((e) => e.outerHTML).join(''),
-    )
-    setMobilePages(chunks)
+    return () => cancelAnimationFrame(raf)
   }, [isMobile, mobilePages, bodyHtml, fontSize, fontFamily])
 
   // useLayoutEffect = paint 전 동기 실행. measure() 가 첫 paint 전에 `--page-w` 설정 →
@@ -301,22 +306,32 @@ export function BookReader({
     const frame = frameRef.current
     if (!frame) return
     const target = Math.max(0, Math.min(next, totalPages - 1))
-    frame.scrollTo({left: target * frame.clientWidth, behavior: 'smooth'})
+    // behavior: 'smooth' → 'auto' — smooth scroll 중 매 frame onScroll → setPage → re-render → jitter (023).
+    // 즉시 jump 로 jitter X. drag/swipe finishDrag 가 페이지 결정 → 자연 사용.
+    frame.scrollTo({left: target * frame.clientWidth, behavior: 'auto'})
   }, [totalPages])
 
   const goPrev = useCallback(() => goToPage(page - 1), [goToPage, page])
   const goNext = useCallback(() => goToPage(page + 1), [goToPage, page])
 
-  // scrollLeft 변경 감지 (smooth scroll 완료 후 page state 갱신).
+  // scrollLeft 변경 감지 — raf throttle 로 매 frame setPage 한 번만 (jitter 완화, 023).
   useEffect(() => {
     const frame = frameRef.current
     if (!frame) return
+    let raf = 0
     const onScroll = (): void => {
-      const cur = Math.round(frame.scrollLeft / frame.clientWidth)
-      setPage(cur)
+      if (raf) return
+      raf = requestAnimationFrame(() => {
+        raf = 0
+        const cur = Math.round(frame.scrollLeft / frame.clientWidth)
+        setPage(cur)
+      })
     }
     frame.addEventListener('scroll', onScroll, {passive: true})
-    return () => frame.removeEventListener('scroll', onScroll)
+    return () => {
+      frame.removeEventListener('scroll', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
   }, [])
 
   // 키보드 네비 — ←/→/Home/End/PageUp/PageDown. 한 누름 = 한 spread (= 2 column 동시 표시 단위) 이동.
@@ -416,6 +431,9 @@ export function BookReader({
         className={cn('book-frame max-sm:flex-1 max-sm:min-h-0', isMobile && mobilePages && 'book-frame-paged')}
         style={BOOK_FRAME_STYLE}
         aria-live="polite"
+        data-mobile={isMobile ? '1' : '0'}
+        data-chunks={mobilePages?.length ?? 0}
+        data-total={totalPages}
       >
         {isMobile && mobilePages ? (
           // key="paged" 강제 — React 가 dangerouslySetInnerHTML div 와 chunks div 를 동일 element 로 diff 시
