@@ -197,7 +197,7 @@ export function ChapterPage() {
   return (
     <main className={MAIN_CLS}>
       <div
-        className="w-full max-w-500 mx-auto border border-rule rounded-lg overflow-hidden bg-surface shadow-soft max-sm:flex max-sm:flex-col">
+        className="w-full max-w-500 mx-auto border border-rule rounded-lg overflow-hidden bg-surface shadow-soft max-sm:flex max-sm:flex-col max-sm:max-w-none max-sm:h-full max-sm:rounded-none max-sm:border-0 max-sm:shadow-none">
         <BookHeader
           seriesTitle={manifest.title}
           seriesSlug={slug}
@@ -289,8 +289,9 @@ export function ChapterPage() {
   )
 }
 
-// 모바일 (≤640px): main `h-[calc(100dvh-160px)]` 명시 height + items-stretch → 자식 stretch chain
-//   (book container → BookReader wrapper flex-1 → frame height: 100%) 가 *명시 부모 height* 에 grounded.
-//   `min-h` 만 있으면 content (= 본문 가장 긴 페이지) 따라 main 늘어남 → frame 모니터 풀까지 김 (016 사용자 보고).
-// 데스크탑 (>640px): items-center 그대로 + min-h (책 frame clamp height 가운데 정렬, content 따라 자연 늘어남).
-const MAIN_CLS = 'flex-1 w-full max-w-page mx-auto flex items-stretch justify-center sm:items-center h-[calc(100dvh-160px)] sm:h-auto sm:min-h-[calc(100vh-160px)] px-[clamp(8px,2vw,16px)]'
+// 모바일 (≤640px) = fullscreen reader 모드 (SDD 017):
+//   `fixed inset-0 z-50 bg-bg` — viewport 풀 점유 + 사이트 header/footer 가림 + z-50 으로 위 덮음.
+//   `items-stretch` + book container `max-sm:h-full` → frame chain 이 viewport (100dvh) 풀 차지.
+//   닫기 = BookHeader 안 시리즈 Link (← 작품 제목 클릭).
+// 데스크탑 (>640px): 기존 인라인 페이지 (sm:items-center + min-h + px) 그대로 — 영향 0.
+const MAIN_CLS = 'flex-1 w-full max-w-page mx-auto flex items-center justify-center min-h-[calc(100vh-160px)] px-[clamp(8px,2vw,16px)] max-sm:fixed max-sm:inset-0 max-sm:z-50 max-sm:bg-bg max-sm:max-w-none max-sm:m-0 max-sm:p-0 max-sm:min-h-0 max-sm:items-stretch'
