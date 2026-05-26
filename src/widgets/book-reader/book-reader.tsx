@@ -7,6 +7,7 @@ import {
   type TouchEvent as ReactTouchEvent,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -137,6 +138,10 @@ export function BookReader({
     if (!frame) return
     // scrollWidth / clientWidth 가 정확히 정수 아닐 수 있음 (브라우저 sub-pixel 반올림 / 마지막 group partial).
     // `Math.ceil` = 마지막 partial group 도 1 spread 로 카운트 (End 버튼이 마지막 콘텐츠 닿게).
+    // CSS variable `--page-w` = frame 의 clientWidth (scrollbar 제외 영역).
+    // 모바일 selector 에서 flex item width 를 100vw 대신 var(--page-w) 로 → scrollbar 너비만큼 viewport 초과해
+    // 우측 잘리는 버그 (014) 해소. 데스크탑은 CSS columns 라 영향 X.
+    frame.style.setProperty('--page-w', `${frame.clientWidth}px`)
     const total = Math.max(1, Math.ceil(frame.scrollWidth / frame.clientWidth))
     const cur = Math.min(Math.max(0, Math.round(frame.scrollLeft / frame.clientWidth)), total - 1)
     setTotalPages(total)
@@ -150,7 +155,11 @@ export function BookReader({
     }
   }, [])
 
-  useEffect(() => {
+  // useLayoutEffect = paint 전 동기 실행. measure() 가 첫 paint 전에 `--page-w` 설정 →
+  // 모바일 flex item width 가 첫 페인트부터 정확한 frame.clientWidth (scrollbar/부모 container 차감 포함).
+  // 이전 useEffect 는 paint 후 실행이라 첫 페인트 = fallback `100vw` (= viewport 너비, 부모 container 너비 초과) →
+  // 우측 잘림 (014 회귀). Vite SPA = SSR 없음 → useLayoutEffect warning 무관.
+  useLayoutEffect(() => {
     measure()
     const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure)
     if (frameRef.current) ro?.observe(frameRef.current)
@@ -298,7 +307,7 @@ export function BookReader({
   return (
     // section + aria-label = 자동 region landmark (role="region" 명시 불필요).
     // 페이지 네비 = 키보드 (←/→/Home/End/PageUp/PageDown) + 터치 swipe + 마우스 drag — 화살표 버튼 X (시각 노이즈 제거).
-    <section className={cn('relative', className)}
+    <section className={cn('relative max-sm:flex-1 max-sm:min-h-0 max-sm:flex max-sm:flex-col', className)}
              aria-label="챕터 본문 (책 형태)"
              tabIndex={0} onKeyDown={onKey}
              onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
@@ -306,7 +315,7 @@ export function BookReader({
              {...rest as HTMLAttributes<HTMLElement>}>
       <div
         ref={frameRef}
-        className="book-frame"
+        className="book-frame max-sm:flex-1 max-sm:min-h-0"
         style={BOOK_FRAME_STYLE}
         aria-live="polite"
       >
