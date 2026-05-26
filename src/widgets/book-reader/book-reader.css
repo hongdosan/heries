@@ -64,11 +64,13 @@
     column-count: 1 !important;
   }
 
-  /* 분할 완료 단계 (mobilePages 있음) — flex row pagination. iOS Safari column-fill: auto 미지원 우회 (020). */
+  /* 분할 완료 단계 (mobilePages 있음) — flex row pagination. iOS Safari column-fill: auto 미지원 우회 (020).
+     scroll-snap-type: none — proximity 도 smooth scroll 중 jitter 잔존 사용자 보고 (023).
+     drag/swipe 후 명시 goToPage 가 페이지 정렬 보장 → snap 불필요. */
   .book-frame.book-frame-paged {
     overflow-x: auto !important;
     overflow-y: hidden !important;
-    scroll-snap-type: x mandatory;
+    scroll-snap-type: none;
   }
 
   .book-content-paged {
