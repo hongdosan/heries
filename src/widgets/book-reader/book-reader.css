@@ -40,64 +40,29 @@
    해결 = 모바일에서는 column 폐기 + 직계 자식 (cover / section-cover / section-body / book-end-cta)
    을 flex row 100vw 강제. JS scrollLeft pagination 그대로 작동. 본 페이지 안 본문은 세로 스크롤. */
 @media (max-width: 640px) {
-  /* frame = 모바일 viewport 풀 사용 (85dvh). 데스크탑처럼 frame 안에 페이지 N 개 가로 정렬 → JS scrollLeft 페이지 전환.
-     이전 (012~014) `height: auto + min-height: 100vh + overflow: visible` 패턴은 *각 페이지가 본문 길이만큼 늘어남*
-     → 페이지마다 height 다름 + scroll-snap mandatory 와 충돌 → 페이지 전환 시 흔들림 (015 사용자 보고).
-     해결 = frame height fixed (85dvh) + 자식 height: 100% + 페이지 안 본문 세로 스크롤 (overflow-y: auto). */
-  /* frame height = 부모 (BookReader root section, chapter container) 가 flex-1 로 결정한 가용 영역.
-     `height: 100%` + `max-sm:flex-1 max-sm:min-h-0` (Tailwind utility) 조합 →
-     chapter MAIN_CLS `items-stretch` + book container `max-sm:flex-col` + BookReader wrapper `flex-1` →
-     frame = viewport 안 사이트 header/footer + book header + progress bar 빼고 남는 영역 자동 fill. */
+  /* 모바일 = 데스크탑 CSS columns 패턴 그대로 + `column-count: 1` (모바일 = 1 column = 1 page).
+     이전 (011~016) flex 패턴은 페이지 안 본문 길이 초과 시 *세로 드래그* 발생 — 사용자 의도 = *자동 페이지 분할*.
+     017 fullscreen reader 안에서 frame height fixed (viewport 풀) → `column-fill: auto` 가 자식 height 초과 시
+     *자동 다음 column 생성* → JS scrollLeft 페이지 전환. iOS Safari 17+ column-fill: auto 지원.
+     데스크탑과 다른 점 = `column-count: 1` (한 page 모드, 데스크탑은 2 spread).
+     spine `::before` (가운데 세로선) = 모바일 1 column 이라 의미 없음 → 숨김. */
   .book-frame {
     height: 100% !important;
     max-height: none !important;
     min-height: 0 !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    /* mandatory → proximity — 흔들림 완화 (mandatory 는 미세 swipe 도 강제 snap → jitter). */
-    scroll-snap-type: x proximity;
+    overflow: hidden !important;
     -webkit-overflow-scrolling: touch;
   }
   .book-frame::before {
     display: none;
   }
-  /* width: max-content (011) 제거 — flex parent intrinsic width 자동 = flex items 합.
-     이전 max-content 가 자식 <p> 의 한국어 line wrap 을 부모에 전파 → flex item width: 100vw 무시되고
-     line 이 viewport 초과 → 우측 텍스트 잘림 (013). */
   .book-content {
-    column-count: unset !important;
-    column-width: unset !important;
-    column-fill: unset !important;
-    display: flex !important;
-    flex-direction: row !important;
-    width: auto !important;
-    height: 100% !important;
-    align-items: stretch !important;
+    /* 데스크탑 BOOK_CONTENT_STYLE inline `column-count: 2 + column-gap: 0 + column-fill: auto + height: 100%` 그대로 두고
+       column-count 만 override. column-fill: auto + column-gap: 0 + height: 100% 는 inline 으로 적용됨. */
+    column-count: 1 !important;
   }
-  /* width = JS measure 가 frame.style 에 set 한 `--page-w` (= frame.clientWidth, scrollbar 제외).
-     이전 100vw 는 데스크탑 좁힘·일부 모바일 브라우저에서 *vertical scrollbar 너비 포함* → flex item 이
-     viewport content area 초과 → 우측 텍스트 잘림 (014). fallback 100% = .book-frame { --page-w: 100% }. */
-  .book-content > * {
-    flex: 0 0 var(--page-w, 100%) !important;
-    width: var(--page-w, 100%) !important;
-    max-width: var(--page-w, 100%) !important;
-    height: 100% !important;
-    min-height: 0 !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    box-sizing: border-box !important;
-    scroll-snap-align: start !important;
-    break-after: unset !important;
-    break-before: unset !important;
-  }
-  /* 한국어 line wrap 강제 — overflow-wrap: break-word 로 긴 단어/구두점도 viewport 안에서 break. */
-  .book-content > * > *,
-  .section-body > * {
-    box-sizing: border-box !important;
-    overflow-wrap: break-word !important;
-    word-break: keep-all;
-    max-width: 100% !important;
-  }
+  /* `.section-body > *`, `.book-cover`, `.section-cover`, `.book-end-cta` 의 break-* / padding-inline 등은
+     기본 (상단 통합 selector) 그대로 적용 — column flow 자동. */
 }
 
 /* column-gap 0 패턴 — book-content 의 직계 자식 중 *section-body 의 자식* (p / blockquote 등) 에만 padding-inline + break-inside.
