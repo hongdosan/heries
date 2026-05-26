@@ -418,7 +418,10 @@ export function BookReader({
         aria-live="polite"
       >
         {isMobile && mobilePages ? (
+          // key="paged" 강제 — React 가 dangerouslySetInnerHTML div 와 chunks div 를 동일 element 로 diff 시
+          // innerHTML 이 잔존 + chunks children 이 mount 안 되는 버그 회피 (021 후속 022).
           <div
+            key="paged"
             ref={contentRef}
             className={cn('book-content book-content-paged article-prose', BOOK_FONT_FAMILY_CLASS[fontFamily])}
             style={{...FONT_SIZE_TOKENS[fontSize]}}
@@ -429,6 +432,7 @@ export function BookReader({
           </div>
         ) : (
           <div
+            key="single"
             ref={contentRef}
             className={cn('book-content article-prose', BOOK_FONT_FAMILY_CLASS[fontFamily])}
             style={{...BOOK_CONTENT_STYLE, ...FONT_SIZE_TOKENS[fontSize]}}
