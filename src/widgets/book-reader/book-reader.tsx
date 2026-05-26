@@ -161,11 +161,16 @@ export function BookReader({
   // 우측 잘림 (014 회귀). Vite SPA = SSR 없음 → useLayoutEffect warning 무관.
   useLayoutEffect(() => {
     measure()
+    // 모바일 (iOS Safari) layout timing 대비 — useLayoutEffect 시점 flex chain layout 미완료 케이스.
+    // 다음 frame 에서 재측정. 사용자 보고 — 글자크기 변경 시 1/1 → N/N 으로 정상화 = mount 직후 첫
+    // measure() 만 1/1 측정 + dep 변경 (fontSize) 시 재측정으로 N/N. raf 로 자동 재측정 (026).
+    const raf = requestAnimationFrame(measure)
     const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure)
     if (frameRef.current) ro?.observe(frameRef.current)
     if (contentRef.current) ro?.observe(contentRef.current)
     globalThis.addEventListener('resize', measure)
     return () => {
+      cancelAnimationFrame(raf)
       ro?.disconnect()
       globalThis.removeEventListener('resize', measure)
     }
