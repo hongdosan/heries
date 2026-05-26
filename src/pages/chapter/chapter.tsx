@@ -197,7 +197,7 @@ export function ChapterPage() {
   return (
     <main className={MAIN_CLS}>
       <div
-        className="w-full max-w-500 mx-auto border border-rule rounded-lg overflow-hidden bg-surface shadow-soft max-sm:flex max-sm:flex-col max-sm:max-w-none max-sm:h-full max-sm:min-h-[600px] max-sm:rounded-none max-sm:border-0 max-sm:shadow-none">
+        className="w-full max-w-500 mx-auto border border-rule rounded-lg overflow-hidden bg-surface shadow-soft max-sm:flex max-sm:flex-col max-sm:max-w-none max-sm:h-full max-sm:rounded-none max-sm:border-0 max-sm:shadow-none">
         <BookHeader
           seriesTitle={manifest.title}
           seriesSlug={slug}
@@ -211,8 +211,7 @@ export function ChapterPage() {
           onCycleFontFamily={cycleFontFamily}
         />
 
-        <div className="relative max-sm:flex-1 max-sm:min-h-0 max-sm:flex max-sm:flex-col"
-             onClick={onContentClick}>
+        <div className="relative max-sm:flex-1 max-sm:min-h-0 max-sm:flex max-sm:flex-col" onClick={onContentClick}>
           <BookReader
             bodyHtml={fullBodyHtml}
             onSectionsChange={setSections}
@@ -295,6 +294,4 @@ export function ChapterPage() {
 //   `items-stretch` + book container `max-sm:h-full` → frame chain 이 viewport (100dvh) 풀 차지.
 //   닫기 = BookHeader 안 시리즈 Link (← 작품 제목 클릭).
 // 데스크탑 (>640px): 기존 인라인 페이지 (sm:items-center + min-h + px) 그대로 — 영향 0.
-// 모바일 fullscreen reader 안에 `max-sm:overflow-y-auto` — viewport 너무 작아지면 (book container min-h 초과 시)
-// fixed container 안 세로 스크롤 fallback. 자식 겹침 방지 (019).
-const MAIN_CLS = 'flex-1 w-full max-w-page mx-auto flex items-center justify-center min-h-[calc(100vh-160px)] px-[clamp(8px,2vw,16px)] max-sm:fixed max-sm:inset-0 max-sm:z-50 max-sm:bg-bg max-sm:max-w-none max-sm:m-0 max-sm:p-0 max-sm:min-h-0 max-sm:items-stretch max-sm:overflow-y-auto'
+const MAIN_CLS = 'flex-1 w-full max-w-page mx-auto flex items-center justify-center min-h-[calc(100vh-160px)] px-[clamp(8px,2vw,16px)] max-sm:fixed max-sm:inset-0 max-sm:z-50 max-sm:bg-bg max-sm:max-w-none max-sm:m-0 max-sm:p-0 max-sm:min-h-0 max-sm:items-stretch'
